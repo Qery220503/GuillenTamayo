@@ -1,0 +1,7 @@
+.txt-number input[type='number'] {
+    -moz-appearance:textfield;
+}
+.txt-number input::-webkit-outer-spin-button,
+.txt-number input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}

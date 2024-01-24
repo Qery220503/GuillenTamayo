@@ -1,0 +1,11 @@
+// Vuetify Library Variables
+@import './vuetify/variables';
+
+// Custom Vuetify Style Overrides
+@import './vuetify/overrides.scss';
+
+@import '~sweetalert2/src/variables';
+
+$swal2-font: "Poppins", sans-serif !important;
+
+@import '~sweetalert2/src/sweetalert2';
