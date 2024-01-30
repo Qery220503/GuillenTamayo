@@ -23,6 +23,10 @@ const PATHS = {
     SET: "api/permissions/",
     ASSING_PERMISSION: "api/permissions/assignPermissionsToRole/",
   },
+  cuadre: {
+    ROOT: "api/caja-cuadre",
+    SET: "api/caja-cuadre/",
+  },
   producto_marca: {
     ROOT: "api/marca",
     SET: "api/marca/",
@@ -114,7 +118,7 @@ const PATHS = {
     ROOT: "api/servicios",
     SET: "api/servicios/",
     COMBO: "api/combo/servicios/",
-    DOCUMENTOS: "api/combo/series/"
+    DOCUMENTOS: "api/combo/series/",
   },
   ubigeo: {
     DEPARTAMENTOS: "api/combo/departamentos",
@@ -233,20 +237,20 @@ const PATHS = {
     DEUDAS_PENDIENTES: "api/reportes/deudas-pendientes",
   },
 
-    cuentas_cobrar: {
-        ROOT: "api/cuentas-cobrar",
-    },
-    cuentas_pagar: {
-        ROOT: "api/cuentas-pagar",
-    },
-    cupones: {
-        ROOT: "api/cupones",
-        VERIFY: "api/cupones/verificar/"
-    },
+  cuentas_cobrar: {
+    ROOT: "api/cuentas-cobrar",
+  },
+  cuentas_pagar: {
+    ROOT: "api/cuentas-pagar",
+  },
+  cupones: {
+    ROOT: "api/cupones",
+    VERIFY: "api/cupones/verificar/",
+  },
 
   eps: {
-    ROOT: "api/eps"
-  }
+    ROOT: "api/eps",
+  },
 };
 
 export default PATHS;

@@ -18,4 +18,12 @@ class Caja extends Model
     ];
     public $timestamps = true;
 
+    public function compPagos()
+    {
+        return $this->hasMany(ComprobantePago::class, 'id_caja');
+    }
+    public function egresos()
+    {
+        return $this->hasMany(Egresos::class, 'id_caja');
+    }
 }

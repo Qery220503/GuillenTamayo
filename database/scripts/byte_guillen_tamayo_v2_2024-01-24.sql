@@ -394,7 +394,36 @@ CREATE TABLE `compras` (
 
 LOCK TABLES `compras` WRITE;
 /*!40000 ALTER TABLE `compras` DISABLE KEYS */;
-INSERT INTO `compras` VALUES (1,2,3,2,1,1,'PROVEEDOR 1','12345678912','F0124324',5,1,'2023-09-29',750.00,635.59,114.41,'',3,'cuotas',0.00,750.00,'2023-11-30',1,'AV. AREQUIPA 123','2023-09-29 16:20:26','2023-09-29 16:20:26'),(2,2,3,2,1,1,'PROVEEDOR 1','12345678912','F0012345',5,2,'2023-10-19',1200.00,1016.95,183.05,'',1,'total',0.00,0.00,'2023-12-30',1,'AV. AREQUIPA 123','2023-10-20 02:08:50','2023-10-20 02:08:50');
+INSERT INTO `compras`(
+`user_id_update`,
+  `user_id`,
+  `id_proveedor`,
+  `id_sucursal`,
+  `id_origen_dinero`,
+  `id_medio_pago`,
+  `nombre_proveedor`,
+  `nro_documento`,
+  `guia_factura`,
+  `id_serie`,
+  `correlativo`,
+  `fecha`,
+  `total`,
+  `subtotal`,
+  `igv`,
+  `referencia`,
+  `observaciones`,
+  `condicion_pago`,
+  `deuda_tipo`,
+  `deuda_total_abonado`,
+  `deuda_saldo`,
+  `fecha_vencimiento`,
+  `estado`,
+  `direccion_proveedor`,
+  `created_at`,
+  `updated_at`
+) VALUES 
+(1,1,2,3,2,1,1,'PROVEEDOR 1','12345678912','F0124324',5,1,'2023-09-29',750.00,635.59,114.41,'',3,'cuotas',0.00,750.00,'2023-11-30',1,'AV. AREQUIPA 123','2023-09-29 16:20:26','2023-09-29 16:20:26'),
+(2,2,2,3,2,1,1,'PROVEEDOR 1','12345678912','F0012345',5,2,'2023-10-19',1200.00,1016.95,183.05,'',1,'total',0.00,0.00,'2023-12-30',1,'AV. AREQUIPA 123','2023-10-20 02:08:50','2023-10-20 02:08:50');
 /*!40000 ALTER TABLE `compras` ENABLE KEYS */;
 UNLOCK TABLES;
 

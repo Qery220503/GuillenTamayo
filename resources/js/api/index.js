@@ -83,6 +83,17 @@ const API = {
       });
     },
   },
+  cuadre: {
+    list(queryParam) {
+      return callAPI("get", PATHS.cuadre.ROOT + queryParam);
+    },
+    create(data) {
+      return callAPI("post", PATHS.cuadre.ROOT, { data: data });
+    },
+    remove(id, params) {
+      return callAPI("delete", PATHS.cuadre.SET + id + params);
+    },
+  },
   producto_marca: {
     list(queryParam) {
       return callAPI("get", PATHS.producto_marca.ROOT + queryParam);

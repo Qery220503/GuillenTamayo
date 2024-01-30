@@ -71,6 +71,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('cupones', CuponesController::class);
     // Route::apiResource('cuentas-cobrar', CuentasCobrarController::class);
     Route::apiResource('cuentas-pagar', CuentasPagarController::class);
+    Route::apiResource('caja-cuadre', CajaCuadreController::class);
 
     Route::get('getDashboardInfo', [DashboardController::class, 'getDashboardInfo']);
 
