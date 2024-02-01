@@ -11,6 +11,7 @@ use App\Models\ComprobanteDetalle;
 use App\Models\Caja;
 use App\Models\ComprobanteSerie;
 use App\Models\AlmacenMovimiento;
+use App\Models\AnamnesisEstadosHistorico;
 use App\Models\ComprobanteDeuda;
 use App\Models\ConformidadMontura;
 use App\Services\ComprobanteService;
@@ -37,6 +38,12 @@ class AnamnesisController extends Controller
   {
     $auth = auth('sanctum')->user();
     try {
+      AnamnesisEstadosHistorico::create([
+        'user_id'=>$auth->id,
+        'fecha'=>date('Y-m-d H:i:s'),
+        'estado'=>'anamnesis_creada'
+      ]);
+
       $data = $request->anamnesis;
       if (!array_key_exists('id_cliente', $request->cliente) || $request->cliente["id_cliente"] == "") {
         $_cliente = $request->cliente;
@@ -53,6 +60,14 @@ class AnamnesisController extends Controller
       $data['id_sucursal'] = $auth->id_sucursal;
       $data['id_cliente'] = $cliente->id_cliente;
       $anamnesis = Anamnesis::create(collect($data)->all());
+
+      AnamnesisEstadosHistorico::create([
+        'user_id'=>$auth->id,
+        'anamnesis_id'=>$anamnesis->id_anamnesis,
+        'fecha'=>date('Y-m-d H:i:s'),
+        'estado'=>'anamnesis_paso_1'
+      ]);
+
       return response()->json([
         'cliente' => $cliente,
         'anamnesis' => $anamnesis
@@ -77,6 +92,15 @@ class AnamnesisController extends Controller
         'id_estado' => 1,
         'id_usuario' => $auth->id,
       ]);
+
+      AnamnesisEstadosHistorico::create([
+        'user_id'=>$auth->id,
+        'anamnesis_id'=>$orden_lab->id_anamnesis,
+        'fecha'=>date('Y-m-d H:i:s'),
+        'estado'=>'anamnesis_paso_2'
+      ]);
+
+
       return response()->json([
         'orden_laboratorio' => $orden_lab,
       ], 200);
@@ -200,6 +224,19 @@ class AnamnesisController extends Controller
         }
 
         DB::commit();
+        AnamnesisEstadosHistorico::create([
+          'user_id'=>$auth->id,
+          'anamnesis_id'=>$request->id_anamnesis,
+          'fecha'=>date('Y-m-d H:i:s'),
+          'estado'=>'anamnesis_paso_3'
+        ]);
+
+        AnamnesisEstadosHistorico::create([
+          'user_id'=>$auth->id,
+          'anamnesis_id'=>$request->id_anamnesis,
+          'fecha'=>date('Y-m-d H:i:s'),
+          'estado'=>'anamnesis_cerrada'
+        ]);
         return response()->json([
           'success' => true,
           'comprobante' => (isset($clientDocument)) ? $clientDocument : $epsInvoice,
@@ -255,6 +292,19 @@ class AnamnesisController extends Controller
         $facturacion_data = ComprobanteService::facturar($comprobante->id_comprobante);
         DB::commit();
 
+        AnamnesisEstadosHistorico::create([
+          'user_id'=>$auth->id,
+          'anamnesis_id'=>$request->id_anamnesis,
+          'fecha'=>date('Y-m-d H:i:s'),
+          'estado'=>'anamnesis_paso_3'
+        ]);
+
+        AnamnesisEstadosHistorico::create([
+          'user_id'=>$auth->id,
+          'anamnesis_id'=>$request->id_anamnesis,
+          'fecha'=>date('Y-m-d H:i:s'),
+          'estado'=>'anamnesis_cerrada'
+        ]);
 
         //Mandamos correo de multifocal si corresponde
         // if ($orden->receta['recipe_selection'] == 'recipe' && $orden->receta['recipe']['selection'] == 'multifocal') {

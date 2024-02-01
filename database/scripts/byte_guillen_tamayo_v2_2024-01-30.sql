@@ -4693,7 +4693,9 @@ CREATE TABLE `anamnesis_estados_historico` (
     `anamnesis_id` int UNSIGNED,
     `user_id` bigint UNSIGNED NOT NULL,
     `fecha` DATE,
-    `estado` VARCHAR(255)
+    `estado` VARCHAR(255),
+    `created_at` timestamp NULL DEFAULT NULL,
+    `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 -- ---
 
