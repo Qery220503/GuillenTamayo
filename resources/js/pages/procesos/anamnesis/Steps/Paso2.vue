@@ -1,8 +1,8 @@
 <template>
-  <div class="overflow-y-auto pa-2" style="overflow-x: hidden !important;">
+  <div class="overflow-y-auto pa-2" style="overflow-x: hidden !important">
     <h2>Datos de montura & lentes</h2>
     <v-row class="mt-2">
-      <v-col class="py-2 px-1" cols="12" md="6">
+      <v-col class="py-2 px-1" cols="12" md="5">
         <v-autocomplete
           return-object
           v-model="$form.montura"
@@ -13,13 +13,96 @@
           label="Buscar Montura"
         ></v-autocomplete>
       </v-col>
-      <v-col class="py-2 px-1" cols="12" md="6">
-        <v-text-field
-          filled
-          dense
-          label="Montura Cliente"
-          v-model="$form.montura_cliente"
-        ></v-text-field>
+      <v-col class="py-2 px-1" cols="12" md="7">
+        <v-row>
+          <v-col cols="12" md="7"
+            ><v-text-field
+              filled
+              dense
+              label="Montura Cliente"
+              v-model="$form.montura_cliente"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" md="4" class="d-flex items-center px-1">
+            <!-- Conformidad de montura dialog -->
+            <v-dialog v-model="dialog" width="800">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  color="primary"
+                  :disabled="$form.montura_cliente.length === 0"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  <v-icon dark> mdi-format-list-bulleted-square </v-icon>
+                  Conformidad de montura</v-btn
+                >
+              </template>
+
+              <v-card>
+                <v-card-title class="text-h5 lighten-2">
+                  Establecer conformidad de montura
+                </v-card-title>
+
+                <v-card-text>
+                  <v-row>
+                    <question
+                      label="Calidad del armazon"
+                      @changeValue="
+                        (value) => setDialogAnswers('q1', 'val', value)
+                      "
+                      @changeObservations="
+                        (value) => setDialogAnswers('q1', 'obs', value)
+                      "
+                    />
+                    <question
+                      label="Estado de las varillas"
+                      @changeValue="
+                        (value) => setDialogAnswers('q2', 'val', value)
+                      "
+                      @changeObservations="
+                        (value) => setDialogAnswers('q2', 'obs', value)
+                      "
+                    />
+                    <question
+                      label="Estado de partes moviles"
+                      @changeValue="
+                        (value) => setDialogAnswers('q3', 'val', value)
+                      "
+                      @changeObservations="
+                        (value) => setDialogAnswers('q3', 'obs', value)
+                      "
+                    />
+                    <question
+                      label="Estado de pintado"
+                      @changeValue="
+                        (value) => setDialogAnswers('q4', 'val', value)
+                      "
+                      @changeObservations="
+                        (value) => setDialogAnswers('q4', 'obs', value)
+                      "
+                    />
+                    <v-divider />
+                    <v-textarea
+                      v-model="dialogObs"
+                      outlined
+                      label="Observaciones"
+                      class="px-2"
+                      rows="2"
+                    />
+                  </v-row>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="secondary" text @click="dialog = false">
+                    Cancelar
+                  </v-btn>
+                  <v-btn color="primary" @click="saveDialog"> Guardar </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
     <v-divider class="my-4"></v-divider>
@@ -170,121 +253,6 @@
     <v-divider class="my-4"></v-divider>
     <!--<h5>Lensometría</h5>-->
     <!--Antecedentes-->
-    <!--
-    <v-row class="mt-1">
-      <v-col class="py-2 px-1" cols="12" md="6">
-        <v-simple-table>
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th class="text-left"></th>
-                <th class="text-left">
-                  <strong>ESF</strong>
-                </th>
-                <th class="text-left">
-                  <strong>CYL</strong>
-                </th>
-                <th class="text-left">
-                  <strong>EJE</strong>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>O.D</strong></td>
-                <td>
-                  <v-text-field
-                    hide-details
-                    outlined
-                    dense
-                    filled
-                    v-model="$form.lensometria.od.esfera"
-                  ></v-text-field>
-                </td>
-                <td>
-                  <v-text-field
-                    hide-details
-                    outlined
-                    dense
-                    filled
-                    v-model="$form.lensometria.od.cilindro"
-                  ></v-text-field>
-                </td>
-                <td>
-                  <v-text-field
-                    hide-details
-                    outlined
-                    dense
-                    filled
-                    v-model="$form.lensometria.od.eje"
-                  ></v-text-field>
-                </td>
-              </tr>
-              <tr>
-                <td><strong>O.I</strong></td>
-                <td>
-                  <v-text-field
-                    hide-details
-                    outlined
-                    dense
-                    filled
-                    v-model="$form.lensometria.oi.esfera"
-                  ></v-text-field>
-                </td>
-                <td>
-                  <v-text-field
-                    hide-details
-                    outlined
-                    dense
-                    filled
-                    v-model="$form.lensometria.oi.cilindro"
-                  ></v-text-field>
-                </td>
-                <td>
-                  <v-text-field
-                    hide-details
-                    outlined
-                    dense
-                    filled
-                    v-model="$form.lensometria.oi.eje"
-                  ></v-text-field>
-                </td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-      </v-col>
-      <v-col class="d-flex align-center">
-        <v-text-field
-          hide-details
-          outlined
-          dense
-          filled
-          class="mr-1"
-          label="Ángulo panorámico"
-          v-model="$form.angulo.panoramico"
-        ></v-text-field>
-        <v-text-field
-          hide-details
-          outlined
-          dense
-          filled
-          class="mr-1"
-          label="Ángulo pantoscópico"
-          v-model="$form.angulo.pantoscopico"
-        ></v-text-field>
-        <v-text-field
-          hide-details
-          outlined
-          dense
-          filled
-          label="Distancia Vértice"
-          v-model="$form.angulo.vertice"
-        ></v-text-field>
-      </v-col>
-    </v-row>
-    -->
-    <!--<v-divider class="my-4"></v-divider>-->
     <div class="d-flex">
       <h3>Receta</h3>
       <v-spacer></v-spacer>
@@ -304,7 +272,7 @@
     <!--Antecedentes-->
 
     <!-- Componente de medidas -->
-    <br>
+    <br />
     <MeasuresComponent :recipes="$form.receta"></MeasuresComponent>
 
     <v-divider class="my-4"></v-divider>
@@ -387,47 +355,51 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn color="error" text @click="cancel()">Cancelar</v-btn>
-      <v-btn color="primary" @click="send()">
-        Guardar
-      </v-btn>
+      <v-btn color="primary" @click="send()"> Guardar </v-btn>
     </v-card-actions>
     <HistorialDialog />
   </div>
 </template>
 <script>
-import MeasuresComponent from "../../../../components/measures/MeasuresComponent.vue";
+import axios from "axios";
 import moment from "moment";
 import API from "../../../../api";
+import MeasuresComponent from "../../../../components/measures/MeasuresComponent.vue";
 import HistorialDialog from "../components/HistorialDialog";
+import Question from "../components/Question.vue";
 export default {
   props: {
     form: {
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     id_cliente: {
       type: Number,
-      default: 0
+      default: 0,
     },
     send: {
-      type: Function
+      type: Function,
     },
     cancel: {
-      type: Function
-    }
+      type: Function,
+    },
+    anamnesis: {
+      type: Object,
+    },
   },
   components: {
     HistorialDialog,
     MeasuresComponent,
+    Question,
   },
-  data: vm => ({
-    requiredRules: [v => !!v || "Campo obligatorio"],
+  data: (vm) => ({
+    requiredRules: [(v) => !!v || "Campo obligatorio"],
     rules: {
       required: UTILS.nRules.required,
       dni: UTILS.nRules.min8,
       ruc: UTILS.nRules.min811,
       only_numbers: UTILS.nRules.only_numbers,
-      email: UTILS.nRules.email
+      email: UTILS.nRules.email,
     },
     validAddForm: false,
     items_monturas: [],
@@ -435,7 +407,7 @@ export default {
     items_tipo_monturas: [
       { text: "Aro Completo", value: "Aro Completo" },
       { text: "Semi al aire", value: "Semi al aire" },
-      { text: "Al aire", value: "Al aire" }
+      { text: "Al aire", value: "Al aire" },
     ],
     items_montaje: [
       { text: "Bisell Brillante", value: "Bisell Brillante" },
@@ -443,8 +415,8 @@ export default {
       { text: "Pase de lunas", value: "Pase de lunas" },
       {
         text: "Reducción de diametro",
-        value: "Reducción de diametro"
-      }
+        value: "Reducción de diametro",
+      },
     ],
     items_disenio: [],
     items_fabricacion: [],
@@ -469,7 +441,16 @@ export default {
       new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
         .toISOString()
         .substr(0, 10)
-    )
+    ),
+    dialog: false,
+    row: null,
+    dialogAnswers: {
+      q1: { val: null, obs: "" },
+      q2: { val: null, obs: "" },
+      q3: { val: null, obs: "" },
+      q4: { val: null, obs: "" },
+    },
+    dialogObs: "",
   }),
   computed: {
     $form: {
@@ -478,8 +459,8 @@ export default {
       },
       set(value) {
         props.set(this, "$form", value);
-      }
-    }
+      },
+    },
   },
   created() {
     let vm = this;
@@ -492,31 +473,31 @@ export default {
       this.getFabricacion(value);
     },
     "$form.lente.fabricacion"(value) {
-      if(value == null || value == "") return;
+      if (value == null || value == "") return;
       this.getMaterial(value);
     },
     "$form.lente.material"(value) {
-      if(value == null || value == "") return;
+      if (value == null || value == "") return;
       this.getSerie(value);
     },
     "$form.lente.serie"(value) {
-      if(value == null || value == "") return;
+      if (value == null || value == "") return;
       this.getTratamiento(value);
     },
     "$form.lente.tratamiento"(value) {
-      if(value == null || value == "") return;
+      if (value == null || value == "") return;
       this.getNombre(value);
     },
     "$form.lente.nombre"(value) {
-      if(value == null || value == "") return;
+      if (value == null || value == "") return;
       this.getFotocromatica(value);
     },
     "$form.lente.fotocromatico"(value) {
-      if(value == null || value == "") return;
+      if (value == null || value == "") return;
       this.getColor(value);
     },
     "$form.lente.color_fotocromatico"(value) {
-      if(value == null || value == ""){
+      if (value == null || value == "") {
         this.$emit("formReset", true);
         return;
       }
@@ -524,14 +505,13 @@ export default {
     },
     "$form.fecha_entrega"(val) {
       this.dateFormatted = this.formatDate(this.$form.fecha_entrega);
-    }
+    },
   },
   mounted() {
     let vm = this;
-    vm.$root.$on("seleccionar_receta", data => {
+    vm.$root.$on("seleccionar_receta", (data) => {
       vm.$form.receta = data.receta;
     });
-
   },
   methods: {
     formatDate(date) {
@@ -552,13 +532,13 @@ export default {
       try {
         let response = await API.productos.combo();
         //vm.items_monturas = response.data
-        vm.items_monturas = response.data.map(element => ({
+        vm.items_monturas = response.data.map((element) => ({
           description: `[${element.codigo_producto}] ${element.nombre_producto}`,
           codigo_producto: element.codigo_producto,
           id_producto: element.id_producto,
           nombre_producto: element.nombre_producto,
           precio_compra: element.precio_compra || null,
-          precio_venta: element.precio_venta || null
+          precio_venta: element.precio_venta || null,
         }));
         vm.$form.productos = vm.items_monturas;
       } catch (e) {
@@ -580,7 +560,7 @@ export default {
       return this.availableDates.includes(a);
     },
 
-    pickerUpdate: function(val) {
+    pickerUpdate: function (val) {
       let totalDay = moment(val, "YYYY-MM").daysInMonth();
       let availableDates = [];
 
@@ -613,9 +593,8 @@ export default {
     async getFabricacion(value) {
       const vm = this;
       try {
-
         const response = await API.precioslentes.fabricacion({
-          disenio: vm.$form.lente.disenio
+          disenio: vm.$form.lente.disenio,
         });
         vm.items_fabricacion = response.data;
 
@@ -630,10 +609,9 @@ export default {
     async getMaterial(value) {
       const vm = this;
       try {
-
         const response = await API.precioslentes.material({
           disenio: vm.$form.lente.disenio,
-          fabricacion: vm.$form.lente.fabricacion
+          fabricacion: vm.$form.lente.fabricacion,
         });
         vm.items_material = response.data;
 
@@ -648,12 +626,10 @@ export default {
     async getSerie(value) {
       const vm = this;
       try {
-
-
         const response = await API.precioslentes.serie({
           disenio: vm.$form.lente.disenio,
           fabricacion: vm.$form.lente.fabricacion,
-          material: vm.$form.lente.material
+          material: vm.$form.lente.material,
         });
         vm.items_serie = response.data;
 
@@ -668,12 +644,11 @@ export default {
     async getTratamiento(value) {
       const vm = this;
       try {
-
         const response = await API.precioslentes.tratamiento({
           disenio: vm.$form.lente.disenio,
           fabricacion: vm.$form.lente.fabricacion,
           material: vm.$form.lente.material,
-          serie: vm.$form.lente.serie
+          serie: vm.$form.lente.serie,
         });
         vm.items_tratamiento = response.data;
 
@@ -688,14 +663,12 @@ export default {
     async getNombre(value) {
       const vm = this;
       try {
-
-
         const response = await API.precioslentes.nombre({
           disenio: vm.$form.lente.disenio,
           fabricacion: vm.$form.lente.fabricacion,
           material: vm.$form.lente.material,
           serie: vm.$form.lente.serie,
-          tratamiento: vm.$form.lente.tratamiento
+          tratamiento: vm.$form.lente.tratamiento,
         });
         vm.items_nombre = response.data;
 
@@ -710,14 +683,13 @@ export default {
     async getFotocromatica(value) {
       const vm = this;
       try {
-
         const response = await API.precioslentes.foto({
           disenio: vm.$form.lente.disenio,
           fabricacion: vm.$form.lente.fabricacion,
           material: vm.$form.lente.material,
           serie: vm.$form.lente.serie,
           tratamiento: vm.$form.lente.tratamiento,
-          nombre: vm.$form.lente.nombre
+          nombre: vm.$form.lente.nombre,
         });
         vm.items_foto = response.data;
 
@@ -732,7 +704,6 @@ export default {
     async getColor(value) {
       const vm = this;
       try {
-
         const response = await API.precioslentes.color({
           disenio: vm.$form.lente.disenio,
           fabricacion: vm.$form.lente.fabricacion,
@@ -740,7 +711,7 @@ export default {
           serie: vm.$form.lente.serie,
           tratamiento: vm.$form.lente.tratamiento,
           nombre: vm.$form.lente.nombre,
-          fotocromatico: vm.$form.lente.fotocromatico
+          fotocromatico: vm.$form.lente.fotocromatico,
         });
 
         vm.items_color = response.data;
@@ -764,9 +735,9 @@ export default {
           tratamiento: vm.$form.lente.tratamiento,
           nombre: vm.$form.lente.nombre,
           fotocromatico: vm.$form.lente.fotocromatico,
-          color_fotocromatico: vm.$form.lente.color_fotocromatico
+          color_fotocromatico: vm.$form.lente.color_fotocromatico,
         });
-        if(response.data.length == 0) return;
+        if (response.data.length == 0) return;
         vm.items_precio = response.data[0];
         vm.$form.lente.monto_compra_proyectado = vm.items_precio.precio_compra;
         vm.$form.lente.monto_compra_detallado = vm.items_precio.precio_compra;
@@ -884,7 +855,46 @@ export default {
     },
     async cancelAnamnesis() {
       const response = await API.anamnesis.descartar(this);
-    }
-  }
+    },
+
+    // openDialog() {
+    //   console.log(this.anamnesis);
+    // },
+
+    setDialogAnswers(key, subkey, value) {
+      this.dialogAnswers[key][`${subkey}`] = value;
+    },
+    async saveDialog() {
+      try {
+        const answers = {
+          p1: "Calidad del armazon",
+          p1_respuesta: this.dialogAnswers.q1,
+          p2: "Estado de las varillas",
+          p2_respuesta: this.dialogAnswers.q2,
+          p3: "Estado de partes moviles",
+          p3_respuesta: this.dialogAnswers.q3,
+          p4: "Estado de pintado",
+          p4_respuesta: this.dialogAnswers.q4,
+        };
+
+        const formData = {
+          id_anamnesis: this.anamnesis.id_anamnesis,
+          ...answers,
+          observaciones: this.dialogObs,
+        };
+        // console.log(formData);
+        const { data } = await axios.post(
+          "/api/anamnesis/conformidad_montura",
+          {
+            ...formData,
+          }
+        );
+        console.log(data);
+        this.dialog = false;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  },
 };
 </script>

@@ -88,6 +88,16 @@
               <v-icon>mdi-emoticon</v-icon>ENCUESTA
             </v-btn>
 
+            <v-btn
+              depressed
+              color="primary"
+              :href="'/conformidadMonturaPDF/' + invoice.id_orden_lab"
+              target="_blank"
+              v-if="invoice.id_orden_lab != null"
+            >
+              <v-icon>mdi-glasses</v-icon>&nbsp; CONFORMIDAD MONTURA
+            </v-btn>
+
             <!--<v-btn depressed dark color="red accent-2" v-if="invoice.external_id" @click="sendDocSunat">
                             <v-icon>mdi-close-octagon-outline</v-icon>Anular Comprobante
                         </v-btn>-->

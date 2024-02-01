@@ -93,6 +93,7 @@
                 :id_cliente="cliente.id_cliente"
                 v-on:formReset="resetStep2"
                 :cancel="cancelarAnamnesis"
+                :anamnesis="anamnesis"
               />
             </v-form>
           </v-stepper-content>
@@ -395,35 +396,6 @@ export default {
             geometry: null,
             replacement: null,
           },
-          // },
-          // contact_recipe: {
-          //   od: {
-          //     esf: null,
-          //     cyl: null,
-          //     eje: null,
-          //     k1: null,
-          //     k2: null,
-          //     cb: null,
-          //     diametro: null,
-          //     dhiv: null,
-          //     sag: null,
-          //   },
-          //   oi: {
-          //     esf: null,
-          //     cyl: null,
-          //     eje: null,
-          //     k1: null,
-          //     k2: null,
-          //     cb: null,
-          //     diametro: null,
-          //     dhiv: null,
-          //     sag: null,
-          //   },
-          //   material: null,
-          //   color: null,
-          //   geometry: null,
-          //   replacement: null,
-          // },
         },
         observaciones: "",
         fecha_entrega: "",

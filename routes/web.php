@@ -27,6 +27,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/conformidadMonturaPDF/{id}', [App\Http\Controllers\AnamnesisController::class, 'conformidadMonturaPDF']);
 Route::get('/ordenLaboratorioPDF/{id}', [App\Http\Controllers\OrdenLaboratorioController::class, 'generarPDF']);
 Route::get('/cotizacionPDf/{id}/{detalle?}', [App\Http\Controllers\CotizacionController::class, 'generarPDF']);
 Route::get('/comandaPDF/{id}', [ComprobanteController::class, 'generarComanda']);

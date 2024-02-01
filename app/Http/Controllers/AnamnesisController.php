@@ -12,6 +12,7 @@ use App\Models\Caja;
 use App\Models\ComprobanteSerie;
 use App\Models\AlmacenMovimiento;
 use App\Models\ComprobanteDeuda;
+use App\Models\ConformidadMontura;
 use App\Services\ComprobanteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,7 @@ use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Mpdf\Mpdf;
 
 class AnamnesisController extends Controller
 {
@@ -342,4 +344,42 @@ class AnamnesisController extends Controller
     }
     return $data->paginate($itemsPerPage);
   }
+
+  public function conformidadMontura(Request $request){
+    try {
+      $conformidad_montura = $request;
+      $saved=ConformidadMontura::create($conformidad_montura->all());
+      return response()->json($saved, 200);
+    } catch (Exception $e) {
+      return response()->json($e,500);
+    }
+  }
+
+  public function vistaConformidadMontura($id){
+    $orden_lab=OrdenLaboratorio::with('anamnesis','cliente','sucursal')->where('id_orden_laboratorio',$id)->get();
+    $conformidad_montura=ConformidadMontura::with('anamnesis')->where('id_anamnesis',$orden_lab[0]->id_anamnesis)->get();
+
+    $orden_lab = $orden_lab[0];
+    $conformidad_montura =$conformidad_montura[0];
+
+    return view("conformidad_montura",compact('orden_lab','conformidad_montura'));
+  }
+
+  public function conformidadMonturaPDF($id)
+    {
+        $html = $this->vistaConformidadMontura($id)->render();
+        $file = 'pdf_' . 'pdf';
+        $mpdf = new Mpdf(
+            [
+                'mode' => 'utf-8',
+                'format' => [80, 360],
+                'margin_top' => 2,
+                'margin_right' => 5,
+                'margin_bottom' => 0,
+                'margin_left' => 5
+            ]
+        );
+        $mpdf->WriteHTML($html);
+        $mpdf->Output($file, 'I');
+    }
 }

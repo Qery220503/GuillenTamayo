@@ -170,6 +170,32 @@ INSERT INTO `anamnesis` (`id_anamnesis`, `id_sucursal`, `id_cliente`, `id_clinic
 (1, 2, 4, 1, 1, 1, 'OJO SECO,DIABETES', '', '', '', 0, '2023-11-03 16:34:12', '2023-11-03 16:35:43');
 
 -- --------------------------------------------------------
+--
+-- Table structure for table `conformidad_montura`
+--
+
+CREATE TABLE `conformidad_montura` (
+  `id` int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `id_anamnesis` int UNSIGNED NOT NULL,
+  `p1` varchar(255) DEFAULT NULL,
+  `p1_respuesta` json DEFAULT NULL,
+  `p2` varchar(255) DEFAULT NULL,
+  `p2_respuesta` json DEFAULT NULL,
+  `p3` varchar(255) DEFAULT NULL,
+  `p3_respuesta` json DEFAULT NULL,
+  `p4` varchar(255) DEFAULT NULL,
+  `p4_respuesta` json DEFAULT NULL,
+  `observaciones` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `conformidad_montura`
+--
+
+
+-- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `caja`
@@ -429,8 +455,8 @@ CREATE TABLE `compras` (
 --
 
 INSERT INTO `compras` (`id_compra`, `user_id_update`, `user_id`, `id_proveedor`, `id_sucursal`, `id_origen_dinero`, `id_medio_pago`, `nombre_proveedor`, `nro_documento`, `guia_factura`, `id_serie`, `correlativo`, `fecha`, `total`, `subtotal`, `igv`, `referencia`, `observaciones`, `condicion_pago`, `deuda_tipo`, `deuda_total_abonado`, `deuda_saldo`, `fecha_vencimiento`, `estado`, `direccion_proveedor`, `created_at`, `updated_at`) VALUES
-(3, 1, 1, 2, 3, 2, 1, '1', 'PROVEEDOR 1', '12345678912', 0, 5, '1', '2023.00', '750.00', '635.59', '114.41', '', 3, 'cuotas', '0.00', '750.00', '2023-11-30', 1, 'AV. AREQUIPA 123', '2023-09-29 16:20:26', '2023-09-29 16:20:26'),
-(4, 2, 2, 2, 3, 2, 1, '1', 'PROVEEDOR 1', '12345678912', 0, 5, '2', '2023.00', '1200.00', '1016.95', '183.05', '', 1, 'total', '0.00', '0.00', '2023-12-30', 1, 'AV. AREQUIPA 123', '2023-10-20 02:08:50', '2023-10-20 02:08:50');
+(3, 2, 2, 2, 2, 2, 1, '1', 'PROVEEDOR 1', '12345678912', 1, 5, '1', '2023.00', '750.00', '635.59', '114.41', '', 3, 'cuotas', '0.00', '750.00', '2023-11-30', 1, 'AV. AREQUIPA 123', '2023-09-29 16:20:26', '2023-09-29 16:20:26'),
+(4, 2, 2, 2, 2, 2, 1, '1', 'PROVEEDOR 1', '12345678912', 1, 5, '2', '2023.00', '1200.00', '1016.95', '183.05', '', 1, 'total', '0.00', '0.00', '2023-12-30', 1, 'AV. AREQUIPA 123', '2023-10-20 02:08:50', '2023-10-20 02:08:50');
 
 -- --------------------------------------------------------
 
@@ -820,7 +846,7 @@ CREATE TABLE `egresos` (
 --
 
 INSERT INTO `egresos` (`id_egreso`, `id_caja`, `id_compra`, `descripcion`, `monto`, `origen`, `fecha_egreso`, `estado`, `created_at`, `updated_at`) VALUES
-(1, 25, NULL, 'DESC', '9.00', 1, '2023-07-06', 1, '2023-07-06 17:34:30', '2023-07-06 17:34:30'),
+(1, NULL, 25, 'DESC', '9.00', 1, '2023-07-06', 1, '2023-07-06 17:34:30', '2023-07-06 17:34:30'),
 (2, NULL, 2, 'COMPRA C001-000002', '24.00', 1, '2023-07-10', 1, '2023-07-10 16:01:23', '2023-07-10 16:01:23'),
 (3, NULL, 3, 'COMPRA C001-000003', '60.00', 1, '2023-07-10', 1, '2023-07-10 16:10:20', '2023-07-10 16:10:20'),
 (4, NULL, 4, 'COMPRA C001-000004', '120.00', 1, '2023-07-10', 1, '2023-07-10 16:21:52', '2023-07-10 16:21:52'),
@@ -4661,6 +4687,16 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `id_role`, `id_sucursal`, `name`, `email`, `email_verified_at`, `password`, `estado`, `remember_token`, `created_at`, `updated_at`) VALUES
 (2, 1, 2, 'admin@gmail.com', 'admin@gmail.com', NULL, '$2y$10$N7jnQemyVnN/b3jZpd0Lz.Cym4Drpb793Q6SmQncT2EO0L0VLzV6S', 1, NULL, NULL, NULL);
 
+-- ---
+CREATE TABLE `anamnesis_estados_historico` (
+    `id` bigint UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `anamnesis_id` int UNSIGNED,
+    `user_id` bigint UNSIGNED NOT NULL,
+    `fecha` DATE,
+    `estado` VARCHAR(255)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- ---
+
 --
 -- Índices para tablas volcadas
 --
@@ -5935,6 +5971,13 @@ ALTER TABLE `ubigeo_provincias`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `FK_user_id_sucursal_idx` FOREIGN KEY (`id_sucursal`) REFERENCES `sucursales` (`id_sucursal`);
+
+ALTER TABLE `conformidad_montura`
+  ADD CONSTRAINT `FK_conformidad_montura_id_anamnesis_idx` FOREIGN KEY (`id_anamnesis`) REFERENCES `anamnesis` (`id_anamnesis`);
+
+ALTER TABLE `anamnesis_estados_historico`
+  ADD CONSTRAINT `FK_anamnesis_estados_historico_id_anamnesis_idx` FOREIGN KEY (anamnesis_id) REFERENCES anamnesis(id_anamnesis),
+  ADD CONSTRAINT `FK_anamnesis_estados_historico_id_user_idx`  FOREIGN KEY (user_id) REFERENCES users(id);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -135,6 +135,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('anamnesis/paso-2/{id_anamnesis}', [AnamnesisController::class,'paso2']);
     Route::post('anamnesis/paso-3/{id_anamnesis}', [AnamnesisController::class,'paso3']);
 
+    Route::post('anamnesis/conformidad_montura', [AnamnesisController::class, 'conformidadMontura']);
     Route::post('anamnesis/descartar/{id}', [AnamnesisController::class, 'descartarAnamnesis']);
     Route::get('anamnesis/search/{id}', [AnamnesisController::class,'searchAnamnesis']);
     Route::get('anamnesis/paciente/{id}', [AnamnesisController::class, 'searchAnamnesisPaciente']);
