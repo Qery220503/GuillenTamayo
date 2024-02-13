@@ -52,6 +52,7 @@ class ProductosCategoriaController extends Controller
         try {
             $marca_data = ProductosCategoria::create([
                 'nombre_categoria' => $request->nombre_categoria,
+                'sunglasses' => $request->sunglasses,
                 'estado' => 1,
             ]);
             return response()->json($marca_data, 200);
@@ -95,7 +96,7 @@ class ProductosCategoriaController extends Controller
             $data = ProductosCategoria::findOrFail($id);
             $data->update($request->all());
             return response()->json($data, 200);
-            
+
         } catch (\Exception $e) {
             return response()->json($e->getMessage(), 500);
         }
@@ -113,7 +114,7 @@ class ProductosCategoriaController extends Controller
             $data = ProductosCategoria::findOrFail($id);
             $data->update(['estado' => 0]);
             return response()->json($data, 200);
-            
+
         } catch (\Exception $e) {
             return response()->json($e->getMessage(), 500);
         }

@@ -1342,6 +1342,10 @@ export default {
           return;
         }
 
+        if(response.data.cupon != null){
+          console.log(cupon)
+        }
+
         if (response.data.pdf) {
           let url =
             response.data.facturador +

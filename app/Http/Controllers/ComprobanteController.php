@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use App\Models\Clientes;
 use App\Models\AlmacenMovimiento;
 use App\Models\ComprobanteDeuda;
+use App\Models\Cupon;
+use App\Models\Productos;
+use App\Models\ProductosCategoria;
 use App\Services\ComprobanteService;
 use Carbon\Carbon;
 use Mpdf\Mpdf;
@@ -102,7 +105,11 @@ class ComprobanteController extends Controller
         ->count();
       $comprobante->correlativo = ++$correlativo;
       $comprobante->save();
+
+      $generarCupon = false;
+
       foreach ($request->detail as $value) {
+
         $value['id_comprobante'] = $comprobante->id_comprobante;
         $detalle = ComprobanteDetalle::create(collect($value)->all());
         if ($detalle->item_type == 1) {
@@ -112,7 +119,27 @@ class ComprobanteController extends Controller
             "precio_total" => $detalle->precio_total
           ], $auth->id_sucursal, 2);
         }
+
+        $producto = Productos::findOrFail($detalle->id_producto);
+        $categoria = ProductosCategoria::findOrFail($producto->id_categoria);
+        if($categoria->sunglasses == true){
+          $generarCupon = true;
+        }
       }
+
+      $date = Carbon::now()->addMonths(12);
+      $cupon = null;
+      if($generarCupon){
+        $cupon = Cupon::create([
+          'id_usuario' => $auth->id,
+          'id_sucursal' => $auth->id_sucursal,
+          'codigo_cupon' => $this->generateCouponCode(5),
+          'tipo_descuento' => 2,
+          'descuento' => 20,
+          'fecha_vencimiento' => $date->toString(),
+        ]);
+      }
+
 
       /* CREACIÓN DE CUOTAS */
 
@@ -132,18 +159,35 @@ class ComprobanteController extends Controller
         DB::commit();
         return response()->json([
           "success" => true,
-          "comprobante" => $comprobante
+          "comprobante" => $comprobante,
+          "cupon" => $cupon,
         ]);
       }
 
 
       $facturacion_data = ComprobanteService::facturar($comprobante->id_comprobante);
       DB::commit();
-      return response()->json($facturacion_data, 200);
+
+      return response()->json([
+        ...$facturacion_data,
+        "cupon" => $cupon,
+      ], 200);
+
     } catch (\Exception $e) {
       DB::rollBack();
       return response()->json($e->getMessage(), 500);
     }
+  }
+
+
+  private function generateCouponCode($length) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $code = '';
+    $max = strlen($characters) - 1;
+    for ($i = 0; $i < $length; $i++) {
+      $code .= $characters[random_int(0, $max)];
+    }
+    return $code;
   }
 
   public function vista($id)

@@ -65,7 +65,7 @@
     </v-card>
 
     <!-- Add/Edit Dialog -->
-    <v-dialog v-model="addDialog" max-width="40%" persistent>
+    <v-dialog v-model="addDialog" max-width="500px" persistent>
       <v-card>
         <v-card-title>
           <span class="headline">{{ addFormTitle }}</span>
@@ -85,6 +85,15 @@
                   :rules="rules.required"
                   autocomplete="off"
                 ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-checkbox
+                  v-model="addForm.sunglasses"
+                  label="Lentes de contacto"
+                  hint="Habilitar esta opción hara que los productos generen un cupon de descuento 20%"
+                ></v-checkbox>
               </v-col>
             </v-row>
             <br />
