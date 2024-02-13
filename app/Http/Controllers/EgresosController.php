@@ -17,7 +17,7 @@ class EgresosController extends Controller
 
     public function index(Request $request){
         $authUser = auth('sanctum')->user();
-        $datos = Egresos::where([
+        $datos = Egresos::with(['mediopago','proveedor','usuario'])->where([
             ["estado", 1]
         ]);
         
@@ -36,7 +36,7 @@ class EgresosController extends Controller
     public function store(Request $request)
     {
         try {
-            $auth = Auth::user();
+            $auth = auth('sanctum')->user();
             $caja = Caja::whereDate('created_at', Carbon::now()->toDateString())
                 ->where('estado', 1)
                 ->first();
@@ -51,6 +51,10 @@ class EgresosController extends Controller
                 'monto' => $request->monto,
                 'id_caja' => ($request->origen == 1) ? $caja->id_caja : null,
                 'origen' => $request->origen,
+                'id_medio_pago' => $request->id_medio_pago,
+                'id_proveedor' => $request->id_proveedor,
+                'observaciones' => $request->observaciones,
+                'id_user' => $auth->id,
                 'fecha_egreso' => Carbon::now()->toDateString()
             ]);
 

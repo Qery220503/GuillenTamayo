@@ -21,6 +21,10 @@ class Egresos extends Model
         'fecha_egreso',
         'id_compra',
         'estado',
+        'id_medio_pago',
+        'id_proveedor',
+        'observaciones',
+        'id_user'
     ];
     public $timestamps = true;
 
@@ -30,4 +34,16 @@ class Egresos extends Model
         $this->attributes['descripcion'] = $this->SetUpperCase($value);
     }
     //--- Fin ---
+
+    public function mediopago(){
+        return $this->belongsTo(MedioPago::class, 'id_medio_pago');
+    }
+
+    public function proveedor(){
+        return $this->belongsTo(Proveedores::class, 'id_proveedor');
+    }
+
+    public function usuario(){
+        return $this->belongsTo(User::class, 'id_user');
+    }
 }
