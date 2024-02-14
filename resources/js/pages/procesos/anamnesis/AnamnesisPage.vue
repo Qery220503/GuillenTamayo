@@ -169,7 +169,7 @@
             <v-icon left> mdi-receipt </v-icon>
             Comanda
           </v-tab>
-          <v-tab v-if="reciboFormato !=  ''">
+          <v-tab v-if="reciboURL !=  ''">
             <v-icon left> mdi-receipt </v-icon>
             Recibo
           </v-tab>
@@ -177,7 +177,7 @@
             <v-icon left> mdi-receipt </v-icon>
             Eps
           </v-tab>
-          <v-tab>
+          <v-tab v-if="showCupon">
             <v-icon left> mdi-ticket-percent </v-icon>
             Cupon
           </v-tab>
@@ -194,7 +194,7 @@
             </v-card>
           </v-tab-item>
 
-          <v-tab-item v-if="reciboFormato !=  ''">
+          <v-tab-item v-if="reciboURL !=  ''">
             <v-card flat>
               <v-card-text v-if="showFormats">
                 <v-select
@@ -236,7 +236,7 @@
             </v-card>
           </v-tab-item>
 
-          <v-tab-item>
+          <v-tab-item v-if="showCupon">
             <v-card flat>
               <v-card-text>
                 <CouponTicket :coupon="cupon" />
@@ -264,17 +264,14 @@ import { RecipeService } from "../../../services/RecipeService";
 export default {
   data() {
     return {
+      showCupon: true,
       showFormats: true,
       comandaURL: "",
-
       reciboURL: "",
       reciboFormato: "",
-
       epsURL: "",
       epsFormato: "",
-
       cupon: null,
-
       breadcrumbs_title: "Anamnesis",
       breadcrumbs: [
         { text: "Inicio", disabled: false, href: "#" },
@@ -825,39 +822,23 @@ export default {
           vm.anamnesis.id_anamnesis,
           vm.formStep3
         );
-        console.log(response);
-        /*
-        if (response.data.success) {
-          const comprobante = response.data.comprobante;
-          let url = "/comandaPDF/" + comprobante.id_comprobante;
-          window.open(url, "Comanda", "width=500,height=600");
-          console.log(response.data.extra);
-          if (response.data.extra.client != null) {
-            const clientDocument = response.data.extra.client;
-            let urlClient =
-              clientDocument.facturador +
-              "/print/document/" +
-              clientDocument.external_id +
-              "/ticket";
-            window.open(urlClient, "RECIBO", "width=500,height=600");
-          }
-          this.$swal.close();
-          this.$router.push("/orden-laboratorio");
-        }
-        */
+
         const data = response.data;
         if (data.success) {
           if ("comprobante" in data && data.comprobante != null) {
-            this.showFormats = true;
             const comprobante = data.comprobante;
             this.comandaURL = "/comandaPDF/" + comprobante.id_comprobante;
-
           }
           const extra = data.extra;
-          if ("client" in extra && extra.client != null) {
+          if ("client" in extra && extra.client != null && Object.keys(extra) > 0) {
             const recibo = response.data.extra.client;
             this.reciboURL = recibo.facturador + "/print/document/" + recibo.external_id;
             this.reciboFormato = 'ticket';
+            this.showFormats = true;
+          }else{
+            this.reciboURL = "/comprobantes/notas-venta/" + data.comprobante.id_comprobante;
+            this.showFormats = false;
+            this.showCupon = false;
           }
 
           if ("eps" in extra && extra.eps != null) {
