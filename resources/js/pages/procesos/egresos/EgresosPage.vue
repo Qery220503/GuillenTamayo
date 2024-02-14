@@ -29,11 +29,12 @@
           :loading="loadingTable"
           loading-text="Cargando... Por favor, espere"
         >
-          <template v-slot:[`item.origen`]="{ item }">
+        <template v-slot:[`item.origen`]="{ item }">
             <v-chip color="primary" small>
               {{ getOrigen(item.origen) }}
             </v-chip>
           </template>
+
 
           <template v-slot:[`item.actions`]="{ item }">
             <v-btn small icon @click="editReg(item)">
@@ -93,6 +94,35 @@
                   required
                   filled
                 ></v-select>
+                <v-select
+                  :rules="rules.required"
+                  :items="medios_pago"
+                  item-text="medio_pago"
+                  item-value="id_medio_pago"
+                  label="Medio de pago"
+                  placeholder="Selecciona el medio de pago"
+                  v-model="addForm.id_medio_pago"
+                  required
+                  filled
+                ></v-select>
+                <v-select
+                  :rules="rules.required"
+                  :items="proveedores"
+                  item-text="nombre"
+                  item-value="id_proveedor"
+                  label="Proveedor"
+                  placeholder="Selecciona el medio de pago"
+                  v-model="addForm.id_proveedor"
+                  required
+                  filled
+                ></v-select>
+                <v-text-field
+                  v-model="addForm.observaciones"
+                  label="Observaciones"
+                  :rules="rules.required"
+                  autocomplete="off"
+                  filled
+                ></v-text-field>
               </v-col>
             </v-row>
             <br />
@@ -127,13 +157,17 @@ export default {
         { text: "Descripción", value: "descripcion", align: "left" },
         { text: "Monto", value: "monto", align: "left" },
         { text: "Origen", value: "origen", align: "left" },
+        { text: "Usuario", value: "usuario.email", align: "left"},
         { text: "Acciones", sortable: false, value: "actions", align: "right" }
       ],
 
       addForm: {
         monto: 0,
         descripcion: null,
-        origen: 1
+        origen: 1,
+        id_medio_pago: 1,
+        id_proveedor:1,
+        observaciones: null,
       },
 
       //--- Datatable ---
@@ -158,7 +192,9 @@ export default {
         { text: "Caja chica", value: 1 },
         { text: "Cuenta Bancaria", value: 2 },
         { text: "Caja Fuerte", value: 3 }
-      ]
+      ],
+      medios_pago: [],
+      proveedores: []
     };
   },
     mounted(){
@@ -166,6 +202,8 @@ export default {
     },
     created() {
         this.getRegistros();
+        this.getMediosPago();
+        this.getProveedor();
     },
   methods: {
     getOrigen(id) {
@@ -242,6 +280,26 @@ export default {
         UTILS.toastr.success("Egreso eliminado correctamente!", this);
       } catch (e) {
         UTILS.toastr.error("Ups! Ocurrió un error", this);
+        console.error(e);
+      }
+    },
+    async getMediosPago() {
+      let vm = this;
+      try {
+        const response = await API.apis.medioPago();
+        vm.medios_pago = response.data;
+      } catch (e) {
+        UTILS.toastrr.error("Ups! Ocurrió un error", this);
+        console.error(e);
+      }
+    },
+    async getProveedor() {
+      let vm = this;
+      try {
+        const response = await API.proveedores.combo();
+        vm.proveedores = response.data;
+      } catch (e) {
+        UTILS.toastrr.error("Ups! Ocurrió un error", this);
         console.error(e);
       }
     },
