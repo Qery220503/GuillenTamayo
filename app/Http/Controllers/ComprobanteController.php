@@ -154,7 +154,12 @@ class ComprobanteController extends Controller
         }
       }
 
-      /* Si es Nota de Pedido */
+
+      /*
+        NOTA DE PEDIDO
+        No entra aca por que se solicito que no hayan notas de venta
+        queda pendiente a implementarse si se requiere.
+      */
       if ($comprobante->id_tipo_comprobante != 1 && $comprobante->id_tipo_comprobante != 2) {
         DB::commit();
         return response()->json([

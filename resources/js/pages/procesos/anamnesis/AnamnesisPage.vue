@@ -155,33 +155,83 @@
 
     <!-- Recibos -->
 
-    <v-dialog v-model="receiptDialog" style="width: 80%" @click:outside="() => {}">
+    <v-dialog
+      v-model="receiptDialog"
+      style="width: 80%"
+      @click:outside="() => {}"
+    >
       <v-card>
         <v-toolbar flat color="primary" dark>
           <v-toolbar-title>Recibo</v-toolbar-title>
         </v-toolbar>
         <v-tabs>
-          <v-tab>
+          <v-tab v-if="comandaURL !=  ''">
             <v-icon left> mdi-receipt </v-icon>
             Comanda
           </v-tab>
-          <v-tab>
+          <v-tab v-if="reciboFormato !=  ''">
             <v-icon left> mdi-receipt </v-icon>
             Recibo
           </v-tab>
-          <v-tab>
+          <v-tab v-if="epsFormato !=  ''">
             <v-icon left> mdi-receipt </v-icon>
             Eps
           </v-tab>
-          <v-tab v-if="showCoupon">
+          <v-tab>
             <v-icon left> mdi-ticket-percent </v-icon>
             Cupon
           </v-tab>
 
-          <v-tab-item>
+          <v-tab-item v-if="comandaURL !=  ''">
             <v-card flat>
               <v-card-text>
-                Comanda
+                <iframe
+                  :src="comandaURL"
+                  frameborder="0"
+                  style="width: 100%; height: 450px"
+                ></iframe>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+
+          <v-tab-item v-if="reciboFormato !=  ''">
+            <v-card flat>
+              <v-card-text v-if="showFormats">
+                <v-select
+                  :items="['a4', 'a5', 'ticket']"
+                  v-model="reciboFormato"
+                  outlined
+                  hide-details
+                  label="Formato comprobante"
+                ></v-select>
+              </v-card-text>
+              <v-card-text>
+                <iframe
+                  :src="reciboURLFormated"
+                  frameborder="0"
+                  style="width: 100%; height: 450px"
+                ></iframe>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+
+          <v-tab-item v-if="epsFormato !=  ''">
+            <v-card flat>
+              <v-card-text>
+                <v-select
+                  :items="['a4', 'a5', 'ticket']"
+                  v-model="epsFormato"
+                  outlined
+                  hide-details
+                  label="Formato comprobante"
+                ></v-select>
+              </v-card-text>
+              <v-card-text>
+                <iframe
+                  :src="epsURLFormated"
+                  frameborder="0"
+                  style="width: 100%; height: 450px"
+                ></iframe>
               </v-card-text>
             </v-card>
           </v-tab-item>
@@ -189,30 +239,10 @@
           <v-tab-item>
             <v-card flat>
               <v-card-text>
-                Recibo
+                <CouponTicket :coupon="cupon" />
               </v-card-text>
             </v-card>
           </v-tab-item>
-
-          <v-tab-item>
-            <v-card flat>
-              <v-card-text>
-                EPS
-              </v-card-text>
-            </v-card>
-          </v-tab-item>
-
-          <v-tab-item>
-            <v-card flat>
-              <v-card-text>
-                Cupon
-              </v-card-text>
-            </v-card>
-          </v-tab-item>
-
-
-
-
         </v-tabs>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -228,11 +258,23 @@ import API from "../../../api";
 import Paso1 from "./Steps/Paso1.vue";
 import Paso2 from "./Steps/Paso2.vue";
 import Paso3 from "./Steps/Paso3.vue";
+import CouponTicket from '../ventas/components/CouponTicket.vue';
 import { RecipeService } from "../../../services/RecipeService";
 
 export default {
   data() {
     return {
+      showFormats: true,
+      comandaURL: "",
+
+      reciboURL: "",
+      reciboFormato: "",
+
+      epsURL: "",
+      epsFormato: "",
+
+      cupon: null,
+
       breadcrumbs_title: "Anamnesis",
       breadcrumbs: [
         { text: "Inicio", disabled: false, href: "#" },
@@ -539,6 +581,7 @@ export default {
     Paso1,
     Paso2,
     Paso3,
+    CouponTicket
   },
   mounted() {
     this.checkIfCashIsOpen("/anamnesis");
@@ -802,6 +845,31 @@ export default {
           this.$router.push("/orden-laboratorio");
         }
         */
+        const data = response.data;
+        if (data.success) {
+          if ("comprobante" in data && data.comprobante != null) {
+            this.showFormats = true;
+            const comprobante = data.comprobante;
+            this.comandaURL = "/comandaPDF/" + comprobante.id_comprobante;
+
+          }
+          const extra = data.extra;
+          if ("client" in extra && extra.client != null) {
+            const recibo = response.data.extra.client;
+            this.reciboURL = recibo.facturador + "/print/document/" + recibo.external_id;
+            this.reciboFormato = 'ticket';
+          }
+
+          if ("eps" in extra && extra.eps != null) {
+            const eps = response.data.extra.eps;
+            this.epsURL = eps.facturador + "/print/document/" + eps.external_id;
+            this.epsFormato = 'ticket';
+          }
+          if("cupon" in data && data.cupon != null){
+            this.cupon = data.cupon;
+          }
+        }
+
         this.receiptDialog = true;
         this.$swal.close();
       } catch (e) {
@@ -968,6 +1036,14 @@ export default {
       }
     },
   },
+  computed:{
+    reciboURLFormated(){
+      return this.reciboURL + '/' +this.reciboFormato;
+    },
+    epsURLFormated(){
+      return this.epsURL + '/' + this.epsFormato
+    }
+  }
 };
 </script>
 <style scoped>

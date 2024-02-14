@@ -145,6 +145,11 @@ class AnamnesisController extends Controller
         ->where('id_sucursal', $auth->id_sucursal)
         ->where('id_serie', $serie->id_serie)
         ->count();
+
+
+      /*
+        Solo si es una venta con EPS.
+      */
       if (isset($_head['id_eps_discount']) &&  $_head['id_eps_discount'] != null) {
         $orden = OrdenLaboratorio::where('id_anamnesis', $request->id_anamnesis)->first();
         $epsHead = EpsService::prepareEpsHeader($_head);
@@ -204,8 +209,6 @@ class AnamnesisController extends Controller
           }
         }
 
-        DB::commit();
-
         AnamnesisEstadosHistorico::create([
           'user_id'=>$auth->id,
           'anamnesis_id'=>$request->id_anamnesis,
@@ -230,9 +233,12 @@ class AnamnesisController extends Controller
           'fecha_vencimiento' => $cuponDate->toDateString(),
         ]);
 
+        DB::commit();
+
+
         return response()->json([
           'success' => true,
-          'comprobante' => (isset($clientDocument)) ? $clientDocument : $epsInvoice,
+          'comprobante' => isset($clientDocument) ? $clientDocument : null,
           'cupon' => $cupon,
           'extra' => [
             'eps' => $facturacion_eps,
@@ -240,6 +246,9 @@ class AnamnesisController extends Controller
           ]
         ], 200);
       } else {
+        /*
+          Solo si no es una venta por EPS
+        */
         $comprobante = Comprobante::create(collect($_head)->all());
         $comprobante->correlativo = ++$correlativo;
         $orden = OrdenLaboratorio::where('id_anamnesis', $request->id_anamnesis)->first();
@@ -248,16 +257,12 @@ class AnamnesisController extends Controller
         foreach ($request->detail as $value) {
           $value['id_comprobante'] = $comprobante->id_comprobante;
           $detalle = ComprobanteDetalle::create(collect($value)->all());
-          Log::info(json_encode($detalle));
           if ($detalle->item_type == 1) {
-
-            Log::info("Here");
             $data = AlmacenMovimiento::egresoStock([
               "id_producto" => $detalle->id_producto,
               "cantidad" => $detalle->cantidad,
               "precio_total" => $detalle->precio_total
             ], $auth->id_sucursal, 2);
-            Log::info(json_encode($data));
           }
         }
         if ($_head['condicion_pago'] == 3 && isset($request->cuotas)) {
@@ -275,6 +280,34 @@ class AnamnesisController extends Controller
         $anamnesis = Anamnesis::where('id_anamnesis', $request->id_anamnesis)->first();
         $anamnesis->estado = 0;
         $anamnesis->save();
+
+        AnamnesisEstadosHistorico::create([
+          'user_id'=>$auth->id,
+          'anamnesis_id'=>$request->id_anamnesis,
+          'fecha'=>date('Y-m-d H:i:s'),
+          'estado'=>'anamnesis_paso_3'
+        ]);
+        AnamnesisEstadosHistorico::create([
+          'user_id'=>$auth->id,
+          'anamnesis_id'=>$request->id_anamnesis,
+          'fecha'=>date('Y-m-d H:i:s'),
+          'estado'=>'anamnesis_cerrada'
+        ]);
+
+        $cuponDate = Carbon::now()->addMonths(12);
+        $cupon = Cupon::create([
+          'id_usuario' => $auth->id,
+          'id_sucursal' => $auth->id_sucursal,
+          'codigo_cupon' => $this->generateCouponCode(8),
+          'tipo_descuento' => 2,
+          'descuento' => 20,
+          'fecha_vencimiento' => $cuponDate->toDateString(),
+        ]);
+
+        /*
+          Nota de venta
+          Pendiente a implementación si se requiere
+        */
         if ($comprobante->id_tipo_comprobante != 1 && $comprobante->id_tipo_comprobante != 2) {
           DB::commit();
           return response()->json([
@@ -286,33 +319,11 @@ class AnamnesisController extends Controller
         $facturacion_data = ComprobanteService::facturar($comprobante->id_comprobante);
         DB::commit();
 
-        AnamnesisEstadosHistorico::create([
-          'user_id'=>$auth->id,
-          'anamnesis_id'=>$request->id_anamnesis,
-          'fecha'=>date('Y-m-d H:i:s'),
-          'estado'=>'anamnesis_paso_3'
-        ]);
-
-        AnamnesisEstadosHistorico::create([
-          'user_id'=>$auth->id,
-          'anamnesis_id'=>$request->id_anamnesis,
-          'fecha'=>date('Y-m-d H:i:s'),
-          'estado'=>'anamnesis_cerrada'
-        ]);
-
         if ($orden->receta['selection'] == 'multifocal') {
           $client = Clientes::where('id_cliente', $comprobante->id_cliente)->first();
           if($client != null) Mail::to($client->email)->send(new MultiFocalMail());
         }
-        $cuponDate = Carbon::now()->addMonths(12);
-        $cupon = Cupon::create([
-          'id_usuario' => $auth->id,
-          'id_sucursal' => $auth->id_sucursal,
-          'codigo_cupon' => $this->generateCouponCode(8),
-          'tipo_descuento' => 2,
-          'descuento' => 20,
-          'fecha_vencimiento' => $cuponDate->toDateString(),
-        ]);
+
 
         return response()->json([
           "success" => true,

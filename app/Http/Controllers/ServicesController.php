@@ -245,7 +245,7 @@ class ServicesController extends Controller
 
     public function tipo_comprobante(){
         try{
-            $data = TipoComprobante::all();
+            $data = TipoComprobante::where('id_tipo_comprobantes', '<>', 3)->get();
             return response()->json($data);
         }
         catch(\Exception $e){
@@ -254,7 +254,7 @@ class ServicesController extends Controller
     }
     public function tipo_comprobante_venta(){
         try{
-            $data = TipoComprobante::whereIn('id_tipo_comprobantes',[1, 2, 3])->get();
+            $data = TipoComprobante::whereIn('id_tipo_comprobantes',[1, 2])->get();
             return response()->json($data);
         }
         catch(\Exception $e){
