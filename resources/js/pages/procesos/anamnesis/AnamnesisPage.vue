@@ -152,6 +152,75 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <!-- Recibos -->
+
+    <v-dialog v-model="receiptDialog" style="width: 80%" @click:outside="() => {}">
+      <v-card>
+        <v-toolbar flat color="primary" dark>
+          <v-toolbar-title>Recibo</v-toolbar-title>
+        </v-toolbar>
+        <v-tabs>
+          <v-tab>
+            <v-icon left> mdi-receipt </v-icon>
+            Comanda
+          </v-tab>
+          <v-tab>
+            <v-icon left> mdi-receipt </v-icon>
+            Recibo
+          </v-tab>
+          <v-tab>
+            <v-icon left> mdi-receipt </v-icon>
+            Eps
+          </v-tab>
+          <v-tab v-if="showCoupon">
+            <v-icon left> mdi-ticket-percent </v-icon>
+            Cupon
+          </v-tab>
+
+          <v-tab-item>
+            <v-card flat>
+              <v-card-text>
+                Comanda
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+
+          <v-tab-item>
+            <v-card flat>
+              <v-card-text>
+                Recibo
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+
+          <v-tab-item>
+            <v-card flat>
+              <v-card-text>
+                EPS
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+
+          <v-tab-item>
+            <v-card flat>
+              <v-card-text>
+                Cupon
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+
+
+
+
+        </v-tabs>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary">Salir</v-btn>
+          <v-btn color="secondary">Ver Comprobante</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script>
@@ -175,6 +244,7 @@ export default {
       validAddFormStep2: false,
       validAddFormStep3: false,
       blackList: false,
+      receiptDialog: false,
       formStep1: {
         cliente: {
           cod_tipo_doc: 1,
@@ -712,6 +782,8 @@ export default {
           vm.anamnesis.id_anamnesis,
           vm.formStep3
         );
+        console.log(response);
+        /*
         if (response.data.success) {
           const comprobante = response.data.comprobante;
           let url = "/comandaPDF/" + comprobante.id_comprobante;
@@ -729,6 +801,9 @@ export default {
           this.$swal.close();
           this.$router.push("/orden-laboratorio");
         }
+        */
+        this.receiptDialog = true;
+        this.$swal.close();
       } catch (e) {
         UTILS.toastr.error("Ups! Ocurrió un error", this);
         console.error(e);

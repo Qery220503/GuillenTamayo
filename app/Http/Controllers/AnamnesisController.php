@@ -14,6 +14,7 @@ use App\Models\AlmacenMovimiento;
 use App\Models\AnamnesisEstadosHistorico;
 use App\Models\ComprobanteDeuda;
 use App\Models\ConformidadMontura;
+use App\Models\Cupon;
 use App\Services\ComprobanteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -126,33 +127,24 @@ class AnamnesisController extends Controller
       $_head['id_sucursal'] = $auth->id_sucursal;
       $_head['id_usuario'] = $auth->id;
       $_head['id_caja'] = $caja->id_caja;
-
-
       if($_head['condicion_pago'] == 1){
         $_head['adelanto'] = 0.00;
         $_head['saldo'] = 0.00;
       }
-
-
       if($_head['condicion_pago'] == 2 || $_head['condicion_pago'] ==  3){
         $_head['saldo'] = $_head['total'] - $_head['adelanto'];
         if($_head['id_eps_discount'] != null){
           $_head['saldo'] -= $_head['eps_discount'];
         }
       }
-
       $_head['dscto_fijo'] = 0.00;
       $_head['dscto_porcentaje'] = 0.00;
       $_head['id_estado_comprobante'] = 4;
       $_head['id_serie'] = $_head['id_serie'];
-
-
       $correlativo = Comprobante::where('id_tipo_comprobante', $request->header['id_tipo_comprobante'])
         ->where('id_sucursal', $auth->id_sucursal)
         ->where('id_serie', $serie->id_serie)
         ->count();
-
-
       if (isset($_head['id_eps_discount']) &&  $_head['id_eps_discount'] != null) {
         $orden = OrdenLaboratorio::where('id_anamnesis', $request->id_anamnesis)->first();
         $epsHead = EpsService::prepareEpsHeader($_head);
@@ -176,8 +168,6 @@ class AnamnesisController extends Controller
           $_head['igv'] = $clientReceipt - $_head['subtotal'];
           $_head['id_eps_discount'] = null;
           $_head['eps_discount'] = 0.00;
-
-
           $clientDocument = Comprobante::create(collect($_head)->all());
           $clientDocument['id_orden_lab'] = $orden->id_orden_laboratorio;
           $clientDocument->correlativo = ++$correlativo;
@@ -192,9 +182,7 @@ class AnamnesisController extends Controller
           $epsInvoice->id_comprobante_eps = $clientDocument->id_comprobante;
           $epsInvoice->save();
         }
-        //Egresos stock
         foreach ($request->detail as $value) {
-
           if ($value['item_type'] == 1) {
             AlmacenMovimiento::egresoStock([
               "id_producto" => $value['id_producto'],
@@ -203,27 +191,21 @@ class AnamnesisController extends Controller
             ], $auth->id_sucursal, 2);
           }
         }
-
-
-
         $facturacion_eps = ComprobanteService::facturar($epsInvoice->id_comprobante);
         $facturacion_client = null;
         if (isset($clientDocument)) $facturacion_client = ComprobanteService::facturar($clientDocument->id_comprobante);
-
-        //Archivamos anamnesis
         $anamnesis = Anamnesis::where('id_anamnesis', $request->id_anamnesis)->first();
         $anamnesis->estado = 0;
         $anamnesis->save();
-
-
-        //Mandamos correo de multifocal si corresponde
-        // if ($orden->receta['recipe_selection'] == 'recipe' && $orden->receta['recipe']['selection'] == 'multifocal') {
         if ($orden->receta['selection'] == 'multifocal') {
           $client = Clientes::where('id_cliente', $clientDocument->id_cliente)->first();
-          if($client != null) Mail::to($client->email)->send(new MultiFocalMail());
+          if($client != null){
+            Mail::to($client->email)->queue(new MultiFocalMail());
+          }
         }
 
         DB::commit();
+
         AnamnesisEstadosHistorico::create([
           'user_id'=>$auth->id,
           'anamnesis_id'=>$request->id_anamnesis,
@@ -237,9 +219,21 @@ class AnamnesisController extends Controller
           'fecha'=>date('Y-m-d H:i:s'),
           'estado'=>'anamnesis_cerrada'
         ]);
+        $cuponDate = Carbon::now()->addMonths(12);
+
+        $cupon = Cupon::create([
+          'id_usuario' => $auth->id,
+          'id_sucursal' => $auth->id_sucursal,
+          'codigo_cupon' => $this->generateCouponCode(8),
+          'tipo_descuento' => 2,
+          'descuento' => 20,
+          'fecha_vencimiento' => $cuponDate->toDateString(),
+        ]);
+
         return response()->json([
           'success' => true,
           'comprobante' => (isset($clientDocument)) ? $clientDocument : $epsInvoice,
+          'cupon' => $cupon,
           'extra' => [
             'eps' => $facturacion_eps,
             'client' => $facturacion_client
@@ -306,17 +300,24 @@ class AnamnesisController extends Controller
           'estado'=>'anamnesis_cerrada'
         ]);
 
-        //Mandamos correo de multifocal si corresponde
-        // if ($orden->receta['recipe_selection'] == 'recipe' && $orden->receta['recipe']['selection'] == 'multifocal') {
         if ($orden->receta['selection'] == 'multifocal') {
           $client = Clientes::where('id_cliente', $comprobante->id_cliente)->first();
           if($client != null) Mail::to($client->email)->send(new MultiFocalMail());
         }
-
+        $cuponDate = Carbon::now()->addMonths(12);
+        $cupon = Cupon::create([
+          'id_usuario' => $auth->id,
+          'id_sucursal' => $auth->id_sucursal,
+          'codigo_cupon' => $this->generateCouponCode(8),
+          'tipo_descuento' => 2,
+          'descuento' => 20,
+          'fecha_vencimiento' => $cuponDate->toDateString(),
+        ]);
 
         return response()->json([
           "success" => true,
           "comprobante" => $comprobante,
+          'cupon' => $cupon,
           "extra" => [
             "client" => $facturacion_data
           ]
@@ -330,6 +331,15 @@ class AnamnesisController extends Controller
         'file' => $e->getFile()
       ], 500);
     }
+  }
+  private function generateCouponCode($length) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $code = '';
+    $max = strlen($characters) - 1;
+    for ($i = 0; $i < $length; $i++) {
+      $code .= $characters[random_int(0, $max)];
+    }
+    return $code;
   }
 
   public function searchAnamnesis($id)

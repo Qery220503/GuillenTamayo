@@ -13,19 +13,8 @@
       >
         <v-card class="mb-4" light style="padding: 15px">
           <v-row dense>
-            <v-col cols="12" md="3">
-              <v-select
-                v-model="form.header.id_serie"
-                :rules="[rules.required]"
-                item-text="serie"
-                item-value="id_serie"
-                label="Serie"
-                filled
-                dense
-                :items="series"
-              ></v-select>
-            </v-col>
-            <v-col cols="12" md="3">
+
+            <v-col cols="12" md="4">
               <v-select
                 v-model="form.header.id_tipo_comprobante"
                 :rules="[rules.required]"
@@ -38,7 +27,21 @@
                 :items="items_tipo_comprobante"
               ></v-select>
             </v-col>
-            <v-col cols="12" md="3">
+
+            <v-col cols="12" md="4">
+              <v-select
+                v-model="form.header.id_serie"
+                :rules="[rules.required]"
+                item-text="serie"
+                item-value="id_serie"
+                label="Serie"
+                filled
+                dense
+                :items="series"
+              ></v-select>
+            </v-col>
+
+            <v-col cols="12" md="4">
               <v-select
                 :items="items_tipo_doc"
                 label="Tipo Documento"
@@ -52,7 +55,7 @@
                 dense
               ></v-select>
             </v-col>
-            <v-col cols="12" md="3">
+            <v-col cols="12" md="4">
               <v-text-field
                 v-model="form.header.nro_documento"
                 label="Nro. Documento"
@@ -171,7 +174,7 @@
                 </template>
               </v-text-field>
             </v-col>
-            <v-col cols="12" md="3">
+            <v-col cols="12" md="4">
               <v-text-field
                 v-model="form.header.nombre_cliente"
                 :rules="[rules.required]"
@@ -180,7 +183,7 @@
                 label="Nombre Cliente"
               ></v-text-field>
             </v-col>
-            <v-col cols="12" md="3">
+            <v-col cols="12" md="4">
               <v-menu
                 v-model="menu2"
                 :close-on-content-click="false"
@@ -209,7 +212,7 @@
                 ></v-date-picker>
               </v-menu>
             </v-col>
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="4">
               <v-text-field
                 v-model="form.header.direccion_cliente"
                 :rules="[rules.required]"
@@ -218,7 +221,7 @@
                 label="Dirección Cliente"
               ></v-text-field>
             </v-col>
-            <v-col cols="12" md="3">
+            <v-col cols="12" md="4">
               <v-select
                 v-model="form.header.id_medio_pago"
                 :items="items_medio_pago"
@@ -230,7 +233,7 @@
                 item-value="id_medio_pago"
               ></v-select>
             </v-col>
-            <v-col cols="12" md="3">
+            <v-col cols="12" md="4">
               <v-text-field
                 v-model="form.header.nro_operacion"
                 label="Nro.Operación"
@@ -667,6 +670,56 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="receiptDialog" style="width: 80%" @click:outside="exitReceiptDialog()">
+      <v-card>
+        <v-toolbar flat color="primary" dark>
+          <v-toolbar-title>Recibo</v-toolbar-title>
+        </v-toolbar>
+        <v-tabs>
+          <v-tab>
+            <v-icon left> mdi-receipt </v-icon>
+            Recibo
+          </v-tab>
+          <v-tab v-if="showCoupon">
+            <v-icon left> mdi-ticket-percent </v-icon>
+            Cupon
+          </v-tab>
+
+          <v-tab-item>
+            <v-card flat>
+              <v-card-text v-if="showFormats">
+                <v-select
+                  :items="['a4', 'a5', 'ticket']"
+                  v-model="format"
+                  outlined
+                  hide-details
+                  label="Formato comprobante"
+                ></v-select>
+              </v-card-text>
+              <v-card-text>
+                <iframe
+                  :src="receiptUrlFormated"
+                  frameborder="0"
+                  style="width: 100%; height: 450px"
+                ></iframe>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item v-if="showCoupon">
+            <v-card flat>
+              <v-card-text>
+                <CouponTicket :coupon="coupon" />
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+        </v-tabs>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="exitReceiptDialog">Salir</v-btn>
+          <v-btn color="secondary" :href="'/comprobantes/ver/' + id_comprobante">Ver Comprobante</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -675,14 +728,20 @@ import axios from "axios";
 import API from "../../../api";
 import Vue from "vue";
 import ClientDialog from "./components/ClientDialog.vue";
+import CouponTicket from "./components/CouponTicket.vue";
 
 export default {
   components: {
+    CouponTicket,
     ClientDialog,
   },
   data: () => ({
     valid: false,
+    format: '',
     series: [],
+    receiptDialog: false,
+    receiptURL: "",
+    showCoupon: false,
     rules: {
       required: UTILS.nRules.required,
       dni: UTILS.nRules.min8,
@@ -699,7 +758,9 @@ export default {
     entries: [],
     searchDocument: "",
     isLoading: false,
-
+    coupon: {
+      codigo_cupon: '',
+    },
     search_productos: null,
     get_producto: {
       unidad_medida: {},
@@ -707,7 +768,7 @@ export default {
     entries_productos: [],
     entries_servicios: [],
     tipos_doc: [],
-
+    id_comprobante: "",
     editedIndex: -1,
     editedItem: {
       codigo: "",
@@ -746,12 +807,10 @@ export default {
       { text: "Saldo", value: "saldo" },
     ],
     dialog: false,
-
     otp_loading: false,
     snackbar: false,
     otp: "",
     text: "",
-
     form: {
       header: {
         id_cliente: "",
@@ -799,6 +858,7 @@ export default {
     ],
     unidades_medida: [],
     series: [],
+    showFormats: false,
   }),
 
   computed: {
@@ -827,6 +887,9 @@ export default {
       });
       return [...products, ...servicios];
     },
+    receiptUrlFormated(){
+      return this.receiptURL + "/" + this.format;
+    }
   },
 
   mounted() {
@@ -1082,6 +1145,10 @@ export default {
       if (this.form.header.deuda_tipo == "total") {
         this.form.header.adelanto = Number(0).toFixed(2);
       }
+    },
+    exitReceiptDialog(){
+      const vm = this;
+      vm.$router.push("/comprobantes");
     },
     handleAdelanto(e) {
       const vm = this;
@@ -1342,24 +1409,27 @@ export default {
           return;
         }
 
-        if(response.data.cupon != null){
-          console.log(cupon)
+        const data = response.data;
+        let url = "";
+
+        if (data.cupon != null) {
+          this.coupon = data.cupon;
+          this.showCoupon = true;
         }
 
-        if (response.data.pdf) {
-          let url =
-            response.data.facturador +
-            "/print/document/" +
-            response.data.external_id +
-            "/ticket";
-          window.open(url, "Comprobante", "width=500,height=600");
+        if (data.pdf) {
+          url = data.facturador + "/print/document/" + data.external_id;
+          this.id_comprobante = data.comprobante.id_comprobante;
+          this.format = 'ticket';
+          this.showFormats = true;
         } else {
-          let url =
-            "/comprobantes/notas-venta/" +
-            response.data.comprobante.id_comprobante;
-          window.open(url, "Nota de Pedido", "width=500,height=600");
+          url = "/comprobantes/notas-venta/" + data.comprobante.id_comprobante;
+          this.id_comprobante = data.comprobante.id_comprobante;
         }
-        vm.$router.push("/comprobantes");
+
+        this.receiptURL = url;
+        this.receiptDialog = true;
+        //vm.$router.push("/comprobantes");
       } catch (e) {
         UTILS.toastr.error(
           "Ocurrio un error durante la creación del comprobante",

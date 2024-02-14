@@ -2,25 +2,25 @@
   <div class="flex-grow-1">
     <div class="my-2">
       <v-row dense>
-        <v-col cols="3">
+        <v-col cols="12" md="4">
           <v-select v-model="$form.header.id_tipo_comprobante" :rules="[rules.required]" item-text="nombre_tipo_documento"
             item-value="id_tipo_comprobantes" label="Tipo Documento" filled dense :items="items_tipo_comprobante"
             @change="handleDocumentChange()"></v-select>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="12" md="4">
           <v-select v-model="$form.header.id_serie" :rules="[rules.required]" item-text="serie" item-value="id_serie"
             label="Serie" filled dense :items="series"></v-select>
         </v-col>
 
-        <v-col cols="3">
+        <v-col cols="12" md="4">
           <v-text-field v-model="$form.header.nombre_cliente" :rules="[rules.required]" filled dense
             label="Nombre Cliente"></v-text-field>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="12" md="4">
           <v-text-field v-model="$form.header.nro_documento" :rules="[rules.required]" filled dense
             label="Nro. Documento"></v-text-field>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="12" md="4">
           <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y
             min-width="auto">
             <template v-slot:activator="{ on, attrs }">
@@ -32,28 +32,28 @@
               :allowed-dates="allowedDates" :min="currentDate" @update:picker-date="pickerUpdate($event)"></v-date-picker>
           </v-menu>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="12" md="4">
           <v-text-field v-model="$form.header.direccion_cliente" :rules="[rules.required]" filled dense
             label="Dirección Cliente"></v-text-field>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="12" md="4">
           <v-select v-model="$form.header.id_medio_pago" :items="items_medio_pago" label="Medio de Pago" filled dense
             :rules="[rules.required]" item-text="medio_pago" item-value="id_medio_pago"></v-select>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="12" md="4">
           <v-text-field v-model="$form.header.nro_operacion" label="Nro.Operación" filled dense></v-text-field>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="12" md="4">
           <v-select v-model="epsSelected" :items="eps_institution" @click:clear="clearEps" item-text="name"
             item-value="id" label="Selecciona la EPS" filled dense clearable></v-select>
         </v-col>
 
-        <v-col cols="3">
+        <v-col cols="12" md="4">
           <v-select :disabled="epsSelected == null" v-model="epsDiscountSelected" :items="epsDiscounts"
             @change="updateEpsDiscount" item-text="detail" item-value="id" label="Selecciona el descuento" filled dense
             return-object></v-select>
         </v-col>
-        <v-col cols="3">
+        <v-col cols="12" md="4">
           <PaymentCoupons @validated="handleCoupon"></PaymentCoupons>
         </v-col>
       </v-row>

@@ -196,7 +196,7 @@
                             </v-col>
                         </v-row>
                         <v-card-actions>
-                            <v-spacer></v-spacer>
+c
                             <v-btn color="error" dark @click="addDialog=false">Cancelar</v-btn>
                             <v-btn color="primary" @click="saveReg()">Guardar</v-btn>
                         </v-card-actions>

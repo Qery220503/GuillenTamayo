@@ -133,10 +133,10 @@ class ComprobanteController extends Controller
         $cupon = Cupon::create([
           'id_usuario' => $auth->id,
           'id_sucursal' => $auth->id_sucursal,
-          'codigo_cupon' => $this->generateCouponCode(5),
+          'codigo_cupon' => $this->generateCouponCode(8),
           'tipo_descuento' => 2,
           'descuento' => 20,
-          'fecha_vencimiento' => $date->toString(),
+          'fecha_vencimiento' => $date->toDateString(),
         ]);
       }
 
@@ -170,6 +170,7 @@ class ComprobanteController extends Controller
 
       return response()->json([
         ...$facturacion_data,
+        "comprobante" => $comprobante,
         "cupon" => $cupon,
       ], 200);
 
