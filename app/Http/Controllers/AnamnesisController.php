@@ -231,6 +231,7 @@ class AnamnesisController extends Controller
           'tipo_descuento' => 2,
           'descuento' => 20,
           'fecha_vencimiento' => $cuponDate->toDateString(),
+          'id_comprobante_origen' => ($clientDocument == null) ? $epsInvoice->id_comprobante : $clientDocument->id_comprobante,
         ]);
 
         DB::commit();
@@ -302,6 +303,7 @@ class AnamnesisController extends Controller
           'tipo_descuento' => 2,
           'descuento' => 20,
           'fecha_vencimiento' => $cuponDate->toDateString(),
+          'id_comprobante_origen' => $comprobante->id_comprobante,
         ]);
 
         /*

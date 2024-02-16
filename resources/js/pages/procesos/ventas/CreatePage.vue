@@ -241,6 +241,9 @@
                 dense
               ></v-text-field>
             </v-col>
+            <v-col cols="12" md="4">
+              <PaymentCoupons @validated="handleCoupon"></PaymentCoupons>
+            </v-col>
           </v-row>
           <v-divider></v-divider>
           <br />
@@ -670,7 +673,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="receiptDialog" style="width: 80%" @click:outside="exitReceiptDialog()">
+    <v-dialog v-model="receiptDialog" max-width="600" @click:outside="exitReceiptDialog()">
       <v-card>
         <v-toolbar flat color="primary" dark>
           <v-toolbar-title>Recibo</v-toolbar-title>
@@ -729,11 +732,13 @@ import API from "../../../api";
 import Vue from "vue";
 import ClientDialog from "./components/ClientDialog.vue";
 import CouponTicket from "./components/CouponTicket.vue";
+import PaymentCoupons from "./components/PaymentCoupons.vue";
 
 export default {
   components: {
     CouponTicket,
     ClientDialog,
+    PaymentCoupons
   },
   data: () => ({
     valid: false,
@@ -812,6 +817,7 @@ export default {
     otp: "",
     text: "",
     form: {
+      id_cupon: null,
       header: {
         id_cliente: "",
         id_tipo_comprobante: 2,
@@ -1133,6 +1139,16 @@ export default {
     this.getUnidadesMedida();
   },
   methods: {
+    handleCoupon(coupon) {
+      this.form.id_cupon = coupon.id;
+      if (coupon.tipo_descuento == 1) {
+        this.form.header.dscto_fijo = Number(coupon.descuento).toFixed(2);
+      } else {
+        this.form.header.descuento_porcentaje = Number(
+          coupon.descuento
+        ).toFixed(2);
+      }
+    },
     HandleClient(client) {
       const vm = this;
       vm.form.header.nro_documento = client.nro_documento;

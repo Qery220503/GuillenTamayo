@@ -118,12 +118,11 @@ class ComprobanteController extends Controller
             "cantidad" => $detalle->cantidad,
             "precio_total" => $detalle->precio_total
           ], $auth->id_sucursal, 2);
-        }
-
-        $producto = Productos::findOrFail($detalle->id_producto);
-        $categoria = ProductosCategoria::findOrFail($producto->id_categoria);
-        if($categoria->sunglasses == true){
-          $generarCupon = true;
+          $producto = Productos::findOrFail($detalle->id_producto);
+          $categoria = ProductosCategoria::findOrFail($producto->id_categoria);
+          if($categoria->sunglasses == true){
+            $generarCupon = true;
+          }
         }
       }
 
@@ -137,9 +136,15 @@ class ComprobanteController extends Controller
           'tipo_descuento' => 2,
           'descuento' => 20,
           'fecha_vencimiento' => $date->toDateString(),
+          'id_comprobante_origen' => $comprobante->id_comprobante,
         ]);
       }
-
+      if(isset($request->id_cupon)){
+        $cuponExpirar = Cupon::findOrFail($request->id_cupon);
+        $cuponExpirar->id_comprobante_uso = $comprobante->id_comprobante;
+        $cuponExpirar->status = 0;
+        $cuponExpirar->save();
+      }
 
       /* CREACIÓN DE CUOTAS */
 

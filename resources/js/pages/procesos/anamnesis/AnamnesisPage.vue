@@ -158,7 +158,7 @@
     <v-dialog
       v-model="receiptDialog"
       style="width: 80%"
-      @click:outside="() => {}"
+      @click:outside="exitReceipt"
     >
       <v-card>
         <v-toolbar flat color="primary" dark>
@@ -246,8 +246,7 @@
         </v-tabs>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary">Salir</v-btn>
-          <v-btn color="secondary">Ver Comprobante</v-btn>
+          <v-btn color="primary" to="/comprobantes">Salir</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -701,6 +700,9 @@ export default {
         return e;
       });
     },
+    exitReceipt(){
+      this.$router.push('/comprobantes');
+    },
     async descartarAnamnesis(id) {
       const vm = this;
       try {
@@ -830,7 +832,7 @@ export default {
             this.comandaURL = "/comandaPDF/" + comprobante.id_comprobante;
           }
           const extra = data.extra;
-          if ("client" in extra && extra.client != null && Object.keys(extra) > 0) {
+          if ("client" in extra && extra.client != null && Object.keys(extra).length > 0) {
             const recibo = response.data.extra.client;
             this.reciboURL = recibo.facturador + "/print/document/" + recibo.external_id;
             this.reciboFormato = 'ticket';

@@ -3,55 +3,140 @@
     <div class="my-2">
       <v-row dense>
         <v-col cols="12" md="4">
-          <v-select v-model="$form.header.id_tipo_comprobante" :rules="[rules.required]" item-text="nombre_tipo_documento"
-            item-value="id_tipo_comprobantes" label="Tipo Documento" filled dense :items="items_tipo_comprobante"
-            @change="handleDocumentChange()"></v-select>
+          <v-select
+            v-model="$form.header.id_tipo_comprobante"
+            :rules="[rules.required]"
+            item-text="nombre_tipo_documento"
+            item-value="id_tipo_comprobantes"
+            label="Tipo Documento"
+            filled
+            dense
+            :items="items_tipo_comprobante"
+            @change="handleDocumentChange()"
+          ></v-select>
         </v-col>
         <v-col cols="12" md="4">
-          <v-select v-model="$form.header.id_serie" :rules="[rules.required]" item-text="serie" item-value="id_serie"
-            label="Serie" filled dense :items="series"></v-select>
+          <v-select
+            v-model="$form.header.id_serie"
+            :rules="[rules.required]"
+            item-text="serie"
+            item-value="id_serie"
+            label="Serie"
+            filled
+            dense
+            :items="series"
+          ></v-select>
         </v-col>
 
         <v-col cols="12" md="4">
-          <v-text-field v-model="$form.header.nombre_cliente" :rules="[rules.required]" filled dense
-            label="Nombre Cliente"></v-text-field>
+          <v-text-field
+            v-model="$form.header.nombre_cliente"
+            :rules="[rules.required]"
+            filled
+            dense
+            label="Nombre Cliente"
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
-          <v-text-field v-model="$form.header.nro_documento" :rules="[rules.required]" filled dense
-            label="Nro. Documento"></v-text-field>
+          <v-text-field
+            v-model="$form.header.nro_documento"
+            :rules="[rules.required]"
+            filled
+            dense
+            label="Nro. Documento"
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
-          <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y
-            min-width="auto">
+          <v-menu
+            v-model="menu2"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
             <template v-slot:activator="{ on, attrs }">
-              <v-text-field v-model="dateFormatted" label="Fecha" prepend-inner-icon="mdi-calendar"
-                :rules="[rules.required]" readonly filled dense v-bind="attrs" v-on="on"
-                @blur="$form.fecha_entrega = parseDate(dateFormatted)"></v-text-field>
+              <v-text-field
+                v-model="dateFormatted"
+                label="Fecha"
+                prepend-inner-icon="mdi-calendar"
+                :rules="[rules.required]"
+                readonly
+                filled
+                dense
+                v-bind="attrs"
+                v-on="on"
+                @blur="$form.fecha_entrega = parseDate(dateFormatted)"
+              ></v-text-field>
             </template>
-            <v-date-picker v-model="$form.header.fecha_emision" no-title @input="menu2 = false"
-              :allowed-dates="allowedDates" :min="currentDate" @update:picker-date="pickerUpdate($event)"></v-date-picker>
+            <v-date-picker
+              v-model="$form.header.fecha_emision"
+              no-title
+              @input="menu2 = false"
+              :allowed-dates="allowedDates"
+              :min="currentDate"
+              @update:picker-date="pickerUpdate($event)"
+            ></v-date-picker>
           </v-menu>
         </v-col>
         <v-col cols="12" md="4">
-          <v-text-field v-model="$form.header.direccion_cliente" :rules="[rules.required]" filled dense
-            label="Dirección Cliente"></v-text-field>
+          <v-text-field
+            v-model="$form.header.direccion_cliente"
+            :rules="[rules.required]"
+            filled
+            dense
+            label="Dirección Cliente"
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
-          <v-select v-model="$form.header.id_medio_pago" :items="items_medio_pago" label="Medio de Pago" filled dense
-            :rules="[rules.required]" item-text="medio_pago" item-value="id_medio_pago"></v-select>
+          <v-select
+            v-model="$form.header.id_medio_pago"
+            :items="items_medio_pago"
+            label="Medio de Pago"
+            filled
+            dense
+            :rules="[rules.required]"
+            item-text="medio_pago"
+            item-value="id_medio_pago"
+          ></v-select>
         </v-col>
         <v-col cols="12" md="4">
-          <v-text-field v-model="$form.header.nro_operacion" label="Nro.Operación" filled dense></v-text-field>
+          <v-text-field
+            v-model="$form.header.nro_operacion"
+            label="Nro.Operación"
+            filled
+            dense
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
-          <v-select v-model="epsSelected" :items="eps_institution" @click:clear="clearEps" item-text="name"
-            item-value="id" label="Selecciona la EPS" filled dense clearable></v-select>
+          <v-select
+            v-model="epsSelected"
+            :items="eps_institution"
+            @click:clear="clearEps"
+            item-text="name"
+            item-value="id"
+            label="Selecciona la EPS"
+            filled
+            dense
+            clearable
+            :disabled="epsDisabled"
+          ></v-select>
+          {{ epsSelected }}
         </v-col>
 
         <v-col cols="12" md="4">
-          <v-select :disabled="epsSelected == null" v-model="epsDiscountSelected" :items="epsDiscounts"
-            @change="updateEpsDiscount" item-text="detail" item-value="id" label="Selecciona el descuento" filled dense
-            return-object></v-select>
+          <v-select
+            :disabled="epsSelected == null"
+            v-model="epsDiscountSelected"
+            :items="epsDiscounts"
+            @change="updateEpsDiscount"
+            item-text="detail"
+            item-value="id"
+            label="Selecciona el descuento"
+            filled
+            dense
+            return-object
+          ></v-select>
         </v-col>
         <v-col cols="12" md="4">
           <PaymentCoupons @validated="handleCoupon"></PaymentCoupons>
@@ -61,9 +146,20 @@
       <br />
       <v-row dense class="pa-2">
         <v-col cols="9">
-          <v-autocomplete :disabled="epsActive" v-model="get_producto" :items="items_producto"
-            :search-input.sync="search_productos" hide-no-data hide-selected dense item-text="Description"
-            item-value="API" label="Buscar Producto" placeholder="Buscar Producto" return-object></v-autocomplete>
+          <v-autocomplete
+            :disabled="epsActive"
+            v-model="get_producto"
+            :items="items_producto"
+            :search-input.sync="search_productos"
+            hide-no-data
+            hide-selected
+            dense
+            item-text="Description"
+            item-value="API"
+            label="Buscar Producto"
+            placeholder="Buscar Producto"
+            return-object
+          ></v-autocomplete>
         </v-col>
         <v-spacer></v-spacer>
         <v-col cols="auto">
@@ -88,31 +184,81 @@
           <tbody>
             <tr v-for="(item, index) in form.detail" :key="index">
               <td>
-                <v-btn v-if="!item.disabled" @click="deleteItem(index)" small color="error" icon>
+                <v-btn
+                  v-if="!item.disabled"
+                  @click="deleteItem(index)"
+                  small
+                  color="error"
+                  icon
+                >
                   <v-icon small> mdi-delete</v-icon>
                 </v-btn>
               </td>
               <td>
-                <v-text-field v-model="item.detalle_item" hide-details outlined dense filled :rules="[rules.required]"
-                  :readonly="item.disabled"></v-text-field>
+                <v-text-field
+                  v-model="item.detalle_item"
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  :rules="[rules.required]"
+                  :readonly="item.disabled"
+                ></v-text-field>
               </td>
               <td>
-                <v-select v-model="item.id_unidad_medida" :items="unidades_medida" item-text="nombre_unidad_medida"
-                  item-value="id_unidad_medida" :rules="[rules.required]" :readonly="item.disabled" hide-details outlined
-                  dense filled></v-select>
+                <v-select
+                  v-model="item.id_unidad_medida"
+                  :items="unidades_medida"
+                  item-text="nombre_unidad_medida"
+                  item-value="id_unidad_medida"
+                  :rules="[rules.required]"
+                  :readonly="item.disabled"
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                ></v-select>
               </td>
               <td>
-                <v-text-field v-on:keyup="calcularTotalFila(index)" v-model="item.cantidad" hide-details outlined dense
-                  filled type="number" :rules="[rules.required]" :readonly="item.disabled"></v-text-field>
+                <v-text-field
+                  v-on:keyup="calcularTotalFila(index)"
+                  v-model="item.cantidad"
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  type="number"
+                  :rules="[rules.required]"
+                  :readonly="item.disabled"
+                ></v-text-field>
               </td>
               <td>
-                <v-text-field v-on:keyup="calcularTotalFila(index)" v-model="item.precio_unitario" prefix="S/."
-                  hide-details outlined dense type="number" filled step="0.01" :rules="[rules.required]"
-                  :readonly="item.disabled"></v-text-field>
+                <v-text-field
+                  v-on:keyup="calcularTotalFila(index)"
+                  v-model="item.precio_unitario"
+                  prefix="S/."
+                  hide-details
+                  outlined
+                  dense
+                  type="number"
+                  filled
+                  step="0.01"
+                  :rules="[rules.required]"
+                  :readonly="item.disabled"
+                ></v-text-field>
               </td>
               <td>
-                <v-text-field v-model="item.precio_total" hide-details prefix="S/." outlined dense filled type="number"
-                  :rules="[rules.required]" :readonly="item.disabled"></v-text-field>
+                <v-text-field
+                  v-model="item.precio_total"
+                  hide-details
+                  prefix="S/."
+                  outlined
+                  dense
+                  filled
+                  type="number"
+                  :rules="[rules.required]"
+                  :readonly="item.disabled"
+                ></v-text-field>
               </td>
             </tr>
           </tbody>
@@ -122,8 +268,16 @@
                 <b>Subtotal: </b>
               </td>
               <td colspan="2">
-                <v-text-field v-model="$form.header.subtotal" readonly hide-details outlined dense filled prefix="S/."
-                  :rules="[rules.required]"></v-text-field>
+                <v-text-field
+                  v-model="$form.header.subtotal"
+                  readonly
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  prefix="S/."
+                  :rules="[rules.required]"
+                ></v-text-field>
               </td>
             </tr>
             <tr>
@@ -131,8 +285,16 @@
                 <b>IGV (18%): </b>
               </td>
               <td colspan="2">
-                <v-text-field v-model="$form.header.igv" readonly hide-details outlined dense filled prefix="S/."
-                  :rules="[rules.required]"></v-text-field>
+                <v-text-field
+                  v-model="$form.header.igv"
+                  readonly
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  prefix="S/."
+                  :rules="[rules.required]"
+                ></v-text-field>
               </td>
             </tr>
             <tr>
@@ -140,22 +302,49 @@
                 <b>Descuento Fijo (S/.): </b>
               </td>
               <td colspan="2">
-                <v-text-field :disabled="epsActive" v-model="$form.header.dscto_fijo" :min="0" type="number" hide-details
-                  outlined dense filled prefix="S/."></v-text-field>
+                <v-text-field
+                  :disabled="epsActive"
+                  v-model="$form.header.dscto_fijo"
+                  :min="0"
+                  type="number"
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  prefix="S/."
+                ></v-text-field>
               </td>
             </tr>
 
             <tr>
               <td colspan="4" style="text-align: right">
-                <b>Descuento (%):</b>
+                <b>Descuento (%):: {{ $form.header.descuento_porcentaje }} </b>
               </td>
               <td colspan="1">
-                <v-text-field :disabled="epsActive" v-model="$form.header.descuento_porcentaje" hide-details outlined
-                  dense filled prefix="%" :min="0" :max="100" type="number"></v-text-field>
+                <v-text-field
+                  :disabled="epsActive"
+                  v-model="$form.header.descuento_porcentaje"
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  prefix="%"
+                  :min="0"
+                  :max="100"
+                  type="number"
+                ></v-text-field>
               </td>
               <td colspan="2">
-                <v-text-field :disabled="epsActive" v-model="$form.header.dscto_porcentaje" readonly hide-details outlined
-                  dense filled prefix="S/."></v-text-field>
+                <v-text-field
+                  :disabled="epsActive"
+                  v-model="$form.header.dscto_porcentaje"
+                  readonly
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  prefix="S/."
+                ></v-text-field>
               </td>
             </tr>
 
@@ -165,15 +354,39 @@
               </td>
 
               <td colspan="1">
-                <v-text-field v-on:keyup="recalculateEpsDiscount(true)" @change="recalculateEpsDiscount(true)"
-                  :disable="form.header.id_eps_discount == null" v-model="epsDiscountPercentage" hide-details outlined
-                  dense filled prefix="%" :min="0" :max="100" type="number" step="0.5"></v-text-field>
+                <v-text-field
+                  v-on:keyup="recalculateEpsDiscount(true)"
+                  @change="recalculateEpsDiscount(true)"
+                  :disable="form.header.id_eps_discount == null"
+                  v-model="epsDiscountPercentage"
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  prefix="%"
+                  :min="0"
+                  :max="100"
+                  type="number"
+                  step="0.5"
+                ></v-text-field>
               </td>
 
               <td colspan="1">
-                <v-text-field v-on:keyup="recalculateEpsDiscount(false)" @change="recalculateEpsDiscount(false)"
-                  :disable="form.header.id_eps_discount == null" v-model="$form.header.eps_discount" hide-details outlined
-                  dense filled prefix="S/." min="0" max="100" type="number" step="0.5"></v-text-field>
+                <v-text-field
+                  v-on:keyup="recalculateEpsDiscount(false)"
+                  @change="recalculateEpsDiscount(false)"
+                  :disable="form.header.id_eps_discount == null"
+                  v-model="$form.header.eps_discount"
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  prefix="S/."
+                  min="0"
+                  max="100"
+                  type="number"
+                  step="0.5"
+                ></v-text-field>
               </td>
             </tr>
             <tr>
@@ -181,8 +394,15 @@
                 <b>Total: </b>
               </td>
               <td colspan="2">
-                <v-text-field v-model="$form.header.total" readonly hide-details outlined dense filled
-                  prefix="S/."></v-text-field>
+                <v-text-field
+                  v-model="$form.header.total"
+                  readonly
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  prefix="S/."
+                ></v-text-field>
               </td>
             </tr>
             <tr v-if="form.header.id_eps_discount != null">
@@ -190,8 +410,15 @@
                 <b>Total (EPS): </b>
               </td>
               <td colspan="2">
-                <v-text-field v-model="coberturaEps" readonly hide-details outlined dense filled
-                  prefix="S/."></v-text-field>
+                <v-text-field
+                  v-model="coberturaEps"
+                  readonly
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  prefix="S/."
+                ></v-text-field>
               </td>
             </tr>
 
@@ -200,10 +427,20 @@
                 <b>Adelanto: </b>
               </td>
               <td colspan="2">
-                <v-text-field v-model="$form.header.adelanto" hide-details outlined dense filled :disabled="form.header.condicion_pago == 1 ||
-                  (form.header.deuda_tipo == 'total' &&
-                    form.header.condicion_pago != 1)
-                  " prefix="S/." @change="handleAdelanto($event)"></v-text-field>
+                <v-text-field
+                  v-model="$form.header.adelanto"
+                  hide-details
+                  outlined
+                  dense
+                  filled
+                  :disabled="
+                    form.header.condicion_pago == 1 ||
+                    (form.header.deuda_tipo == 'total' &&
+                      form.header.condicion_pago != 1)
+                  "
+                  prefix="S/."
+                  @change="handleAdelanto($event)"
+                ></v-text-field>
               </td>
             </tr>
           </tfoot>
@@ -217,19 +454,42 @@
           <strong> Deuda Asociada </strong>
         </v-col>
         <v-col cols="3">
-          <v-select v-model="$form.header.condicion_pago" :items="item_tipo_pago" label="Condición de Pago"
-            item-text="text" item-value="value" dense></v-select>
+          <v-select
+            v-model="$form.header.condicion_pago"
+            :items="item_tipo_pago"
+            label="Condición de Pago"
+            item-text="text"
+            item-value="value"
+            dense
+          ></v-select>
         </v-col>
 
         <v-col cols="3" v-if="form.header.condicion_pago != 1">
-          <v-menu v-model="menuDeudaDate" :close-on-content-click="false" :nudge-right="40" transition="scale-transition"
-            offset-y min-width="auto">
+          <v-menu
+            v-model="menuDeudaDate"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
             <template v-slot:activator="{ on, attrs }">
-              <v-text-field v-model="form.header.fecha_vencimiento" prepend-inner-icon="mdi-calendar" readonly dense
-                label="Fecha de vencimiento" v-bind="attrs" v-on="on" hide-details></v-text-field>
+              <v-text-field
+                v-model="form.header.fecha_vencimiento"
+                prepend-inner-icon="mdi-calendar"
+                readonly
+                dense
+                label="Fecha de vencimiento"
+                v-bind="attrs"
+                v-on="on"
+                hide-details
+              ></v-text-field>
             </template>
-            <v-date-picker v-model="form.header.fecha_vencimiento" no-title
-              @input="menuDeudaDate = false"></v-date-picker>
+            <v-date-picker
+              v-model="form.header.fecha_vencimiento"
+              no-title
+              @input="menuDeudaDate = false"
+            ></v-date-picker>
           </v-menu>
         </v-col>
 
@@ -244,15 +504,32 @@
       <!-- Deudas -->
       <v-row v-if="form.header.condicion_pago == 2" dense class="pa-2 py-0">
         <v-col cols="3">
-          <v-select @change="handleTipoDeuda" v-model="form.header.deuda_tipo" :items="tipos_deuda" label="Tipo de Deuda"
-            item-text="text" item-value="value"></v-select>
+          <v-select
+            @change="handleTipoDeuda"
+            v-model="form.header.deuda_tipo"
+            :items="tipos_deuda"
+            label="Tipo de Deuda"
+            item-text="text"
+            item-value="value"
+          ></v-select>
         </v-col>
         <v-col cols="3">
-          <v-text-field @change="handleAdelanto($event)" v-model="form.header.adelanto" label="Adelanto (S/.)"
-            type="number" min="0" :disabled="form.header.deuda_tipo == 'total' ? true : false"></v-text-field>
+          <v-text-field
+            @change="handleAdelanto($event)"
+            v-model="form.header.adelanto"
+            label="Adelanto (S/.)"
+            type="number"
+            min="0"
+            :disabled="form.header.deuda_tipo == 'total' ? true : false"
+          ></v-text-field>
         </v-col>
         <v-col cols="3">
-          <v-text-field v-model="saldo" label="Saldo (S/.)" type="number" disabled></v-text-field>
+          <v-text-field
+            v-model="saldo"
+            label="Saldo (S/.)"
+            type="number"
+            disabled
+          ></v-text-field>
         </v-col>
       </v-row>
       <v-row v-if="form.header.condicion_pago == 3" dense class="pa-2 py-0">
@@ -269,21 +546,46 @@
               <tbody>
                 <tr v-for="(item, index) in $form.cuotas" :key="index">
                   <td>
-                    <v-menu v-model="item.menu2" :close-on-content-click="false" :nudge-right="40"
-                      transition="scale-transition" offset-y min-width="auto">
+                    <v-menu
+                      v-model="item.menu2"
+                      :close-on-content-click="false"
+                      :nudge-right="40"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="auto"
+                    >
                       <template v-slot:activator="{ on, attrs }">
-                        <v-text-field v-model="item.fecha" prepend-inner-icon="mdi-calendar" readonly dense v-bind="attrs"
-                          v-on="on" hide-details></v-text-field>
+                        <v-text-field
+                          v-model="item.fecha"
+                          prepend-inner-icon="mdi-calendar"
+                          readonly
+                          dense
+                          v-bind="attrs"
+                          v-on="on"
+                          hide-details
+                        ></v-text-field>
                       </template>
-                      <v-date-picker v-model="item.date" no-title @input="item.menu2 = false"></v-date-picker>
+                      <v-date-picker
+                        v-model="item.date"
+                        no-title
+                        @input="item.menu2 = false"
+                      ></v-date-picker>
                     </v-menu>
                   </td>
                   <td>
-                    <v-text-field v-model="item.monto" dense :value="form.header.total" prefix="S/." type="number"
-                      hide-details></v-text-field>
+                    <v-text-field
+                      v-model="item.monto"
+                      dense
+                      :value="form.header.total"
+                      prefix="S/."
+                      type="number"
+                      hide-details
+                    ></v-text-field>
                   </td>
                   <td>
-                    <v-btn color="error" @click="deleteCuota(index)">Borrar</v-btn>
+                    <v-btn color="error" @click="deleteCuota(index)"
+                      >Borrar</v-btn
+                    >
                   </td>
                 </tr>
               </tbody>
@@ -301,7 +603,9 @@
       <br />
       <v-card-actions class="justify-end">
         <v-spacer />
-        <v-btn color="primary" @click="finishAnamnesis()" :loading="loadingBtn">Guardar</v-btn>
+        <v-btn color="primary" @click="finishAnamnesis()" :loading="loadingBtn"
+          >Guardar</v-btn
+        >
       </v-card-actions>
 
       <v-dialog v-model="dialog" max-width="600px">
@@ -314,26 +618,57 @@
               <v-container>
                 <v-row>
                   <v-col cols="12" sm="6" md="6">
-                    <v-select :items="tipos_doc" label="Tipo Documento" placeholder="Selecciona un tipo de Documento"
-                      v-model="editedItem.id_tipo_doc" required item-text="tipo_documento"
-                      item-value="id_tipo_doc"></v-select>
-                    <v-text-field v-model="editedItem.nombre" label="Nombre / Razón Social Proveedor"
-                      placeholder="Nombre / Razón Social Proveedor" :rules="requiredRules"></v-text-field>
-                    <v-text-field v-model="editedItem.email" label="Correo Electrónico"
-                      placeholder="Correo Electrónico"></v-text-field>
+                    <v-select
+                      :items="tipos_doc"
+                      label="Tipo Documento"
+                      placeholder="Selecciona un tipo de Documento"
+                      v-model="editedItem.id_tipo_doc"
+                      required
+                      item-text="tipo_documento"
+                      item-value="id_tipo_doc"
+                    ></v-select>
+                    <v-text-field
+                      v-model="editedItem.nombre"
+                      label="Nombre / Razón Social Proveedor"
+                      placeholder="Nombre / Razón Social Proveedor"
+                      :rules="requiredRules"
+                    ></v-text-field>
+                    <v-text-field
+                      v-model="editedItem.email"
+                      label="Correo Electrónico"
+                      placeholder="Correo Electrónico"
+                    ></v-text-field>
                   </v-col>
-                  <v-col cols="12" sm="6" md="6"><!--v-on:keyup.enter.prevent="buscarDoc()"-->
-                    <v-text-field v-model="editedItem.nro_doc" label="Nro. Documento" placeholder="Nro. Documento"
-                      :rules="requiredRules">
+                  <v-col cols="12" sm="6" md="6"
+                    ><!--v-on:keyup.enter.prevent="buscarDoc()"-->
+                    <v-text-field
+                      v-model="editedItem.nro_doc"
+                      label="Nro. Documento"
+                      placeholder="Nro. Documento"
+                      :rules="requiredRules"
+                    >
                       <template #append-outer>
-                        <v-btn color="primary" class="mb-1" @click="obtenerDataDocumentos()">
+                        <v-btn
+                          color="primary"
+                          class="mb-1"
+                          @click="obtenerDataDocumentos()"
+                        >
                           <v-icon>mdi-magnify</v-icon>
                         </v-btn>
                       </template>
                     </v-text-field>
-                    <v-text-field v-if="showAdd" v-model="editedItem.direccion" label="Dirección" placeholder="Dirección"
-                      :rules="requiredRules"></v-text-field>
-                    <v-text-field v-model="editedItem.telefono" label="Teléfono" placeholder="Teléfono"></v-text-field>
+                    <v-text-field
+                      v-if="showAdd"
+                      v-model="editedItem.direccion"
+                      label="Dirección"
+                      placeholder="Dirección"
+                      :rules="requiredRules"
+                    ></v-text-field>
+                    <v-text-field
+                      v-model="editedItem.telefono"
+                      label="Teléfono"
+                      placeholder="Teléfono"
+                    ></v-text-field>
                   </v-col>
                 </v-row>
               </v-container>
@@ -360,7 +695,7 @@ export default {
   props: {
     form: {
       type: Object,
-      default: () => { },
+      default: () => {},
     },
     send: {
       type: Function,
@@ -463,6 +798,7 @@ export default {
     epsDiscountSelected: null,
     epsActive: false,
     epsDiscountPercentage: null,
+    epsDisabled: false,
   }),
 
   computed: {
@@ -480,7 +816,11 @@ export default {
         let Description = "";
         let type = "P";
         Description =
-        "[" + entry.codigo_producto + "] " + entry.nombre_producto + ` | ${entry.codigo_varilla} | TIENDA: ${entry.st_tienda} | ALMACEN: ${entry.st_almacen}`;
+          "[" +
+          entry.codigo_producto +
+          "] " +
+          entry.nombre_producto +
+          ` | ${entry.codigo_varilla} | TIENDA: ${entry.st_tienda} | ALMACEN: ${entry.st_almacen}`;
         return Object.assign({}, entry, { Description, type });
       });
       const servicios = this.entries_servicios.map((entry) => {
@@ -508,8 +848,9 @@ export default {
       return Number(saldo).toFixed(2);
     },
     coberturaEps() {
-      const epsDiscount = this.$form.header.total - this.$form.header.eps_discount;
-      return epsDiscount < 0 ? 0.00 : Number(epsDiscount).toFixed(2);
+      const epsDiscount =
+        this.$form.header.total - this.$form.header.eps_discount;
+      return epsDiscount < 0 ? 0.0 : Number(epsDiscount).toFixed(2);
     },
   },
   mounted() {
@@ -619,6 +960,7 @@ export default {
       this.$form.header.pago_saldo = this.$form.header.total - val;
     },
     "form.header.descuento_porcentaje"(value) {
+      console.log("Here 2")
       var sumaTotal = this.$form.detail.reduce(function (sum, product) {
         var total_fila = parseFloat(Number(product.precio_total));
         if (!isNaN(total_fila)) {
@@ -785,13 +1127,20 @@ export default {
       this.eps_institution = response.data;
     },
     handleCoupon(coupon) {
-      if (coupon.tipo_descuento == 1) {
-        this.$form.header.dscto_fijo = Number(coupon.descuento).toFixed(2);
-      } else {
-        this.$form.header.descuento_porcentaje = Number(
-          coupon.descuento
-        ).toFixed(2);
-      }
+
+        if (coupon.tipo_descuento == 1) {
+          this.$form.header.dscto_fijo = Number(coupon.descuento).toFixed(2);
+        } else {
+          this.$form.header.descuento_porcentaje = Number(
+            coupon.descuento
+          ).toFixed(2);
+          console.log("Here")
+        }
+
+        this.epsSelected = null;
+        this.clearEps();
+        this.epsDisabled = true;
+
     },
     handleTipoDeuda() {
       if (this.$form.header.deuda_tipo == "total") {
@@ -1019,7 +1368,7 @@ export default {
     calcularTotalFila(indx) {
       this.$form.detail[indx].precio_total = Number(
         this.$form.detail[indx].precio_unitario *
-        this.$form.detail[indx].cantidad
+          this.$form.detail[indx].cantidad
       ).toFixed(2);
       this.calcularTotal();
     },

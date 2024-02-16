@@ -20,12 +20,14 @@ class Cupon extends Model
         'tipo_descuento',
         'descuento',
         'fecha_vencimiento',
-
         'status',
-        'active'
+        'active',
+        'id_comprobante_origen',
+        'id_comprobante_uso',
     ];
+
     public $timestamps = true;
-    
+
     // protected $with = array('sucursal');
     public function usuario(){
         return $this->belongsTo(User::class, 'id_usuario');
@@ -40,10 +42,10 @@ class Cupon extends Model
     }
     //--- End ---
 
-    
+
     //--- Static Methods ---
-    public function customRemove(){   
-        try{            
+    public function customRemove(){
+        try{
             if($this->active != 1){
                 $this->active = 1;
                 $this->status = 1;
@@ -57,7 +59,7 @@ class Cupon extends Model
 
         }catch(\Exception $e){
             throw new \Exception($e->getMessage(), 500);
-        }  
+        }
     }
     //--- End ---
 }
