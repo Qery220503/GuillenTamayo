@@ -85,6 +85,17 @@
                         </td>
                         <td>
                             <v-text-field
+                                v-model="filter.material_producto"
+                                type="text"
+                                outlined
+                                dense
+                                class="mt-1"
+                                hide-details
+                                @input="GetRecords()"
+                            ></v-text-field>
+                        </td>
+                        <td>
+                            <v-text-field
                                 v-model="filter.stock"
                                 type="text"
                                 outlined
@@ -270,6 +281,24 @@
                         </v-row>
                     </v-form>
                 </v-card-text>
+                <template>
+                    <v-data-table
+                    flat
+                    :headers="headers"
+                    :items="viewHistory"
+                    class="flex-grow-1 scroll-me"
+                    item-key="id_compra"
+                    no-data-text="Sin compras asignadas"
+                    no-results-text="Sin compras asignadas"
+                    >
+                    <template v-slot:item.fecha="{ item }">
+                        <div>
+                        {{ item.created_at | formatDateGeneral }}
+                        </div>
+                    </template>
+
+                    </v-data-table>
+                </template>
             </v-card>
         </v-dialog>
         <!-- Fin -->
@@ -345,6 +374,7 @@ export default {
                 { text: "Producto", value: "nombre_producto", align: "left" },
                 { text: "Código Varilla", value: "codigo_varilla", align: "left" },
                 { text: "Marca", value: "marca.marca_producto", align: "left" },
+                { text: "Material", value: "material.nombre_material", align: "left" },
                 { text: "Stock Total", value: "stock", align: "left" },
                 { text: "Stock Sucursal", value: "st_sucursal", align: "left" },
                 { text: "Stock Almacén", value: "st_almacen", align: "left" },
@@ -357,9 +387,15 @@ export default {
                 // { text: "Estado", value: "estado", sortable: false, align: 'center' },
                 { text: "Acciones", sortable: false, value: "actions", align: "right" }
             ],
+            headers: [
+                { text: "Fecha de Ingreso", value: "fecha", align: "center" },
+                { text: "Nº de Factura", value: "correlativo", align: "center" },
+                { text: "Proveedor", value: "proveedor.nombre", align: "center" }
+            ],
             viewDialog: false,
             viewForm: {
             },
+            viewHistory: [],
             
             //--- Datatable ---
             loadingTable: false,
@@ -375,6 +411,7 @@ export default {
                 nombre_producto: "",
                 codigo_varilla: "",
                 marca_producto: "",
+                material_producto: "",
                 stock: "",
                 precio_compra: "",
                 precio_venta: "",
@@ -414,6 +451,7 @@ export default {
                 );
 
                 this.dataReg     = response.data;
+                console.log(this.dataReg);
                 this.currentPage = this.dataReg.current_page;
                 this.pageCount   = this.dataReg.last_page;
                 this.totalReg    = this.dataReg.total;
@@ -428,11 +466,16 @@ export default {
             this.filter = {};
             this.GetRecords();
         },
-        handleDataRowClick(row){
+        async handleDataRowClick(row){
             this.viewForm = Object.assign({}, row);
-            this.viewForm.marca_producto = row.marca.marca_producto;
-            this.viewForm.margen_ganancia = row.precio_venta - row.precio_compra;
-            this.viewDialog = true;
+                this.viewForm.marca_producto = row.marca.marca_producto;
+                this.viewForm.margen_ganancia = row.precio_venta - row.precio_compra;
+                this.viewDialog = true;
+
+                const response = await API.compras.trackProduct(row.codigo_producto);
+                if (response.data) {
+                    this.viewHistory = response.data;
+                }
         },
 
         deleteReg() {

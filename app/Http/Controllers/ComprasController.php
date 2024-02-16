@@ -317,4 +317,12 @@ class ComprasController extends Controller
 
         return response()->json($data, 200);
     }
+
+    public function trackProduct ($id)
+    {
+        $data = ComprasDetalle::where('codigo_producto', $id)->get()->pluck('id_compra');
+        $compras = Compras::whereIn('id_compra', $data)->get();
+        return response()->json($compras, 200); 
+
+    }
 }

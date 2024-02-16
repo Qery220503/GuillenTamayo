@@ -175,12 +175,12 @@ export default {
       urlCotizacion: "",
       cotizacionDialog: false,
       recipes: {
-        recipe_selection: 'recipe',
-        recipe: {
-          dip: null,
+          // recipe_selection: "recipe",
+          // recipe: {
           panoramic_angle: null,
           pantoscopic_angle: null,
           vertex_distance: null,
+          dip: null,
           od: {
             esf: null,
             cyl: null,
@@ -189,7 +189,7 @@ export default {
             alt: null,
             prismas: null,
             avcc: null,
-            eje:null,
+            eje: null,
           },
           oi: {
             esf: null,
@@ -199,9 +199,9 @@ export default {
             alt: null,
             prismas: null,
             avcc: null,
-            eje:null,
+            eje: null,
           },
-          selection: 'far',
+          selection: "far",
           /* Specific recipes */
           near: {
             oi: {
@@ -221,7 +221,7 @@ export default {
               prismas: null,
               //avcc: null,
               eje: null,
-            }
+            },
           },
           intermediate: {
             oi: {
@@ -241,7 +241,7 @@ export default {
               prismas: null,
               //avcc: null,
               eje: null,
-            }
+            },
           },
           far: {
             oi: {
@@ -261,7 +261,7 @@ export default {
               prismas: null,
               //avcc: null,
               eje: null,
-            }
+            },
           },
           multifocal: {
             od: {
@@ -282,11 +282,8 @@ export default {
               dnp: null,
               alt: null,
               prismas: null,
-              //avcc: null
+              //avcc: null,
             },
-            panoramic_angle: null,
-            pantoscopic_angle: null,
-            vertex_distance: null
           },
           bifocal: {
             od: {
@@ -297,7 +294,7 @@ export default {
               dnp: null,
               alt: null,
               prismas: null,
-              //avcc: null
+              //avcc: null,
             },
             oi: {
               esf: null,
@@ -307,42 +304,41 @@ export default {
               dnp: null,
               alt: null,
               prismas: null,
-              //avcc: null
+              //avcc: null,
             },
             panoramic_angle: null,
             pantoscopic_angle: null,
-            vertex_distance: null
-          }
+            vertex_distance: null,
+          },
+          contact: {
+            od: {
+              esf: null,
+              cyl: null,
+              eje: null,
+              k1: null,
+              k2: null,
+              cb: null,
+              diametro: null,
+              dhiv: null,
+              sag: null,
+            },
+            oi: {
+              esf: null,
+              cyl: null,
+              eje: null,
+              k1: null,
+              k2: null,
+              cb: null,
+              diametro: null,
+              dhiv: null,
+              sag: null,
+            },
+            material: null,
+            color: null,
+            geometry: null,
+            replacement: null,
+          },
         },
-        contact_recipe: {
-          od: {
-            esf: null,
-            cyl: null,
-            eje: null,
-            k1: null,
-            k2: null,
-            cb: null,
-            diametro: null,
-            dhiv: null,
-            sag: null
-          },
-          oi: {
-            esf: null,
-            cyl: null,
-            eje: null,
-            k1: null,
-            k2: null,
-            cb: null,
-            diametro: null,
-            dhiv: null,
-            sag: null
-          },
-          material: null,
-          color: null,
-          geometry: null,
-          replacement: null,
-        }
-      },
       anamnesis: {
         id_anamnesis: null
       },
