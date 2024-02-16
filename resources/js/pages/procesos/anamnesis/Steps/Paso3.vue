@@ -1,6 +1,8 @@
 <template>
   <div class="flex-grow-1">
     <div class="my-2">
+      Coupon: {{ coupon }} <br>
+      Header {{ form.header }}
       <v-row dense>
         <v-col cols="12" md="4">
           <v-select
@@ -318,7 +320,7 @@
 
             <tr>
               <td colspan="4" style="text-align: right">
-                <b>Descuento (%):: {{ $form.header.descuento_porcentaje }} </b>
+                <b>Descuento (%): </b>
               </td>
               <td colspan="1">
                 <v-text-field
@@ -494,11 +496,7 @@
         </v-col>
 
         <v-spacer></v-spacer>
-        <!--
-        <v-col cols="3" v-if="form.header.id_tipo_comprobante == 1">
-          <v-checkbox v-model="$form.header.deuda_generada" label="Factura Gratutita"></v-checkbox>
-        </v-col>
-        -->
+
       </v-row>
 
       <!-- Deudas -->
@@ -799,6 +797,7 @@ export default {
     epsActive: false,
     epsDiscountPercentage: null,
     epsDisabled: false,
+    coupon: null
   }),
 
   computed: {
@@ -870,8 +869,10 @@ export default {
       this.$form.detail.splice(2, this.$form.detail.length);
       this.epsActive = true;
       this.$form.header.dscto_porcentaje = null;
+      console.log('epsSelectedWatch')
       this.$form.header.descuento_porcentaje = null;
       this.$nextTick(() => {
+        console.log('here 9')
         this.$form.header.dscto_fijo = null;
       });
     },
@@ -960,7 +961,7 @@ export default {
       this.$form.header.pago_saldo = this.$form.header.total - val;
     },
     "form.header.descuento_porcentaje"(value) {
-      console.log("Here 2")
+      console.log("Here 2: " + value)
       var sumaTotal = this.$form.detail.reduce(function (sum, product) {
         var total_fila = parseFloat(Number(product.precio_total));
         if (!isNaN(total_fila)) {
@@ -984,7 +985,7 @@ export default {
       }
 
       if (
-        this.$form.header.dscto_fijo != null ||
+        this.$form.header.dscto_fijo != null &&
         this.$form.header.dscto_fijo != 0
       ) {
         this.$form.header.dscto_fijo = 0.0;
@@ -995,6 +996,7 @@ export default {
       }
       if (value > 100) {
         this.$nextTick(() => {
+          console.log("Descuento Porcentaje")
           this.$form.header.descuento_porcentaje = 100;
         });
         return;
@@ -1002,7 +1004,6 @@ export default {
       let descuento = sumaTotal * (value / 100);
       this.$form.header.dscto_porcentaje = descuento;
       sumaTotal = sumaTotal - descuento;
-      //this.$form.header.dscto_porcentaje = parseFloat(descuento).toFixed(2);
       this.$form.header.subtotal = parseFloat(sumaTotal / 1.18).toFixed(2);
       this.$form.header.igv = parseFloat(
         sumaTotal - this.$form.header.subtotal
@@ -1038,6 +1039,7 @@ export default {
       }
       if (value > sumaTotal) {
         this.$nextTick(() => {
+          console.log("here6")
           this.$form.header.dscto_fijo = sumaTotal;
         });
         return;
@@ -1079,10 +1081,6 @@ export default {
             total -= this.$form.header.eps_discount;
           total = total < 0 ? 0 : total;
           let cuotaMonto = Number(total / 3);
-          /*
-          if (this.$form.header.id_eps_discount != null)
-            cuotaMonto -= this.$form.header.eps_discount;*/
-
           let lastDate = null;
           for (let index = 0; index < 3; index++) {
             const fecha = new Date();
@@ -1127,20 +1125,12 @@ export default {
       this.eps_institution = response.data;
     },
     handleCoupon(coupon) {
-
-        if (coupon.tipo_descuento == 1) {
-          this.$form.header.dscto_fijo = Number(coupon.descuento).toFixed(2);
-        } else {
-          this.$form.header.descuento_porcentaje = Number(
-            coupon.descuento
-          ).toFixed(2);
-          console.log("Here")
-        }
-
         this.epsSelected = null;
         this.clearEps();
         this.epsDisabled = true;
-
+        this.coupon = coupon;
+        console.log("handleCoupon");
+        this.$form.header.descuento_porcentaje = 25;
     },
     handleTipoDeuda() {
       if (this.$form.header.deuda_tipo == "total") {

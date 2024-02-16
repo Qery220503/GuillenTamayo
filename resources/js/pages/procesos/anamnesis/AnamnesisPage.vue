@@ -535,6 +535,7 @@ export default {
           adelanto: 0.0,
           saldo: 0.0,
           dscto_porcentaje: "",
+          descuento_porcentaje: "",
           dscto_fijo: "",
           comentario: "",
           deuda_generada: false,
