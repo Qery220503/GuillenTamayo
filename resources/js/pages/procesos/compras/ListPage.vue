@@ -316,6 +316,7 @@ export default {
                     +"&"+myParams
                 );
                 this.dataReg = response.data;
+                console.log(this.dataReg);
                 this.currentPage = response.data.current_page;
                 this.totalReg = this.dataReg.total;
                 this.loadingTable = false;

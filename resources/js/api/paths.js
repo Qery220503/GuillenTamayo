@@ -148,6 +148,7 @@ const PATHS = {
     ROOT: "api/compras",
     SET: "api/compras/",
     SERIES: "api/compra/series",
+    PRODUCTOS: "api/compra/product/",
   },
   origenDinero: {
     ROOT: "api/combo/origen-dinero",

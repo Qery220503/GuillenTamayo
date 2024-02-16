@@ -106,6 +106,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('buscarDniRuc', [ServicesController::class,'buscarDniRuc']);
     Route::get('list/productos', [ServicesController::class,'productos']);
     Route::get('compra/series', [ComprasController::class, 'getComprasSeries']);
+    Route::get('compra/product/{id}', [ComprasController::class, 'trackProduct']);
     Route::get('combo/proveedores', [ProveedoresController::class,'combo']);
     Route::get('proveedor/cuenta-corriente/{id}', [ProveedoresController::class,'cuenta_corriente']);
     Route::get('combo/origen-dinero', [ServicesController::class,'origen_dinero']);

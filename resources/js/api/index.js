@@ -526,7 +526,7 @@ const API = {
     },
   },
   compras: {
-    list(queryParam) {
+    list(queryParam = "") {
       return callAPI("get", PATHS.compras.ROOT + queryParam);
     },
     create(data) {
@@ -543,6 +543,9 @@ const API = {
     },
     series() {
       return callAPI("get", PATHS.compras.SERIES);
+    },
+    trackProduct(id) {
+      return callAPI("get", PATHS.compras.PRODUCTOS + id);
     },
   },
   origenDinero: {

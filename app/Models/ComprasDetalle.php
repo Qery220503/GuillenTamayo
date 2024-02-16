@@ -26,7 +26,7 @@ class ComprasDetalle extends Model
     public $timestamps = true;
 
     public function compra(){
-        return $this->belongsTo(Compras::class, 'id_compra');
+        return $this->belongsTo(Compras::class, 'id_compra', 'id_compra');
     }
     
     //--- Mutators ---

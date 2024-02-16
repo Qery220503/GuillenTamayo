@@ -11,7 +11,7 @@ use App\Models\ProductosMarca;
 use App\Models\StockProductoSucursal;
 use App\Traits\DatabaseRowsTrait;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; 
 use Exception;
 
 class ProductosController extends Controller
@@ -23,7 +23,7 @@ class ProductosController extends Controller
     }
 
     public function index(Request $request){
-        $datos = Productos::with('marca')
+        $datos = Productos::with(['marca','material'])
         ->where([
             ["estado", 1],
         ]);
@@ -38,7 +38,14 @@ class ProductosController extends Controller
             $datos->where("codigo_varilla", "LIKE", "%".$request->codigo_varilla."%");
         }
         if(isset($request->marca_producto)){
-            $datos->where("marca_producto", "LIKE", "%".$request->marca_producto."%");
+            $datos->whereHas('marca', function ($query) use ($request) {
+                $query->where('marca_producto', 'LIKE', '%' . $request->marca_producto . '%');
+            });
+        }
+        if(isset($request->material_producto)){
+            $datos->whereHas('material', function ($query) use ($request) {
+                $query->where('nombre_material', 'LIKE', '%' . $request->material_producto . '%');
+            });
         }
         if(isset($request->stock)){
             $datos->where("stock", "LIKE", "%".$request->stock."%");
