@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CouponMail;
 use App\Models\Comprobante;
 use App\Models\ComprobanteDetalle;
 use App\Models\Caja;
@@ -15,6 +16,7 @@ use App\Models\Productos;
 use App\Models\ProductosCategoria;
 use App\Services\ComprobanteService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Mpdf\Mpdf;
 use Illuminate\Support\Facades\DB;
 
@@ -62,7 +64,7 @@ class ComprobanteController extends Controller
   public function store(Request $request)
   {
     DB::beginTransaction();
-    try {
+    //try {
       $auth = auth('sanctum')->user();
       $_head =  $request->header;
       if ($request->header["id_cliente"] == "") {
@@ -85,7 +87,6 @@ class ComprobanteController extends Controller
       $_head['id_usuario'] = $auth->id;
       $_head['id_caja'] = $caja->id_caja;
       $_head['id_estado_comprobante'] = 4;
-      $_head['id_serie'] = $_head['id_serie'];
       $_head['saldo'] = 0.00;
       if ($_head['condicion_pago'] == 2 || $_head['condicion_pago'] == 3) {
         $_head['saldo'] = $_head['total'] - $_head['adelanto'];
@@ -138,6 +139,8 @@ class ComprobanteController extends Controller
           'fecha_vencimiento' => $date->toDateString(),
           'id_comprobante_origen' => $comprobante->id_comprobante,
         ]);
+        $cliente = Clientes::find($comprobante->id_cliente);
+        Mail::to($cliente->email)->queue(new CouponMail($cupon, $cliente));
       }
       if(isset($request->id_cupon)){
         $cuponExpirar = Cupon::findOrFail($request->id_cupon);
@@ -183,11 +186,12 @@ class ComprobanteController extends Controller
         "comprobante" => $comprobante,
         "cupon" => $cupon,
       ], 200);
-
+/*
     } catch (\Exception $e) {
       DB::rollBack();
       return response()->json($e->getMessage(), 500);
     }
+    */
   }
 
 

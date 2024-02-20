@@ -41,13 +41,17 @@ class Anamnesis extends Model
         return $this->belongsTo(Doctores::class, 'id_doctor');
     }
     public function empresa(){
-        return $this->hasMany(EmpresaConvenio::class, 'id_empresa_convenio');
+        return $this->belongsTo(EmpresaConvenio::class, 'id_empresa_convenio');
     }
     public function sucursal(){
         return $this->belongsTo(Sucursales::class, 'id_sucursal');
     }
     public function orden(){
         return $this->hasOne(OrdenLaboratorio::class, 'id_anamnesis', 'id_anamnesis');
+    }
+
+    public function historial(){
+        return $this->hasMany(AnamnesisEstadosHistorico::class,'anamnesis_id', 'id_anamnesis');
     }
 
     //--- Mutators ---

@@ -30,9 +30,15 @@
             </v-chip>
         </template>
           <template v-slot:[`item.actions`]="{ item }">
+            
             <v-btn v-if="item.orden == null" small icon @click="archivarAnamnesis(item)">
                 <v-icon small>mdi-close</v-icon>
             </v-btn>
+            
+            <v-btn  small icon :to="'/anamnesis/ver/' + item.id_anamnesis">
+                <v-icon small>mdi-eye</v-icon>
+            </v-btn>
+
             <!--<v-btn small icon @click="retakeAnamnesis(item)">
               <v-icon small>mdi-restart</v-icon>
             </v-btn>-->

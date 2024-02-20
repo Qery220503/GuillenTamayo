@@ -91,7 +91,7 @@
               <v-col>
                 <v-checkbox
                   v-model="addForm.sunglasses"
-                  label="Lentes de contacto"
+                  label="Lentes Solares"
                   hint="Habilitar esta opción hara que los productos generen un cupon de descuento 20%"
                 ></v-checkbox>
               </v-col>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CouponMail;
 use App\Mail\MultiFocalMail;
 use App\Models\Clientes;
 use App\Models\Anamnesis;
@@ -39,17 +40,11 @@ class AnamnesisController extends Controller
   {
     $auth = auth('sanctum')->user();
     try {
-      AnamnesisEstadosHistorico::create([
-        'user_id'=>$auth->id,
-        'fecha'=>date('Y-m-d H:i:s'),
-        'estado'=>'anamnesis_creada'
-      ]);
+
 
       $data = $request->anamnesis;
       if (!array_key_exists('id_cliente', $request->cliente) || $request->cliente["id_cliente"] == "") {
         $_cliente = $request->cliente;
-        $_cliente['cod_tipo_doc'] = $_cliente["cod_tipo_doc"];
-        $_cliente['nombre_razon_social'] = $_cliente["nombre_razon_social"];
         $cliente = Clientes::create($_cliente);
         $_head["id_cliente"] = $cliente->id_cliente;
       } else {
@@ -62,6 +57,14 @@ class AnamnesisController extends Controller
       $data['id_cliente'] = $cliente->id_cliente;
       $anamnesis = Anamnesis::create(collect($data)->all());
 
+
+      AnamnesisEstadosHistorico::create([
+        'user_id'=>$auth->id,
+        'anamnesis_id'=>$anamnesis->id_anamnesis,
+        'fecha'=>date('Y-m-d H:i:s'),
+        'estado'=>'anamnesis_creada'
+      ]);
+
       AnamnesisEstadosHistorico::create([
         'user_id'=>$auth->id,
         'anamnesis_id'=>$anamnesis->id_anamnesis,
@@ -73,7 +76,7 @@ class AnamnesisController extends Controller
         'cliente' => $cliente,
         'anamnesis' => $anamnesis
       ], 200);
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       return response()->json([$e->getMessage(), $e->getLine()], 500);
     }
   }
@@ -105,7 +108,7 @@ class AnamnesisController extends Controller
       return response()->json([
         'orden_laboratorio' => $orden_lab,
       ], 200);
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       return response()->json([$e->getMessage(), $e->getLine(), $e->getFile()], 500);
     }
   }
@@ -140,7 +143,6 @@ class AnamnesisController extends Controller
       $_head['dscto_fijo'] = 0.00;
       $_head['dscto_porcentaje'] = 0.00;
       $_head['id_estado_comprobante'] = 4;
-      $_head['id_serie'] = $_head['id_serie'];
       $correlativo = Comprobante::where('id_tipo_comprobante', $request->header['id_tipo_comprobante'])
         ->where('id_sucursal', $auth->id_sucursal)
         ->where('id_serie', $serie->id_serie)
@@ -234,6 +236,9 @@ class AnamnesisController extends Controller
           'id_comprobante_origen' => ($clientDocument == null) ? $epsInvoice->id_comprobante : $clientDocument->id_comprobante,
         ]);
 
+        $cliente = Clientes::find( $_head['id_cliente']);
+        Mail::to($cliente->email)->queue(new CouponMail($cupon, $cliente));
+        
         DB::commit();
 
 
@@ -306,6 +311,9 @@ class AnamnesisController extends Controller
           'id_comprobante_origen' => $comprobante->id_comprobante,
         ]);
 
+        $cliente = Clientes::find( $_head['id_cliente']);
+        Mail::to($cliente->email)->queue(new CouponMail($cupon, $cliente));
+
         /*
           Nota de venta
           Pendiente a implementación si se requiere
@@ -357,7 +365,9 @@ class AnamnesisController extends Controller
 
   public function searchAnamnesis($id)
   {
-    $anamnesis = Anamnesis::where('id_anamnesis', $id)->first();
+    $anamnesis = Anamnesis::with(['cliente', 'clinica', 'doctor', 'empresa', 'sucursal', 'orden', 'historial.user'])
+      ->where('id_anamnesis', $id)
+      ->first();
     if ($anamnesis) {
       return response()->json($anamnesis, 200);
     }
@@ -386,10 +396,18 @@ class AnamnesisController extends Controller
   public function descartarAnamnesis($id)
   {
     $anamnesis = Anamnesis::where('id_anamnesis', $id)->first();
-
+    $auth = auth()->user();
     $anamnesis->update([
       'estado' => 0
     ]);
+
+    AnamnesisEstadosHistorico::create([
+      'user_id'=>$auth->id,
+      'anamnesis_id'=>$anamnesis->id_anamnesis,
+      'fecha'=>date('Y-m-d H:i:s'),
+      'estado'=>'anamnesis_archivada_usuario'
+    ]);
+
 
     return response()->json([
       'msg' => "Anamnesis desactivada"
@@ -400,8 +418,7 @@ class AnamnesisController extends Controller
   {
 
     $user = auth()->user();
-    $data = Anamnesis::where('estado', 1)
-      ->with(['cliente', 'orden.montura', 'orden.lente'])
+    $data = Anamnesis::with(['cliente', 'orden.montura', 'orden.lente'])
       ->where('id_sucursal', $user->id_sucursal);
     $itemsPerPage = $request->perpage;
     $sortBy = $request->sortBy;

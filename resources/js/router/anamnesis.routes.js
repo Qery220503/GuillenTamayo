@@ -16,6 +16,14 @@ export default [
       )
   },
   {
+    path: "/anamnesis/ver/:id",
+    name: "anamnesis-ver",
+    component: () =>
+      import(
+        /* webpackChunkName: "anamnesis-ver" */ "@/pages/procesos/anamnesis/AnamnesisDetail.vue"
+      )
+  },
+  {
     path: "/orden-laboratorio",
     name: "orden-laboratorio",
     component: () =>

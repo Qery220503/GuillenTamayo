@@ -25,6 +25,9 @@ class AnamnesisEstadosHistorico extends Model
 
     protected $appends = [];
     
+    public function user(): BelongsTo {
+        return $this->belongsTo(User::class, 'user_id');
+    }
     public function anamnesis():BelongsTo{
         return $this->belongsTo(Anamnesis::class, 'anamnesis_id', 'id_anmnesis');
     }

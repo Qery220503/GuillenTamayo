@@ -30,7 +30,6 @@ class MultiFocalMail extends Mailable implements ShouldQueue
     public function build()
     {
         $image = env('APP_URL')."/images/illustrations/logo.png";
-        Log::info("Logo: ". $image);
         return $this->view('mails.multifocal')
                     ->subject('¡Descubre cómo mejorar tu experiencia con tus nuevos lentes multifocales!')
                     ->with([

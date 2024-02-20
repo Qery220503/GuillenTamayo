@@ -1,5 +1,7 @@
 <template>
-  <div class="pa-2">
+  
+
+  <div class="overflow-y-auto pa-3" style="overflow-x: hidden !important">
     <!--Paciente-->
     <v-row>
       <v-col class="py-2 px-1" cols="12" md="3">
@@ -355,15 +357,21 @@
         ></v-select>
       </v-col>
     </v-row>
-    <v-card-actions>
-      <v-btn color="success" @click="send(true)">
-        <v-icon left> mdi-cash </v-icon>
-        Cotizar
-      </v-btn>
-      <v-spacer></v-spacer>
-      <v-btn color="error" text to="/dashboard">Cancelar</v-btn>
-      <v-btn color="primary" @click="send()"> Guardar </v-btn>
-    </v-card-actions>
+
+    <v-row>
+      <v-col style="display: flex; justify-content: center; flex-direction: row; flex-wrap: wrap;">
+        <v-btn color="info" @click="send(true)">
+          <v-icon left> mdi-cash </v-icon>
+          Cotizar
+        </v-btn>
+        <v-spacer></v-spacer>
+        <div>
+          <v-btn color="error" text to="/dashboard">Cancelar</v-btn>
+          <v-btn color="primary" @click="send()"> Guardar </v-btn>
+        </div>
+      </v-col>
+    </v-row>
+
 
     <v-dialog v-model="dialogMantenimiento" persistent max-width="350">
       <v-card color="primary" dark>

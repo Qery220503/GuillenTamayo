@@ -29,6 +29,20 @@ if (token) {
   );
 }
 
+
+caller.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response.status === 401) {
+      window.location.href = "/login";
+      localStorage.clear();
+    }
+    return Promise.reject(error);
+  }
+);
+
 const call = async (_type, _endpoint, _body) => {
   var _data = undefined;
   try {

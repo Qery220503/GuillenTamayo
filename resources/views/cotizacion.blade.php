@@ -634,26 +634,6 @@
 </head>
 <body>
 @php
-{{
-    /*
-    function getRefraccion($ojo){
-        $esfera = ($ojo["esfera"] != null || "") ? $ojo["esfera"] : " ";
-        $cilindro = ($ojo["cilindro"] != null || "") ? $ojo["cilindro"] : " ";
-        $eje = ($ojo["eje"] != null || "") ? $ojo["eje"] : " ";
-        $adicion = ($ojo["adicion"] != null || "") ? $ojo["adicion"] : " ";
-        $dip = ($ojo["dip"] != null || "") ? $ojo["dip"] : " ";
-        $alt = ($ojo["alt"] != null || "") ? $ojo["alt"] : " ";
-        $prismas = ($ojo["prismas"] != null || "") ? $ojo["prismas"] : " ";
-        $avcc = ($ojo["avcc"] != null || "") ? $ojo["avcc"] : " ";
-        return "ESF: $esfera CIL: $cilindro EJE: $eje ADIC: $adicion DIP: $dip ALT: $alt PRISM: $prismas";
-    }
-    $rc = $cotizacion->refraccion_cerca;
-    $rl = $cotizacion->refraccion_lejos;
-    $od_rc = getRefraccion($rc["od"]);
-    $oi_rc = getRefraccion($rc["oi"]);
-    $od_rl = getRefraccion($rl["od"]);
-    $oi_rl = getRefraccion($rl["oi"]);
-    */
 
     function getTotal($detalles){
         $total = 0;
@@ -670,7 +650,7 @@
 
 
     $totalCotizacion = getTotal($detalle);
-}}
+
 @endphp
 
 <div class="text-center company_logo_box pt-5">
