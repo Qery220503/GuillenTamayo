@@ -14,9 +14,7 @@ const caller = axios.create({
   },
 });
 if (localStorage.getItem("user_token")) {
-  caller.defaults.headers.common["Authorization"] =
-    "Bearer " + localStorage.getItem("user_token");
-  console.log("ENVIANDO TOKEN: " + localStorage.getItem("user_token"));
+  caller.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("user_token");
 }
 
 caller.defaults.withCredentials = true;
@@ -71,6 +69,11 @@ const call = async (_type, _endpoint, _body) => {
 async function callAPI(type, endpoint, options = {}) {
   try {
     var data;
+    
+    if (localStorage.getItem("user_token")) {
+      console.log("Heree21312e");
+      caller.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("user_token");
+    }
     if (options.csrf_cookie) {
       await caller.get("sanctum/csrf-cookie").then(async (response) => {
         data = await call(type, endpoint, options.data);

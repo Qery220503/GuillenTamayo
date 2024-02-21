@@ -116,9 +116,10 @@ export default {
         },
         async login( userCredentials ){
             try{
-                const response = await API.users.login(userCredentials);
+                const response = await API.users.apiLogin(userCredentials);
                 const res_data = response.data;
-
+                console.log(res_data);
+                localStorage.setItem('user_token', res_data.user_token);
                 localStorage.setItem('user_id',res_data.user_data.id);
                 localStorage.setItem('user_data',JSON.stringify(res_data.user_data));
                 localStorage.setItem('user_permissions',JSON.stringify(res_data.permissions));

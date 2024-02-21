@@ -231,7 +231,17 @@
                 :rules="[rules.required]"
                 item-text="medio_pago"
                 item-value="id_medio_pago"
+                @change="handleMedio"
               ></v-select>
+            </v-col>
+            <v-col cols="12" md="4" v-if="form.header.id_medio_pago == 5">
+              <v-text-field
+                :rules="[rules.required]"
+                v-model="form.header.nota_credito_referencia"
+                label="Referencia Nota de Crédito"
+                filled
+                dense
+              ></v-text-field>
             </v-col>
             <v-col cols="12" md="4">
               <v-text-field
@@ -240,6 +250,14 @@
                 filled
                 dense
               ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-textarea
+                filled
+                label="Observaciones"
+                v-model="form.header.observaciones"
+                rows="2"
+              ></v-textarea>
             </v-col>
             <v-col cols="12" md="4">
               <PaymentCoupons @validated="handleCoupon"></PaymentCoupons>
@@ -819,6 +837,8 @@ export default {
     form: {
       id_cupon: null,
       header: {
+        nota_credito_referencia: "",
+        observaciones: "",
         id_cliente: "",
         id_tipo_comprobante: 2,
         id_estado_comprobante: "",
@@ -1139,6 +1159,9 @@ export default {
     this.getUnidadesMedida();
   },
   methods: {
+    handleMedio(){
+      if(this.form.header.id_medio_pago != 5) this.form.header.	nota_credito_referencia = '';
+    },
     handleCoupon(coupon) {
       this.form.id_cupon = coupon.id;
       if (coupon.tipo_descuento == 1) {

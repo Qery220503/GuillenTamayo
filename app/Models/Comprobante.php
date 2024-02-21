@@ -49,7 +49,9 @@ class Comprobante extends Model
         'eps_discount',
         'fecha_vencimiento',
         'total_abonado',
-        'id_comprobante_eps'
+        'id_comprobante_eps',
+        'observaciones',
+        'nota_credito_referencia'
     ];
     public $timestamps = true;
 

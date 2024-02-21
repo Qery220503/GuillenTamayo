@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Http\Controllers\Auth\ApiAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Resources\V1\ResponseResource;
@@ -15,7 +16,13 @@ use App\Http\Resources\V1\ResponseResource;
 |
 */
 
+/*
+|--------------------------------------------------------------------------
+| AUTH API Routes
+|--------------------------------------------------------------------------
+*/
 
+Route::post("login", [ApiAuthController::class,"login"]);
 
 Route::get('/exportClinica', [ExportController::class, 'exportarClinicas']);
 Route::get('/exportDoctores', [ExportController::class, 'exportarDoctores']);
@@ -35,7 +42,9 @@ Route::get('/exportReporteFormatoCompras',[ExportController::class,'exportFormat
 Route::get('/exportCuadroGeneral', [ReportesController::class, 'cuadroGeneralExcel']);
 Route::get('/exportDeudasComprobantes', [ReportesController::class, 'deudasPendientesExcel']);
 //API ADMIN PANEL
+//Route::group(['middleware' => ['auth:sanctum']], function () 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('logout', [ApiAuthController::class,'logout']);
     Route::get('/user', function (Request $request) {
         return new ResponseResource(auth('sanctum')->user());
     });

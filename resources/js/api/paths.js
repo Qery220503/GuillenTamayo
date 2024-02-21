@@ -11,6 +11,8 @@ const PATHS = {
     AUTH: "api/user",
     LIST: "api/users",
     LOGIN: "/signin",
+    API_LOGIN: "api/login",
+    API_LOGOUT: "api/logout",
     COMBO: "api/combo/usuarios",
   },
   roles: {

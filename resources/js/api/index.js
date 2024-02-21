@@ -10,6 +10,12 @@ const API = {
         csrf_cookie: true,
       });
     },
+    apiLogin(credentials){
+      return callAPI("post", PATHS.users.API_LOGIN, {
+        data: credentials,
+        csrf_cookie: true,
+      });
+    },
     auth() {
       return callAPI("post", PATHS.users.AUTH);
     },

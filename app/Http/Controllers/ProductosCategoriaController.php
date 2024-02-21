@@ -52,7 +52,7 @@ class ProductosCategoriaController extends Controller
         try {
             $marca_data = ProductosCategoria::create([
                 'nombre_categoria' => $request->nombre_categoria,
-                'sunglasses' => $request->sunglasses,
+                'sunglasses' => ($request->sunglasses != 1) ? 0 : 1,
                 'estado' => 1,
             ]);
             return response()->json($marca_data, 200);
