@@ -3,118 +3,179 @@
 
 <head>
     <style>
-
-
         body {
             font-family: Tahoma, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #ffffff;
             margin: 0;
             padding: 0;
+            text-align: center;
+        }
+
+        p {
+            text-align: center;
+            color: #000000;
+        }
+
+        h1, h2, h3, h4, h5, h6{
+            color: #043c77;
+            text-align: center;
+            text-transform: uppercase;
+            margin: 10px;
+        }
+
+        h1 {
+            font-size: 46px;
+        }
+
+        h2 {
+            font-size: 40px;
+        }
+
+        h3 {
+            font-size: 34px;
+        }
+
+        h4 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+        h5 {
+            margin-bottom: -10px;
+            font-size: 22px;
+        }
+
+        h6 {
+            font-size: 16px;
+        }
+
+        hr {
+            min-width: 80px;
+            border-top: solid 4px #043c77;
+        }
+
+        .date {
+            max-width: 340px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .date div {
+            margin: auto;
+        }
+
+        .date h2 {
+            margin-bottom: 2px;
+            font-weight: 800;
+        }
+
+        .coupons {
+            padding: 60px 10px;
+        }
+
+        .coupon {
+            background-image: url('https://i.ibb.co/khcM5Sp/coupon.png');
+            background-size: cover;
+            padding: 20px;
+            max-width: 200px;
+            min-height: 80px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .coupon h3 {
+            position: relative;
+            z-index: 1;
+            color: #ffffff;
+            margin: auto;
+        }
+
+        .container {
+            background-color: #ddeaf8;
+            padding: 60px 10px;
         }
 
         .email-container {
-            max-width: 600px;
+            max-width: 580px;
             margin: 20px auto;
-            background-color: #f0f0f0;
+            padding: 20px;
+            background-color: #ffffff;
             border-radius: 5px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
         }
 
         .header {
-            padding: 30px 10px; 
+            padding: 20px 10px; 
             display: flex; 
-            justify-content: center;
-            align-items: center;
-            align-content: center;
         }
         .header img {
-            max-width: 250px;
+            max-width: 300px;
+            margin: auto;
         }
 
-        .discount {
-            font-size: 100px;
-            color: rgb(4, 60, 119);
-            font-weight:900;
+        .copyright {
+            background-color: #043c77;
+            margin: -20px;
+            margin-top: 20px;
+            min-height: 140px;
+            border-radius: 0 0 10px 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .ticket {
-            background-color: #f0f0f0;
-            border: 2px solid #ccc;
-            padding: 20px;
-            margin: 20px;
-            border-radius: 5px;
-            border-style: dashed
+        .copyright p {
+            color: #ffffff;
+            margin: auto;
         }
 
-        .ticket-code {
-            font-size: 24px;
-            font-weight: bold;
-            color: rgb(4, 60, 119);
-        }
-
-        .content {
-            padding: 0px 40px;
-        }
-
-        .disclaimer {
-            text-align: center;
-            padding: 40px 50px;
-            color: #888;
-            font-size: 12px;
-            background-color: rgb(4, 60, 119);
-            text-align: center;
-            border-radius: 5px 5px 5px 5px;
-        }
-
-        .signature {
-            
-            font-size: 12px;
-            text-align: center;
-            padding: 20px 0;
-            color: black;
-            
+        .orange {
+            color: #e15524;
         }
     </style>
 </head>
 
 <body>
     <div class="email-container">
-        <div class="header" style="text-align: center;">
+        <div class="header">
             <img src="{{ env('LOGO_URL') }}" alt="Logo de Guillén Tamayo">
         </div>
-
-        <div>
-            <img style="width: 100%" src="{{ env('MAIL_IMAGE') }}" alt="Logo de Guillén Tamayo">
-        </div>
-
-        <div class="content">
-            <div style="width: 100%; padding: 10px;">
-                <span style="font-size: 25px">Hola, <strong style="color: rgb(4, 60, 119);">{{ ucwords($client->nombre_razon_social) }}</strong></span><br/> 
-                <span style="font-size: 25px">Tenemos un regalo para tí</span>
+        <div class="container">
+            <h1>20% DSCTO</h1>
+            <h5 class="orange">en tu próxima <br>compra</h5>
+            <img src="{{ env('MAIL_BANNER') }}" alt="Lentes" width="100%">
+            <h6>el cupón vence el:</h6>
+            <div class="date">
+                <div>
+                    <h2>{{ date("d",strtotime($coupon->fecha_vencimiento)) }}</h2>
+                    <hr>
+                    <h5>día</h5>
+                </div>
+                <div>
+                    <h2>{{ date("m",strtotime($coupon->fecha_vencimiento)) }}</h2>
+                    <hr>
+                    <h5>mes</h5>
+                </div>
+                <div>
+                    <h2>{{ date("y",strtotime($coupon->fecha_vencimiento)) }}</h2>
+                    <hr>
+                    <h5>año</h5>
+                </div>
             </div>
         </div>
-        <div style="text-align: center; padding: 5px 50px;">
-            <span style="font-size: 100px; font-weight: bold; color: #333;">20%</span><br/>
-            <span style="font-size: 15px">De descuento en tu próxima compra</span>
-        </div>
-
-        <div class="content">
-            <div class="ticket">
-                <p style="text-align: center; font-size: 15px;">Código de descuento:</p>
-                <p style="text-align: center; font-size: 25px; font-weight: bold; color: rgb(4, 60, 119);">{{ $coupon->codigo_cupon }}</p>
-                <p style="text-align: center; font-size: 15px;">Fecha de Vencimiento: {{ $coupon->fecha_vencimiento }}</p>
+        <div class="coupons">
+            <h4>Hola, <b class="orange">{{ ucwords($client->nombre_razon_social) }}</b></h4>
+            <p>Utiliza el <b>código del cupón</b> que aparece abajo<br> para obtener un <b>20% de descuento</b> en cualquiera de<br> nuestros productos.</p>
+            <div class="coupon">
+                <h3>{{ $coupon->codigo_cupon }}</h3>
             </div>
-            <div class="signature">
-                <p style="font-size: 15px">Con cariño,</p>
-                <p style="font-size: 15px">Todos los que hacen Guillén Tamayo</p>
-            </div>
-
         </div>
-
-        <div class="disclaimer">
-            <p>© 2023 Guillén Tamayo. Todos los derechos reservados</p>
+        <div class="copyright">
+            <p>© 2023 Guillén Tamayo. Todos los derechos reservados.</p>
         </div>
     </div>
 </body>
-
 </html>
