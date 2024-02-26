@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Anamnesis extends Model
 {
     use DatabaseRowsTrait;
-    
+
     use HasFactory;
     protected $table = 'anamnesis';
     protected $primaryKey = 'id_anamnesis';
@@ -26,7 +26,7 @@ class Anamnesis extends Model
         'estado',
     ];
     public $timestamps = true;
-
+    public $appends = ['last_state'];
     protected $casts = [
         'created_at'  => 'date:Y-m-d'
     ];
@@ -68,4 +68,8 @@ class Anamnesis extends Model
         $this->attributes['frecuencia_visita'] = $this->SetUpperCase($value);
     }
     //--- Fin ---
+
+    public function getLastStateAttribute(){
+      return $this->historial()->orderBy('id','DESC')->first();
+    }
 }

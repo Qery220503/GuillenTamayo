@@ -513,6 +513,8 @@ export default {
       },
       formStep3: {
         header: {
+          observaciones: "",
+          nota_credito_referencia: "",
           id_cliente: "",
           id_tipo_comprobante: 2,
           id_tipo_documento: 1,
@@ -581,7 +583,16 @@ export default {
     CouponTicket
   },
   mounted() {
-    this.checkIfCashIsOpen("/anamnesis");
+    let route = "/anamnesis";
+    const anamnesisId = this.$route.query.anamnesis;
+    console.log("Parametro: " + anamnesisId)
+    if (anamnesisId) {
+      route = `/anamnesis?anamnesis=${anamnesisId}`;
+    }
+    this.checkIfCashIsOpen(route);
+    if (anamnesisId) {
+      this.processAnamnesis(anamnesisId);
+    }
   },
   watch: {
     "formStep1.cliente.lista_negra"(value) {
@@ -598,6 +609,14 @@ export default {
     },
   },
   methods: {
+    async processAnamnesis(anamnesisId){
+      const anamnesis = await this.searchAnamnesis(anamnesisId);
+      this.retomarAnamnesis(anamnesis);
+    },
+    async searchAnamnesis(id_anamnesis){
+      const response = await API.anamnesis.search(id_anamnesis);
+      return response.data;
+    },
     nextStep(isCotizacion = false) {
       const vm = this;
       let caller = null;

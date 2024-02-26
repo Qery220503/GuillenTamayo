@@ -69,9 +69,8 @@ const call = async (_type, _endpoint, _body) => {
 async function callAPI(type, endpoint, options = {}) {
   try {
     var data;
-    
+
     if (localStorage.getItem("user_token")) {
-      console.log("Heree21312e");
       caller.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("user_token");
     }
     if (options.csrf_cookie) {

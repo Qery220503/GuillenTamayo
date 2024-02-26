@@ -16,7 +16,7 @@
           :options.sync="dataTabOptions"
           class="flex-grow-1 scroll-me"
           :footer-props="{
-            itemsPerPageOptions: [25, 50, 100, 1000]
+            itemsPerPageOptions: [10, 25, 50, 100, 1000]
           }"
           :loading="loadingTable"
           loading-text="Cargando... Por favor, espere"
@@ -30,18 +30,59 @@
             </v-chip>
         </template>
           <template v-slot:[`item.actions`]="{ item }">
-            
-            <v-btn v-if="item.orden == null" small icon @click="archivarAnamnesis(item)">
-                <v-icon small>mdi-close</v-icon>
-            </v-btn>
-            
-            <v-btn  small icon :to="'/anamnesis/ver/' + item.id_anamnesis">
-                <v-icon small>mdi-eye</v-icon>
-            </v-btn>
 
-            <!--<v-btn small icon @click="retakeAnamnesis(item)">
-              <v-icon small>mdi-restart</v-icon>
-            </v-btn>-->
+            <v-tooltip bottom v-if="canCloseAnamnesis(item)">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                small
+                icon
+                @click="archivarAnamnesis(item)"
+                v-bind="attrs"
+                v-on="on"
+                >
+                  <v-icon small>mdi-close</v-icon>
+                </v-btn>
+
+              </template>
+              <span>Archivar Anamnesis</span>
+            </v-tooltip>
+
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                small
+                icon
+                :to="'/anamnesis/ver/' + item.id_anamnesis"
+                v-bind="attrs"
+                v-on="on"
+                >
+                  <v-icon small>mdi-eye</v-icon>
+                </v-btn>
+
+              </template>
+              <span>Ver Anamnesis</span>
+            </v-tooltip>
+
+
+            <v-tooltip bottom v-if="canRetakeAnamnesis(item)">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                small
+                icon
+                @click="retakeAnamnesis(item)"
+                v-bind="attrs"
+                v-on="on"
+                >
+                  <v-icon small>mdi-restart</v-icon>
+                </v-btn>
+              </template>
+              <span>Retomar Anamnesis</span>
+            </v-tooltip>
+
+
+
+
           </template>
         </v-data-table>
       </v-row>
@@ -81,11 +122,41 @@ export default {
       data_reg: [],
       filter: {
         searchTerm: ""
-      }
+      },
+      estados: {
+        anamnesis_creada: "Anamnesis Iniciada",
+        anamnesis_paso_1: "Paso 1 completado",
+        anamnesis_paso_2: "Paso 2 completado",
+        anamnesis_paso_3: "Paso 3 completado",
+        anamnesis_cerrada: "Anamnesis Completada",
+        anamnesis_archivada_usuario: "Anamnesis archivada por usuario",
+        anamnesis_archivada_automaticamente: "Anamnesis archivada automáticamente",
+      },
     };
   },
   methods: {
-    async getRegistros(page = 1, per_page = 25, sortDesc = 1, sortBy = "") {
+    canCloseAnamnesis(item){
+      let states = [
+        'anamnesis_creada',
+        'anamnesis_paso_1'
+      ];
+      if(item.last_state.estado in states){
+        return true;
+      }
+      return false;
+    },
+    canRetakeAnamnesis(item){
+      let states = [
+        'anamnesis_creada',
+        'anamnesis_paso_1',
+        'anamnesis_paso_2',
+      ]
+      if(item.last_state.estado in states){
+        return true;
+      }
+      return true;
+    },
+    async getRegistros(page = 1, per_page = 25, sortDesc = 0, sortBy = "id_anamnesis") {
       this.loadingTable = true;
       this.data_reg = [];
       try {
@@ -111,15 +182,14 @@ export default {
       }
     },
     getEstado(item){
-        if(item.orden == null) return "Pendiente Orden Lab.";
-        return "Pendiente Comprobante";
+      return this.estados[item.last_state.estado];
     },
     getColor(item){
         if(item.orden == null) return "secondary";
         return "primary";
     },
     retakeAnamnesis(item){
-        // console.log(item)
+      this.$router.push('/anamnesis?anamnesis=' + item.id_anamnesis);
     },
     async archivarAnamnesis(item){
         const response =  await API.anamnesis.descartar(item.id_anamnesis);
@@ -127,7 +197,7 @@ export default {
     }
   },
   created() {
-    this.getRegistros();
+    //this.getRegistros();
   },
   watch: {
     dataTabOptions(event) {

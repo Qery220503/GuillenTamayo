@@ -8,11 +8,14 @@ use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\MailController;
 use App\Mail\CouponMail;
 use App\Models\Comprobante;
+use App\Models\OrdenLaboratorio;
 use App\Models\Sucursales;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -28,13 +31,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/multifocal', function () {
-    return view('mails.multifocal');
-});
-Route::get('/coupon', function () {
-    Mail::to('acunaramirezalexander487@gmail.com')->queue(new CouponMail());
-    return 'sended';
-});
 Route::get('/conformidadMonturaPDF/{id}', [App\Http\Controllers\AnamnesisController::class, 'conformidadMonturaPDF']);
 Route::get('/ordenLaboratorioPDF/{id}', [App\Http\Controllers\OrdenLaboratorioController::class, 'generarPDF']);
 Route::get('/cotizacionPDf/{id}/{detalle?}', [App\Http\Controllers\CotizacionController::class, 'generarPDF']);

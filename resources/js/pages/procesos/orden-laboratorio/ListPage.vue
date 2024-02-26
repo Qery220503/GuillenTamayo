@@ -142,23 +142,75 @@
               {{ item.anamnesis.doctor.nombres + " " + (item.anamnesis.doctor.apellidos ?? '')}}
             </div>
           </template>
+          <template v-slot:[`item.comprobante_generado`]="{item}">
+            <v-chip
+              color="primary"
+              v-if="item.comprobante_generado"
+            >
+              Generado
+            </v-chip>
+
+            <v-chip
+              v-else
+              color="secondary"
+            >
+              Sin generar
+            </v-chip>
+          </template>
           <template v-slot:[`item.actions`]="{ item }">
-            <v-btn
-              small
-              icon
-              :to="'/orden-laboratorio/detalle/' + item.id_orden_laboratorio"
-              link
-            >
-              <v-icon small>mdi-eye-outline</v-icon>
-            </v-btn>
-            <v-btn
-              small
-              icon
-              :href="'/ordenLaboratorioPDF/' + item.id_orden_laboratorio"
-              target="_blank"
-            >
-              <v-icon small>mdi-file-pdf-box</v-icon>
-            </v-btn>
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  small
+                  icon
+                  :to="'/orden-laboratorio/detalle/' + item.id_orden_laboratorio"
+                  link
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  <v-icon small>mdi-eye-outline</v-icon>
+                </v-btn>
+              </template>
+              <span>Ver Orden</span>
+            </v-tooltip>
+
+
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+
+                <v-btn
+                  v-bind="attrs"
+                  v-on="on"
+                  small
+                  icon
+                  :href="'/ordenLaboratorioPDF/' + item.id_orden_laboratorio"
+                  target="_blank"
+                >
+                  <v-icon small>mdi-file-pdf-box</v-icon>
+                </v-btn>
+              </template>
+              <span>PDF</span>
+            </v-tooltip>
+
+
+
+
+            <v-tooltip bottom v-if="item.comprobante_generado">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                small
+                icon
+                @click="retakeAnamnesis(item)"
+                v-bind="attrs"
+                v-on="on"
+                >
+                  <v-icon small>mdi-restart</v-icon>
+                </v-btn>
+              </template>
+              <span>Facturar</span>
+            </v-tooltip>
           </template>
         </v-data-table>
       </v-row>
@@ -192,6 +244,7 @@ export default {
           value: "anamnesis.clinica.nombre_clinica",
           align: "left"
         },
+        { text: "Comprobante", value: "comprobante_generado", align: "center", sortable: false},
         {
           text: "Doctor",
           sortable: false,
@@ -294,7 +347,10 @@ export default {
         UTILS.toastr.error("Ups! Ocurrió un error", this);
         console.error(e);
       }
-    }
+    },
+    retakeAnamnesis(item){
+      this.$router.push('/anamnesis?anamnesis=' + item.id_anamnesis);
+    },
   },
   watch: {
     dataTabOptions(event) {

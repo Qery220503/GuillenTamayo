@@ -6,6 +6,8 @@ use App\Traits\DatabaseRowsTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrdenLaboratorio extends Model
 {
@@ -19,8 +21,6 @@ class OrdenLaboratorio extends Model
         'id_cliente',
         'id_precio_lentes',
         'id_estado_orden_laboratorio',
-        'lensometria',
-        'angulos',
         'receta',
         'observaciones',
         'montura_cliente',
@@ -34,26 +34,23 @@ class OrdenLaboratorio extends Model
         'monto_compra_detallado',
         'tipo_montura',
         'montaje',
-
-        //'seleccion_medidas'
     ];
     public $timestamps = true;
 
     protected $casts = [
         'receta' => 'array',
-        'lensometria' => 'array',
-        'angulos' => 'array',
     ];
     protected $with = array('status');
 
-    protected $appends = ['codigo_orden_lab', 
-                        'fecha_emision', 
-                        'fecha_entrega_parse', 
-                        'doctor_nombre', 
-                        'clinica_nombre', 
-                        'angulos_parse', 
-                    ];
-    
+    protected $appends = [
+      'codigo_orden_lab',
+      'fecha_emision',
+      'fecha_entrega_parse',
+      'doctor_nombre',
+      'clinica_nombre',
+      'comprobante_generado'
+    ];
+
     public function historial(){
         return $this->hasMany(OrdenLaboratorioHistorial::class, 'id_orden', 'id_orden_laboratorio');
     }
@@ -81,16 +78,16 @@ class OrdenLaboratorio extends Model
     public function estadoComprobante(){
         return $this->belongsTo(OrdenLaboratorioEstados::class, 'id_estado_orden_laboratorio','id_estado_orden_laboratorio');
     }
-
+    public function comprobante(){
+      return $this->hasOne(Comprobante::class,'id_orden_lab');
+    }
     //--- Funciones ---
     public static function listAll($request){
         $auth = auth('sanctum')->user();
         $data = OrdenLaboratorio::with(
             'anamnesis',
-            'montura',
             'cliente',
             'status',
-            'usuario',
             'lente',
             'anamnesis.clinica',
             'anamnesis.doctor'
@@ -130,21 +127,8 @@ class OrdenLaboratorio extends Model
         return $data->latest()->paginate($itemsPerPage);
     }
 
-    /*
-    public function getRefraccionLejosParseAttribute(){
-        $data = $this->refraccion_lejos;
-        return [ 
-            'od' =>'ESF: '.$data['od']['esfera'].' CIL: '.$data['od']['cilindro'].' EJE: '.$data['od']['eje'].' DNP:'.$data['od']['dnp'].' ALT: '.$data['od']['alt'].' PRISM: '.$data['od']['prismas'].'',
-            'oi' =>'ESF: '.$data['oi']['esfera'].' CIL: '.$data['oi']['cilindro'].' EJE: '.$data['oi']['eje'].' DNP:'.$data['oi']['dnp'].' ALT: '.$data['oi']['alt'].' PRISM: '.$data['oi']['prismas'].''
-        ];
-    }
-    public function getRefraccionCercaParseAttribute(){
-        $data = $this->refraccion_cerca;
-        return [ 
-            'od' =>'ESF: '.$data['od']['esfera'].' CIL: '.$data['od']['cilindro'].' EJE: '.$data['od']['eje'].' DNP:'.$data['od']['dnp'].' ALT: '.$data['od']['alt'].' PRISM: '.$data['od']['prismas'].'',
-            'oi' =>'ESF: '.$data['oi']['esfera'].' CIL: '.$data['oi']['cilindro'].' EJE: '.$data['oi']['eje'].' DNP:'.$data['oi']['dnp'].' ALT: '.$data['oi']['alt'].' PRISM: '.$data['oi']['prismas'].''
-        ];
-    }*/
+
+    //--- Accessors ---
     public function getCodigoOrdenLabAttribute(){
         return str_pad($this->id_orden_laboratorio, 8, "0", STR_PAD_LEFT);
     }
@@ -160,12 +144,9 @@ class OrdenLaboratorio extends Model
     public function getClinicaNombreAttribute(){
         return $this->anamnesis->clinica['nombre_clinica'];
     }
-    public function getAngulosParseAttribute(){
-        return $this->angulos;
-        //return json_decode($this->angulos, true);
+    public function getComprobanteGeneradoAttribute(){
+      return !is_null($this->comprobante);
     }
-    //--- Fin ---
-
 
     //--- Mutators ---
     public function setObservacionesAttribute($value){

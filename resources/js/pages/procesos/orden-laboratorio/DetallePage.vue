@@ -313,9 +313,10 @@
           </v-col>
           <!-- PRECIO LENTES -->
         </v-row>
+        <!--
         <v-divider class="my-4"></v-divider>
         <h5>Lensometría</h5>
-        <!--Antecedentes-->
+
         <v-row class="mt-1">
           <v-col class="py-2 px-1" cols="12" md="6">
             <v-simple-table>
@@ -437,6 +438,7 @@
             ></v-text-field>
           </v-col>
         </v-row>
+        -->
 
         <v-divider class="my-4"></v-divider>
         <h5>Receta</h5>

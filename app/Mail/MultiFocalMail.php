@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Clientes;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -17,10 +18,10 @@ class MultiFocalMail extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(
+      public Clientes $client
+    )
+    {}
 
     /**
      * Build the message.

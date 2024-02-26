@@ -153,7 +153,7 @@ class AnamnesisController extends Controller
         Solo si es una venta con EPS.
       */
       if (isset($_head['id_eps_discount']) &&  $_head['id_eps_discount'] != null) {
-        $orden = OrdenLaboratorio::where('id_anamnesis', $request->id_anamnesis)->first();
+        $orden = OrdenLaboratorio::with(['lente'])->where('id_anamnesis', $request->id_anamnesis)->first();
         $epsHead = EpsService::prepareEpsHeader($_head);
         $total = $_head['total'];
         if($total < $_head['eps_discount']){
@@ -204,10 +204,10 @@ class AnamnesisController extends Controller
         $anamnesis = Anamnesis::where('id_anamnesis', $request->id_anamnesis)->first();
         $anamnesis->estado = 0;
         $anamnesis->save();
-        if ($orden->receta['selection'] == 'multifocal') {
+        if ($orden->lente['modelo'] == 'MULTIFOCAL') {
           $client = Clientes::where('id_cliente', $clientDocument->id_cliente)->first();
           if($client != null){
-            Mail::to($client->email)->queue(new MultiFocalMail());
+            Mail::to($client->email)->queue(new MultiFocalMail($client));
           }
         }
 
@@ -238,7 +238,7 @@ class AnamnesisController extends Controller
 
         $cliente = Clientes::find( $_head['id_cliente']);
         Mail::to($cliente->email)->queue(new CouponMail($cupon, $cliente));
-        
+
         DB::commit();
 
 
@@ -257,7 +257,7 @@ class AnamnesisController extends Controller
         */
         $comprobante = Comprobante::create(collect($_head)->all());
         $comprobante->correlativo = ++$correlativo;
-        $orden = OrdenLaboratorio::where('id_anamnesis', $request->id_anamnesis)->first();
+        $orden = OrdenLaboratorio::with(['lente'])->where('id_anamnesis', $request->id_anamnesis)->first();
         $comprobante->id_orden_lab = $orden->id_orden_laboratorio;
         $comprobante->save();
         foreach ($request->detail as $value) {
@@ -328,10 +328,11 @@ class AnamnesisController extends Controller
         }
         $facturacion_data = ComprobanteService::facturar($comprobante->id_comprobante);
         DB::commit();
-
-        if ($orden->receta['selection'] == 'multifocal') {
+        if ($orden->lente['modelo'] == 'MULTIFOCAL') {
           $client = Clientes::where('id_cliente', $comprobante->id_cliente)->first();
-          if($client != null) Mail::to($client->email)->send(new MultiFocalMail());
+          if($client != null){
+            Mail::to($client->email)->send(new MultiFocalMail($client));
+          }
         }
 
 
@@ -365,7 +366,16 @@ class AnamnesisController extends Controller
 
   public function searchAnamnesis($id)
   {
-    $anamnesis = Anamnesis::with(['cliente', 'clinica', 'doctor', 'empresa', 'sucursal', 'orden', 'historial.user'])
+    $anamnesis = Anamnesis::with([
+      'cliente',
+      'clinica',
+      'doctor',
+      'empresa',
+      'sucursal',
+      'orden.montura',
+      'orden.lente',
+      'historial.user'
+      ])
       ->where('id_anamnesis', $id)
       ->first();
     if ($anamnesis) {
@@ -416,12 +426,13 @@ class AnamnesisController extends Controller
 
   public function obtenerAnamnesis(Request $request)
   {
-
     $user = auth()->user();
+
     $data = Anamnesis::with(['cliente', 'orden.montura', 'orden.lente'])
       ->where('id_sucursal', $user->id_sucursal);
-    $itemsPerPage = $request->perpage;
-    $sortBy = $request->sortBy;
+
+    $itemsPerPage = ($request->itemsPerPage == null) ? 10 : $request->itemsPerPage;
+    $sortBy = ($request->sortBy == null) ? 'id_anamnesis' : $request->sortBy;
     $sortDesc = $request->sortDesc == true ? 'desc' : 'asc';
 
     if (isset($request->searchTerm)) {
