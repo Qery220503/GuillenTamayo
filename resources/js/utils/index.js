@@ -114,7 +114,13 @@ const UTILS = {
         },
         min811: value => {
             return (value && value.length > 10) || "Mínimo 11 caracteres";
-        }
+        },
+        maxLength: value => {
+            return (value && value.length <= 255) || "Máximo 255 caracteres";
+        },
+        phoneLength: value => {
+          return (value && value.length == 9) || "Se necesitan 9 caracteres";
+        },
     },
     const: {
         TIMEOUT: 1000,

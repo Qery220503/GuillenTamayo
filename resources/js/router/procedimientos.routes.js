@@ -11,4 +11,8 @@ export default [
 
     //--- Cuentas ---
     // { path: '/cuentas-pagar', component:()=>import("@/pages/procesos/cuentas/CuentasPorPagar.vue") },
+    //--- Campaigns ---
+
+    { path: "/campaigns", name:"campaigns-list", component:()=>import("@/pages/procesos/Campañas/CampaignPage.vue")},
+
 ];

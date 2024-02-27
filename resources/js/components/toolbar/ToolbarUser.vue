@@ -14,7 +14,7 @@
                     </v-avatar>
                 </v-badge>
             </v-btn>
-        </template> 
+        </template>
 
         <!-- user menu list -->
         <v-list dense nav>
@@ -64,7 +64,7 @@ export default {
             }
         },
         LogoutSession(){
-            axios.post('/logout').then(response => {
+            axios.post('/api/logout').then(response => {
                 this.clearStorage();
                 window.location.href = "login";
             });

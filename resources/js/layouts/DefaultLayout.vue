@@ -18,8 +18,8 @@
       <!-- Navigation menu info -->
       <template v-slot:prepend>
         <div class="pa-2 align-center">
-          <div class="align-center" style="text-align: center; background-color: white; display: flex; justify-content: center; align-items: center;"><!-- style="padding: 20px 10px;"-->
-            <img width="200" src="/images/illustrations/logo.png" />
+          <div class="align-center" style="text-align: center; display: flex; justify-content: center; align-items: center;"><!-- style="padding: 20px 10px;"-->
+            <img width="200" src="/images/illustrations/logo-white.png"/>
           </div>
         </div>
       </template>

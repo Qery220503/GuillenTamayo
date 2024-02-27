@@ -16,6 +16,9 @@ const API = {
         csrf_cookie: true,
       });
     },
+    apiLogout(){
+      return callAPI("get", PATHS.users.API_LOGOUT);
+    },
     auth() {
       return callAPI("post", PATHS.users.AUTH);
     },

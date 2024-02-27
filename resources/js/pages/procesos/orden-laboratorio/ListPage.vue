@@ -197,7 +197,7 @@
 
 
 
-            <v-tooltip bottom v-if="item.comprobante_generado">
+            <v-tooltip bottom v-if="!item.comprobante_generado">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                 small
@@ -206,7 +206,7 @@
                 v-bind="attrs"
                 v-on="on"
                 >
-                  <v-icon small>mdi-restart</v-icon>
+                  <v-icon small>mdi-receipt</v-icon>
                 </v-btn>
               </template>
               <span>Facturar</span>

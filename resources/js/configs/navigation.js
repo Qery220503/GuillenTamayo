@@ -33,6 +33,11 @@ export default {
           icon: "mdi-text-box-plus-outline",
           text: "Notas",
           link: "/notas"
+        },
+        {
+          icon: "mdi-hand-heart",
+          text: "Campañas",
+          link: "/campaigns"
         }
         // { icon: 'mdi-cash-multiple', text: 'Pago Deudas', link: '/' },
       ]

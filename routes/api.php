@@ -42,9 +42,9 @@ Route::get('/exportReporteFormatoCompras',[ExportController::class,'exportFormat
 Route::get('/exportCuadroGeneral', [ReportesController::class, 'cuadroGeneralExcel']);
 Route::get('/exportDeudasComprobantes', [ReportesController::class, 'deudasPendientesExcel']);
 //API ADMIN PANEL
-//Route::group(['middleware' => ['auth:sanctum']], function () 
+//Route::group(['middleware' => ['auth:sanctum']], function ()
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('logout', [ApiAuthController::class,'logout']);
+    Route::post('logout', [ApiAuthController::class,'logout']);
     Route::get('/user', function (Request $request) {
         return new ResponseResource(auth('sanctum')->user());
     });
