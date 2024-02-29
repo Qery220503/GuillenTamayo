@@ -112,6 +112,11 @@ export default {
           link: "/egresos"
         },
         {
+          icon: "mdi-file-document",
+          text: "Guías de Remisión",
+          link: "/guias_remision"
+        },
+        {
           icon: "mdi-poll",
           text: "Contabilidad",
           items: [

@@ -14,13 +14,13 @@ class MotivoTraslado extends Model
     protected $table = 'motivo_traslado'; 
     protected $primaryKey = 'id_motivo_traslado';
     protected $fillable = [
-        'description'
+        'descripcion'
     ];
 
     
     //--- Mutators ---
     public function setDescriptionAttribute($value){
-        $this->attributes['description'] = $this->SetUpperCase($value);
+        $this->attributes['descripcion'] = $this->SetUpperCase($value);
     }
     //--- Fin ---
 }

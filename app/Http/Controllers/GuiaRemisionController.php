@@ -32,7 +32,7 @@ class GuiaRemisionController extends Controller
 
     public function clientes() {
         try {
-            $data = Clientes::select('id_cliente', 'cod_tipo_doc', 'nro_documento', 'nombre_razon_social')->where('estado', 1)->get();
+            $data = Clientes::all();
             return response()->json($data);
         }
         catch(\Exception $e) {

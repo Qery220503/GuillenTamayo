@@ -13,7 +13,7 @@ class GuiaRemision extends Model
     use HasFactory;
     protected $table = 'guia_remision'; 
     protected $primaryKey = 'id_guia_remision';
-    protected $fillable = [    
+    protected $fillable = [
         'id_serie',
         'id_sucursal',	
         'fecha_emision',

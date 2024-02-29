@@ -21,7 +21,7 @@
           lazy-validation
         >
           <v-row>
-            <v-col class="py-1 px-1" cols="12" md="3">
+            <v-col class="py-1 px-1" cols="12" md="4">
               <v-select
                 :items="sucursales"
                 :rules="[rules2.required]"
@@ -30,9 +30,10 @@
                 item-text="nombre_sucursal"
                 item-value="id_sucursal"
                 filled
+                @input="getSeries"
               ></v-select>
             </v-col>
-            <v-col class="py-1 px-1" cols="12" md="3">
+            <v-col class="py-1 px-1" cols="12" md="4">
               <v-select
                 :items="series"
                 :rules="[rules2.required]"
@@ -43,7 +44,7 @@
                 filled
               ></v-select>
             </v-col>
-            <v-col class="py-1 px-1" cols="12" md="3">
+            <v-col class="py-1 px-1" cols="12" md="4">
               <v-menu
                 v-model="menu"
                 :close-on-content-click="true"
@@ -59,7 +60,7 @@
                     label="Fecha de emisión"
                     filled
                     readonly
-                    dense
+                    
                     v-bind="attrs"
                     v-on="on"
                   ></v-text-field>
@@ -71,7 +72,63 @@
                 ></v-date-picker>
               </v-menu>
             </v-col>
-            <v-col class="py-1 px-1" cols="12" md="3">
+
+            <v-col class="py-1 px-1" cols="12" md="4">
+              <v-autocomplete
+                v-model="getCliente"
+                :items="clientes"
+                hide-no-data
+                hide-selected
+                :item-text="formatItemText"
+                item-value="API"
+                label="Buscar Cliente"
+                placeholder="Buscar Cliente"
+                return-object
+                filled
+                clearable
+              ><template v-slot:append>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      color="primary"
+                      class="mb-1 mx-1"
+                      dark
+                      v-on="on"
+                      small
+                      @click.stop="addDialogClient = true"
+                    >
+                    <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Tooltip</span>
+                </v-tooltip>
+              </template></v-autocomplete>
+              
+            </v-col>
+
+            <v-col class="py-1 px-1" cols="12" md="4">
+              <v-select
+                :items="modo_traslado"
+                :rules="[rules2.required]"
+                v-model="guias_remision.modo_traslado"
+                label="Modo de Traslado"
+                item-text="modo"
+                item-value="modo_traslado"
+                filled
+              ></v-select>
+            </v-col>
+            <v-col class="py-1 px-1" cols="12" md="4">
+              <v-select
+                :rules="[rules2.required]"
+                v-model="guias_remision.id_motivo_traslado"
+                label="Motivo de Traslado"
+                item-text="motivo"
+                item-value="motivo_traslado"
+                filled
+              ></v-select>
+            </v-col>
+
+            <v-col class="py-1 px-1" cols="12" md="4">
               <v-menu
                 v-model="menu2"
                 :close-on-content-click="true"
@@ -87,7 +144,7 @@
                     label="Fecha traslado"
                     filled
                     readonly
-                    dense
+                    
                     v-bind="attrs"
                     v-on="on"
                   ></v-text-field>
@@ -99,66 +156,30 @@
                 ></v-date-picker>
               </v-menu>
             </v-col>
-            <v-col class="py-1 px-1" cols="12" md="3">
-              <v-autocomplete
-                v-model="getCliente"
-                :items="items_cliente"
-                :search-input.sync="search_clientes"
-                hide-no-data
-                hide-selected
-                item-text="Cliente"
-                item-value="API"
-                label="Buscar Cliente"
-                placeholder="Buscar Cliente"
-                append-outer-icon="mdi-plus-box"
-                @click:append-outer="addDialogClient = true"
-                return-object
-                filled
-              ></v-autocomplete>
-            </v-col>
-            <v-col class="py-1 px-1" cols="12" md="3">
+
+            <v-col class="py-1 px-1" cols="12" md="4">
               <v-select
-                :items="modo_traslado"
+                :items="unidades_de_medida"
                 :rules="[rules2.required]"
-                v-model="guias_remision.modo_traslado"
-                label="Modo de Traslado"
-                item-text="modo"
-                item-value="modo_traslado"
+                v-model="guias_remision.id_unidad_medida"
+                label="Unidad de medida"
+                item-text="nombre_unidad_medida"
+                item-value="id_unidad_medida"
                 filled
               ></v-select>
             </v-col>
-            <v-col class="py-1 px-1" cols="12" md="6">
-              <v-select
-                :rules="[rules2.required]"
-                v-model="guias_remision.motivo_traslado"
-                label="Motivo de Traslado"
-                item-text="motivo"
-                item-value="motivo_traslado"
-                filled
-              ></v-select>
-            </v-col>
-            <v-col class="py-1 px-1" cols="12" md="6">
+
+            <v-col class="py-1 px-1" cols="12" md="4">
               <v-textarea
                 v-model="guias_remision.descripcion_motivo_traslado"
                 label="Descripción del motivo de Traslado"
                 rows="1"
-                append-icon="mdi-close"
-                auto-grow
                 row-height="5"
                 filled
               ></v-textarea>
             </v-col>
-            <v-col class="py-1 px-1" cols="12" md="3">
-              <v-select
-                :rules="[rules2.required]"
-                v-model="guias_remision.id_unidad"
-                label="Unidad de medida"
-                item-text="unidad"
-                item-value="id_unidad"
-                filled
-              ></v-select>
-            </v-col>
-            <v-col class="py-1 px-1" cols="12" md="3">
+
+            <v-col class="py-1 px-1" cols="12" md="4">
               <v-text-field
                 v-model="guias_remision.peso_total"
                 :rules="rules"
@@ -170,9 +191,9 @@
                 filled
               />
             </v-col>
-            <v-col class="py-1 px-1" cols="12" md="3">
+            <v-col class="py-1 px-1" cols="12" md="4">
               <v-text-field
-                v-model="guias_remision.numero_paquetes"
+                v-model="guias_remision.cantidad"
                 :rules="[rules2.required]"
                 :min="1"
                 :max="50"
@@ -182,12 +203,11 @@
                 filled
               />
             </v-col>
-            <v-col class="py-1 px-1" cols="12" md="6">
+            <v-col class="py-1 px-1" cols="12" md="4">
               <v-textarea
                 v-model="guias_remision.observaciones"
                 label="Observaciones"
                 rows="1"
-                auto-grow
                 row-height="5"
                 filled
               ></v-textarea>
@@ -198,7 +218,7 @@
           <br />
           <v-row>
             <v-col class="py-1" cols="12" md="12">
-              <div class="mt-0 text-subtitle-3 ">Punto partida</div>
+              <div class="mt-0 text-subtitle-2 ">Punto partida</div>
             </v-col>
             <v-col class="py-1 px-1" cols="12" md="4">
               <v-select
@@ -210,7 +230,6 @@
                 item-text="nombre_departamento"
                 item-value="id_departamento"
                 filled
-                dense
               ></v-select>
             </v-col>
             <v-col class="py-1 px-1" cols="12" md="4">
@@ -222,7 +241,6 @@
                 item-text="nombre_provincia"
                 item-value="id_provincia"
                 filled
-                dense
               ></v-select>
             </v-col>
             <v-col class="py-1 px-1" cols="6" md="4">
@@ -234,7 +252,6 @@
                 item-text="nombre_distrito"
                 item-value="id_distrito"
                 filled
-                dense
               ></v-select>
             </v-col>
             <v-col class="py-1 px-1" cols="12" md="12">
@@ -246,7 +263,7 @@
               ></v-text-field>
             </v-col>
             <v-col class="py-1" cols="12" md="12">
-              <div class="mt-0 text-subtitle-3 ">Punto llegada</div>
+              <div class="mt-0 text-subtitle-2 ">Punto llegada</div>
             </v-col>
             <v-col class="py-1 px-1" cols="12" md="4">
               <v-select
@@ -258,7 +275,6 @@
                 item-text="nombre_departamento"
                 item-value="id_departamento"
                 filled
-                dense
               ></v-select>
             </v-col>
             <v-col class="py-1 px-1" cols="12" md="4">
@@ -270,7 +286,6 @@
                 item-text="nombre_provincia"
                 item-value="id_provincia"
                 filled
-                dense
               ></v-select>
             </v-col>
             <v-col class="py-1 px-1" cols="6" md="4">
@@ -282,7 +297,6 @@
                 item-text="nombre_distrito"
                 item-value="id_distrito"
                 filled
-                dense
               ></v-select>
             </v-col>
             <v-col class="py-1 px-1" cols="12" md="12">
@@ -308,7 +322,6 @@
                 :rules="[rules2.required]"
                 required
                 filled
-                dense
               ></v-select>
             </v-col>
             <v-col class="py-1 px-1" cols="12" md="4">
@@ -319,7 +332,7 @@
                 :rules="[rules2.required]"
                 autocomplete="off"
                 filled
-                dense>
+                >
                 <template #append-outer>
                     <v-btn
                         color="primary"
@@ -336,7 +349,7 @@
                 label="MTC"
                 :rules="[rules2.required]"
                 filled
-                dense
+                
                 autocomplete="off"
               ></v-text-field>
             </v-col>
@@ -346,7 +359,7 @@
                 label="Nombre"
                 :rules="[rules2.required]"
                 filled
-                dense
+                
                 autocomplete="off"
               ></v-text-field>
             </v-col>
@@ -356,7 +369,7 @@
                 label="Dirección fiscal"
                 :rules="[rules2.required]"
                 filled
-                dense
+                
                 autocomplete="off"
               ></v-text-field>
             </v-col>
@@ -375,7 +388,7 @@
                 :rules="[rules2.required]"
                 required
                 filled
-                dense
+                
               ></v-select>
             </v-col>
             <v-col class="py-1 px-1" cols="12" md="4">
@@ -386,7 +399,7 @@
                 :rules="[rules2.required]"
                 autocomplete="off"
                 filled
-                dense>
+                >
                     <template #append-outer>
                         <v-btn
                             color="primary"
@@ -403,7 +416,7 @@
                 label="MTC"
                 :rules="[rules2.required]"
                 filled
-                dense
+                
                 autocomplete="off"
               ></v-text-field>
             </v-col>
@@ -413,7 +426,7 @@
                 label="Nombre"
                 :rules="[rules2.required]"
                 filled
-                dense
+                
                 autocomplete="off"
               ></v-text-field>
             </v-col>
@@ -423,7 +436,7 @@
                 label="Dirección fiscal"
                 :rules="[rules2.required]"
                 filled
-                dense
+                
                 autocomplete="off"
               ></v-text-field>
             </v-col>
@@ -436,7 +449,7 @@
                 label="Nro. de Placa"
                 :rules="[rules2.required]"
                 filled
-                dense
+                
                 autocomplete="off"
               ></v-text-field>
             </v-col>
@@ -446,7 +459,7 @@
                 label="Modelo"
                 :rules="[rules2.required]"
                 filled
-                dense
+                
                 autocomplete="off"
               ></v-text-field>
             </v-col>
@@ -456,7 +469,7 @@
                 label="Marca"
                 :rules="[rules2.required]"
                 filled
-                dense
+                
                 autocomplete="off"
               ></v-text-field>
             </v-col>
@@ -466,7 +479,7 @@
                 label="N° placa semirremolque"
                 type="text"
                 filled
-                dense
+                
               />
             </v-col>
           </v-row>
@@ -546,7 +559,7 @@
                   :rules="[rules2.required]"
                   required
                   filled
-                  dense
+                  
                 ></v-select>
               </v-col>
               <v-col class="py-1 px-1" cols="12" md="4">
@@ -556,7 +569,7 @@
                   :rules="[rules2.required]"
                   autocomplete="off"
                   filled
-                  dense>
+                  >
                     <template #append-outer>
                         <v-btn
                             color="primary"
@@ -573,7 +586,7 @@
                   label="Nombre"
                   :rules="[rules2.required]"
                   filled
-                  dense
+                  
                   autocomplete="off"
                 ></v-text-field>
               </v-col>
@@ -593,7 +606,7 @@
                       v-bind="attrs"
                       v-on="on"
                       :rules="[rules2.required]"
-                      dense
+                      
                       filled
                     ></v-text-field>
                   </template>
@@ -610,7 +623,7 @@
                   label="Teléfono Principal"
                   autocomplete="off"
                   filled
-                  dense
+                  
                 ></v-text-field>
               </v-col>
               <v-col class="py-1 px-1" cols="12" md="4">
@@ -619,7 +632,7 @@
                   label="Teléfono Adicional"
                   autocomplete="off"
                   filled
-                  dense
+                  
                 ></v-text-field>
               </v-col>
               <v-col class="py-1 px-1" cols="12" md="4">
@@ -630,7 +643,7 @@
                   autocomplete="off"
                   type="email"
                   filled
-                  dense
+                  
                 ></v-text-field>
               </v-col>
               <v-col class="py-1 px-1" cols="12" md="4">
@@ -642,7 +655,7 @@
                   item-text="nombre_ocupacion"
                   item-value="id_ocupacion"
                   filled
-                  dense
+                  
                 ></v-select>
               </v-col>
               <v-col class="py-1 px-1" cols="12" md="4">
@@ -655,7 +668,7 @@
                   item-text="nombre_departamento"
                   item-value="id_departamento"
                   filled
-                  dense
+                  
                 ></v-select>
               </v-col>
               <v-col class="py-1 px-1" cols="12" md="4">
@@ -667,7 +680,7 @@
                   item-text="nombre_provincia"
                   item-value="id_provincia"
                   filled
-                  dense
+                  
                 ></v-select>
               </v-col>
               <v-col class="py-1 px-1" cols="6" md="4">
@@ -679,7 +692,7 @@
                   item-text="nombre_distrito"
                   item-value="id_distrito"
                   filled
-                  dense
+                  
                 ></v-select>
               </v-col>
               <v-col class="py-1 px-1" cols="12">
@@ -689,7 +702,7 @@
                   :rules="[rules2.required]"
                   autocomplete="off"
                   filled
-                  dense
+                  
                 ></v-text-field>
               </v-col>
               <v-col class="py-1 px-1" cols="12">
@@ -753,11 +766,11 @@ export default {
           .substr(0, 10),
         id_cliente: null,
         modo_traslado: 1,
-        motivo_traslado: null,
+        id_motivo_traslado: null,
         descripcion_motivo_traslado: null,
-        id_unidad: null,
+        id_unidad_medida: null,
         peso_total: null,
-        numero_paquetes: null,
+        cantidad: null,
         observaciones: null,
 
         id_departamento_partida: null,
@@ -770,32 +783,24 @@ export default {
         id_distrito_llegada: null,
         direccion_llegada: null,
 
-        cod_tipo_doc_transp_publico: 1,
-        nro_documento_transp_publico: null,
-        mtc_transp_publico: null,
-        nombre_razon_social_transp_publico: null,
-        direccion_transp_publico: null,
+        dni_conductor: null,
+        nombre_conductor: null,
+        licencia_conductor: null,
+        telefono_conductor: null,
+        placa_vehiculo: null,
 
-        cod_tipo_doc_transp_privado: 1,
-        nro_documento_transp_privado: null,
-        mtc_transp_privado: null,
-        nombre_razon_social_transp_privado: null,
-        direccion_transp_privado: null,
-        nro_placa_transp_privado: null,
-        modelo_transp_privado: null,
-        marca_transp_privado: null,
-        placa_semir_transp_privado: null,
 
       },
       sucursales: [],
       series: [],
+      unidades_de_medida: [],
+      clientes: [],
 
-      search_clientes: null,
       entries_clientes: [],
 
       modo_traslado: [
-        { modo_traslado: 1, modo: "Transporte público" },
-        { modo_traslado: 0, modo: "Transporte privado" }
+        { modo_traslado: '1', modo: "Transporte público" },
+        { modo_traslado: '0', modo: "Transporte privado" }
       ],
 
       motivo_traslado: [],
@@ -833,10 +838,7 @@ export default {
       validClientAddForm: false,
       addDialogClient: false,
 
-      items_tipo_doc: [
-        { id_tipo_documento: 1, nombre_tipo_documento: "DNI" },
-        { id_tipo_documento: 2, nombre_tipo_documento: "RUC" }
-      ],
+      items_tipo_doc: [],
 
       getCliente: null,
 
@@ -855,21 +857,25 @@ export default {
     };
   },
 
-  computed: {
-    items_cliente() {
-      const clients = this.entries_clientes.map(entry => {
-        let Description = "";
-        Description = "[" + entry.nro_documento + "] " + entry.nombre_razon_social;
-        return Object.assign({}, entry, { Description });
-      });
-      console.log(clients);
-      return [...clients];
-    } 
-  },
+  // computed: {
+  //   items_cliente() {
+  //     const clients = this.entries_clientes.map(entry => {
+  //       let Description = "";
+  //       Description = "[" + entry.nro_documento + "] " + entry.nombre_razon_social;
+  //       return Object.assign({}, entry, { Description });
+  //     });
+  //     console.log();
+  //     return [...clients];
+  //   } 
+  // },
 
   created() {
     let vm = this;
     vm.getSucursal();
+    vm.getSeries();
+    vm.getUnidadMedida();
+    vm.getTipoDoc();
+    vm.getClientes();
 
     console.log("Created");
   },
@@ -886,16 +892,43 @@ export default {
       let vm = this;
       try {
         const response = await API.sucursales.combo();
-        console.log(response.data);
         vm.sucursales = response.data;
       } catch (e) {
         UTILS.toastr.error("Ups! Ocurrió un error", this);
         console.error(e);
       }
     },
+    async getTipoDoc() {
+      let vm = this;
+      try {
+          const response = await API.tipos_documentos.combo();
+          vm.items_tipo_doc = response.data;
+          
+      } catch (e) {
+          UTILS.toastr.error("Ups! Ocurrió un error", this);
+          console.error(e);
+      }
+    },
+    async getSeries() {
+      let vm = this;
+      try {
+        const response = await API.series.search('5',vm.guias_remision.id_sucursal);
+        vm.series = response.data;
+      } catch (e) {
+        UTILS.toastr.error("Ups! Ocurrió un error", this);
+        console.error(e);
+      }
+    },
 
-    async getSerie() {
-
+    async getClientes() {
+      let vm = this;
+      try {
+        const response = await API.guia_remision.clientes();
+        vm.clientes = response.data;
+      } catch (e) {
+        UTILS.toastr.error("Ups! Ocurrió un error", this);
+        console.error(e);
+      }
     },
 
     async getMotivoTraslado() {
@@ -903,7 +936,14 @@ export default {
     },
 
     async getUnidadMedida() {
-
+      let vm = this;
+      try {
+        const response = await API.unidad_medida.list();
+        vm.unidades_de_medida = response.data;
+      } catch (e) {
+        UTILS.toastr.error("Ups! Ocurrió un error", this);
+        console.error(e);
+      }
     },
 
     async getDepartamento() {
@@ -974,31 +1014,17 @@ export default {
       } catch (error) {
         this.$store.commit("loader", false);
       }
-    },    
+    },
+    
+    formatItemText(item) {
+      return `[${item.nro_documento}] ${item.nombre_razon_social}`;
+    },
   },
   watch: {
     getCliente(val) {
-      if (val = null) return;
-      console.log(val, "Trying to add");
-
-      console.log(detail, "Detail");
+      if (val === null) return;
+      this.guias_remision.id_cliente = val.id_cliente ;
     },
-
-    search_clientes(val) {
-      if (this.items_cliente.length > 0) return;
-      console.log("Search clients");
-
-      fetch("/api/list/clientes")
-        .then(res => res.json())
-        .then(res => {
-          this.count = res.length;
-          this.entries_clientes = res;
-        })
-        .catch(err => {
-          console.log(err);
-        })
-        .finally(() => (this.isLoading = false));
-    }
   }
 };
 </script>

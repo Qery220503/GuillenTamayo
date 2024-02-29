@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comprobante;
 use App\Models\ComprobanteSerie;
 use Illuminate\Http\Request;
 
@@ -93,5 +94,12 @@ class SerieController extends Controller
         return response()->json([
             'msg' => 'Serie eliminada'
         ],200);
+    }
+
+    public function search($tipo, $sucursal) {
+        $data = ComprobanteSerie::where('id_tipo_comprobante', $tipo)->where('id_sucursal',$sucursal)
+        ->where('estado','1')->get();
+
+        return response()->json($data);
     }
 }

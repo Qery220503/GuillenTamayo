@@ -704,6 +704,9 @@ const API = {
     sucursal(id) {
       return callAPI("get", PATHS.serie.SUCURSALES + id);
     },
+    search(tipo, sucursal) {
+      return callAPI("get", PATHS.serie.SEARCH + tipo + '/' + sucursal)
+    },
   },
   reportes_caja: {
     comprobantes(queryParam) {
@@ -755,6 +758,9 @@ const API = {
         data: data,
       });
     },
+    clientes() {
+      return callAPI("get", PATHS.guia_remision.CLIENTES);
+    }
   },
   encuestas: {
     create(data) {

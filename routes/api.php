@@ -110,6 +110,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('combo/departamentos/', [ServicesController::class,'departamentos']);
     Route::get('combo/provincias/{id_departamento}', [ServicesController::class,'provincias']);
     Route::get('combo/distritos/{provincia}', [ServicesController::class,'distritos']);
+    Route::get('serie/search/{tipo}/{sucursal}', [SerieController::class,'search']);
 
     Route::get('combo/ocupacion/', [ServicesController::class,'ocupacion']);
     Route::post('buscarDniRuc', [ServicesController::class,'buscarDniRuc']);
