@@ -72,6 +72,7 @@ export default {
         this.dialog = false;
         this.loading = false;
         this.$emit("created", response.data);
+        this.$refs.form.reset();
       }catch(e){
         console.error(e);
       }

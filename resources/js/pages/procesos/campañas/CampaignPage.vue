@@ -19,12 +19,12 @@
           ></v-text-field>
         </v-col>
         <v-col>
-          <v-btn class="mr-2" color="deep-orange" dark>
+          <v-btn class="mr-2" color="deep-orange" dark @click="clearFilters()">
             <v-icon>mdi-broom</v-icon> Limpiar Filtros
           </v-btn>
         </v-col>
         <v-col class="text-right">
-          <CampaignCreate @created="getRecords"></CampaignCreate>
+          <CampaignCreate @created="handleCreated"></CampaignCreate>
         </v-col>
       </v-row>
 
@@ -63,6 +63,7 @@
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
+                    :disabled="item.order_count <= 0 || item.active == 0"
                     small
                     icon
                     v-bind="attrs"
@@ -125,9 +126,13 @@ export default {
       dataTabOptions: {},
       dataReg: {},
       searchTerm: "",
+      loading: false,
     };
   },
   methods: {
+    handleCreated() {
+      this.getRecords();
+    },
     async getRecords(
       searchTerm = "",
       page = 1,
@@ -144,9 +149,7 @@ export default {
           sortDesc,
           sortBy,
         };
-        console.log(parameters);
         const result = "?" + new URLSearchParams(parameters).toString();
-        console.log(result);
         const response = await API.campaign.list(result);
         Object.assign(this.dataReg, response.data);
         this.currentPage = response.data.current_page;
@@ -157,19 +160,30 @@ export default {
         this.loadingTable = false;
       }
     },
+    clearFilters() {
+      this.searchTerm = "";
+      this.getRecords();
+    },
   },
   created() {
     this.getRecords();
   },
-  dataTabOptions(event) {
-    this.itemsPerPage = event.itemsPerPage;
-    this.getRecords(
-      this.searchTerm,
-      event.page,
-      event.itemsPerPage,
-      event.sortDesc,
-      event.sortBy[0]
-    );
+  watch: {
+    searchTerm() {
+      if(!this.loadingTable){
+        this.getRecords(this.searchTerm);
+      }
+    },
+    dataTabOptions(event) {
+      this.itemsPerPage = event.itemsPerPage;
+      this.getRecords(
+        this.searchTerm,
+        event.page,
+        event.itemsPerPage,
+        event.sortDesc,
+        event.sortBy[0]
+      );
+    },
   },
 };
 </script>
