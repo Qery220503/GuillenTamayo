@@ -100,7 +100,7 @@
                     <v-icon>mdi-plus</v-icon>
                     </v-btn>
                   </template>
-                  <span>Tooltip</span>
+                  <span>Crear Cliente</span>
                 </v-tooltip>
               </template></v-autocomplete>
               
