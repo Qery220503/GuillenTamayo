@@ -61,22 +61,6 @@
             </div>
           </v-card>
         </v-col>
-        <v-col class="pa-1">
-          <v-card color="deep-orange lighten-1" class="text-center py-1" style="height: 100%">
-            <v-icon color="white" large> mdi-account </v-icon>
-            <div class="text-subtitle-1 font-weight-bold white--text text-center">
-              Total Nuevos Clientes<br />{{ dashboard_info.total_clientes }}
-            </div>
-          </v-card>
-        </v-col>
-        <v-col class="pa-1">
-          <v-card color="warning" class="text-center py-1" style="height: 100%">
-            <v-icon color="white" large> mdi-view-dashboard-variant </v-icon>
-            <div class="text-subtitle-1 font-weight-bold white--text text-center">
-              Total Productos<br />{{ dashboard_info.total_productos }}
-            </div>
-          </v-card>
-        </v-col>
       </v-row>
       <v-row dense>
         <v-col cols="6">

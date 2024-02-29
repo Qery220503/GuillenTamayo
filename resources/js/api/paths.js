@@ -199,6 +199,7 @@ const PATHS = {
     ROOT: "api/serie",
     SET: "api/serie/",
     SUCURSALES: "api/sucursales/series/",
+    SEARCH: "api/serie/search/"
   },
   cotizaciones: {
     ROOT: "api/cotizaciones",
@@ -228,6 +229,7 @@ const PATHS = {
   },
   guia_remision: {
     ROOT: "api/guia_remision",
+    CLIENTES: "api/list/clientes",
   },
   encuestas: {
     ROOT: "api/encuestas",

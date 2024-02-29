@@ -11,6 +11,9 @@
           <v-btn color="#1D6F42" class="mr-2" dark>
             Exportar<v-icon>mdi-file-excel</v-icon>
           </v-btn>
+          <v-btn color="primary" class="mr-2" to="/guias_remision/crear" link>
+            Añadir Guía <v-icon>mdi-plus</v-icon>
+          </v-btn>
         </v-col>
       </v-row>
       <v-row dense class="pa-2 align-center">

@@ -9,7 +9,7 @@ export default [
     },
     {
         /* path: "/guia_remision/crear/:id", */
-        path: "/guia_remision/crear/:id",
+        path: "/guias_remision/crear",
         name: "guia_remision-crear",
         component: () =>
             import(

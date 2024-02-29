@@ -113,6 +113,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('combo/provincias/{id_departamento}', [ServicesController::class,'provincias']);
     Route::get('combo/distritos/{provincia}', [ServicesController::class,'distritos']);
     Route::get('combo/campaigns', [CampaignController::class,'loadCampaigns']);
+    Route::get('serie/search/{tipo}/{sucursal}', [SerieController::class,'search']);
+
     Route::get('combo/ocupacion/', [ServicesController::class,'ocupacion']);
     Route::post('buscarDniRuc', [ServicesController::class,'buscarDniRuc']);
     Route::get('list/productos', [ServicesController::class,'productos']);
