@@ -882,10 +882,8 @@ export default {
       this.$form.detail.splice(2, this.$form.detail.length);
       this.epsActive = true;
       this.$form.header.dscto_porcentaje = null;
-      console.log("epsSelectedWatch");
       this.$form.header.descuento_porcentaje = null;
       this.$nextTick(() => {
-        console.log("here 9");
         this.$form.header.dscto_fijo = null;
       });
     },
@@ -974,7 +972,6 @@ export default {
       this.$form.header.pago_saldo = this.$form.header.total - val;
     },
     "form.header.descuento_porcentaje"(value) {
-      console.log("Here 2: " + value);
       var sumaTotal = this.$form.detail.reduce(function (sum, product) {
         var total_fila = parseFloat(Number(product.precio_total));
         if (!isNaN(total_fila)) {
@@ -1009,7 +1006,6 @@ export default {
       }
       if (value > 100) {
         this.$nextTick(() => {
-          console.log("Descuento Porcentaje");
           this.$form.header.descuento_porcentaje = 100;
         });
         return;
@@ -1052,7 +1048,6 @@ export default {
       }
       if (value > sumaTotal) {
         this.$nextTick(() => {
-          console.log("here6");
           this.$form.header.dscto_fijo = sumaTotal;
         });
         return;
@@ -1142,7 +1137,6 @@ export default {
       this.clearEps();
       this.epsDisabled = true;
       this.coupon = coupon;
-      console.log("handleCoupon");
       this.$form.header.descuento_porcentaje = 25;
     },
     handleTipoDeuda() {

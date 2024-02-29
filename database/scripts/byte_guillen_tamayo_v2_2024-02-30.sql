@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 29, 2024 at 03:44 PM
+-- Generation Time: Feb 29, 2024 at 04:38 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -1184,6 +1184,25 @@ CREATE TABLE `motivo_traslado` (
   `descripcion` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `motivo_traslado`
+--
+
+INSERT INTO `motivo_traslado` (`id_motivo_traslado`, `descripcion`) VALUES
+(1, 'Venta'),
+(2, 'Compra'),
+(3, 'Venta con entrega a terceros'),
+(4, 'Traslado entre establecimientos de la misma empresa'),
+(5, 'Consignación'),
+(6, 'Devolución'),
+(7, 'Recojo de bienes transformados'),
+(8, 'Importación'),
+(9, 'Exportación'),
+(13, 'Otros no comprendidos en ningún código del presente catálogo'),
+(14, 'Venta sujeta a confirmación del comprador'),
+(17, 'Traslado de bienes para transformación'),
+(18, 'Traslado por emisor itinerante de comprobantes de pago');
+
 -- --------------------------------------------------------
 
 --
@@ -1473,7 +1492,7 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (3, 'App\\Models\\User', 2, 'MyApp', 'fd8c8dbbd872ddd68ec74045c3e874264db111ca89540a7493762f976d5aae6c', '[\"*\"]', NULL, '2024-02-26 16:18:17', '2024-02-26 16:18:17'),
 (4, 'App\\Models\\User', 2, 'MyApp', '8faa363d1d50ebf34b12a9c3ff67a983a12f0f277fe7e89bebbac6defbfe2e7a', '[\"*\"]', NULL, '2024-02-26 18:45:53', '2024-02-26 18:45:53'),
 (5, 'App\\Models\\User', 2, 'MyApp', '9d541595bd0c42ca4c6933e0c3f76ac51f5d68cb674813b1c1a51ee1469a33d2', '[\"*\"]', NULL, '2024-02-27 14:05:49', '2024-02-27 14:05:49'),
-(6, 'App\\Models\\User', 2, 'MyApp', '4a05a2ebd07b4a9e77ce070f87cb22699dbeeccd1397fd3d12d742e0ac27b19b', '[\"*\"]', '2024-02-29 15:24:35', '2024-02-28 13:19:04', '2024-02-29 15:24:35');
+(6, 'App\\Models\\User', 2, 'MyApp', '4a05a2ebd07b4a9e77ce070f87cb22699dbeeccd1397fd3d12d742e0ac27b19b', '[\"*\"]', '2024-02-29 15:41:19', '2024-02-28 13:19:04', '2024-02-29 15:41:19');
 
 -- --------------------------------------------------------
 
@@ -5561,7 +5580,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `motivo_traslado`
 --
 ALTER TABLE `motivo_traslado`
-  MODIFY `id_motivo_traslado` int UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_motivo_traslado` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `notas`

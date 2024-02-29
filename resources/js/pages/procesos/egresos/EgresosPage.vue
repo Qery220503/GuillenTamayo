@@ -251,7 +251,6 @@ export default {
         try {
           this.loadingTable = true;
           this.$store.commit("loader", true);
-          console.log(this.dialogEditar);
           if (this.dialogEditar == false) {
             const response = await API.egresos.create(this.addForm);
             UTILS.toastr.success("Egreso creado correctamente", this);

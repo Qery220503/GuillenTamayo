@@ -79,7 +79,7 @@
                 {{ pago.medio_pago.medio_pago }}
               </td>
 
-              
+
               <td>
                 {{ (pago.observacion) ? pago.observacion : "Sin Observaciones" }}
               </td>
@@ -114,7 +114,6 @@ export default {
   methods:{
     async loadPagos(){
         const response = await API.credito.pagos(this.receipt.id_comprobante);
-        console.log(response, "RE")
         this.deudaPagos  = response.data.pagos;
     }
   },

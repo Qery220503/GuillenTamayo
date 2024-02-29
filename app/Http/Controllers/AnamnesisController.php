@@ -181,6 +181,7 @@ class AnamnesisController extends Controller
           $detalle["id_comprobante"] = $epsInvoice->id_comprobante;
           ComprobanteDetalle::create(collect($detalle)->all());
         }
+        $clientDocument = null;
         if ($total > $epsInvoice->total) {
           $clientReceipt = $total - $epsInvoice->total;
           $_head['total'] = $clientReceipt;
@@ -217,7 +218,7 @@ class AnamnesisController extends Controller
         $anamnesis = Anamnesis::where('id_anamnesis', $request->id_anamnesis)->first();
         $anamnesis->estado = 0;
         $anamnesis->save();
-        if ($orden->lente['modelo'] == 'MULTIFOCAL') {
+        if ($orden->lente['modelo'] == 'MULTIFOCAL' &&  $clientDocument != null) {
           $client = Clientes::where('id_cliente', $clientDocument->id_cliente)->first();
           if($client != null){
             Mail::to($client->email)->queue(new MultiFocalMail($client));
@@ -249,15 +250,19 @@ class AnamnesisController extends Controller
           'id_comprobante_origen' => ($clientDocument == null) ? $epsInvoice->id_comprobante : $clientDocument->id_comprobante,
         ]);
 
+
+        $orden->id_comprobante = isset($clientDocument) ? $clientDocument->id_comprobante : $epsInvoice->id_comprobante;
+        $orden->save();
+
+
         $cliente = Clientes::find( $_head['id_cliente']);
         Mail::to($cliente->email)->queue(new CouponMail($cupon, $cliente));
-
         DB::commit();
 
 
         return response()->json([
           'success' => true,
-          'comprobante' => isset($clientDocument) ? $clientDocument : null,
+          'comprobante' => ($clientDocument != null) ? $clientDocument : null,
           'cupon' => $cupon,
           'extra' => [
             'eps' => $facturacion_eps,
@@ -273,6 +278,10 @@ class AnamnesisController extends Controller
         $orden = OrdenLaboratorio::with(['lente'])->where('id_anamnesis', $request->id_anamnesis)->first();
         $comprobante->id_orden_lab = $orden->id_orden_laboratorio;
         $comprobante->save();
+
+        $orden->id_comprobante = $comprobante->id_comprobante;
+        $orden->save();
+
         foreach ($request->detail as $value) {
           $value['id_comprobante'] = $comprobante->id_comprobante;
           $detalle = ComprobanteDetalle::create(collect($value)->all());
@@ -331,6 +340,7 @@ class AnamnesisController extends Controller
           Nota de venta
           Pendiente a implementación si se requiere
         */
+        /*
         if ($comprobante->id_tipo_comprobante != 1 && $comprobante->id_tipo_comprobante != 2) {
           DB::commit();
           return response()->json([
@@ -338,7 +348,7 @@ class AnamnesisController extends Controller
             "comprobante" => $comprobante,
             'extra' => []
           ]);
-        }
+        }*/
         $facturacion_data = ComprobanteService::facturar($comprobante->id_comprobante);
         DB::commit();
         if ($orden->lente['modelo'] == 'MULTIFOCAL') {

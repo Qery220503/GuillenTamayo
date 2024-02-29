@@ -229,21 +229,24 @@ class CampaignController extends Controller
         No entra aca por que se solicito que no hayan notas de venta
         queda pendiente a implementarse si se requiere.
       */
+
+      /*
       if ($comprobante->id_tipo_comprobante != 1 && $comprobante->id_tipo_comprobante != 2) {
         DB::commit();
         return response()->json([
           "success" => true,
           "comprobante" => $comprobante,
         ]);
-      }
+      }*/
+
+
       $facturacion_data = ComprobanteService::facturar($comprobante->id_comprobante);
 
       // Asignación de ordenes a comprobante global
       $idsOrdenes = OrdenLaboratorio::where('id_campana', $campaign->id)
                     ->pluck('id_orden_laboratorio')
                     ->toArray();
-      Log::info('Ordenes: ' . json_encode($idsOrdenes));
-      Log::info('Comprobante: ' . $comprobante->id_comprobante);
+
 
 
       DB::table('orden_laboratorio')

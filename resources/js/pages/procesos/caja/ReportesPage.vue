@@ -416,7 +416,6 @@ export default {
       );
       vm.egresosCaja = [];
       vm.egresosCaja = response.data;
-      console.log(vm.egresosCaja, "EGRESOS CAJA");
     },
     async getCajas() {
       const vm = this;
@@ -459,7 +458,6 @@ export default {
         );
 
         this.pagosDeudas = response.data;
-        console.log(response.data, "PAGOS DEUDAS");
       } catch (e) {
         console.error(e);
       }

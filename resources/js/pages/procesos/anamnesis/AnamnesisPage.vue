@@ -116,7 +116,7 @@
 
     <v-dialog v-model="receiptDialog" style="width: 80%" @click:outside="exitReceipt">
       <v-card>
-        <v-toolbar flat color="primary" dark>
+        <v-toolbar flat color="primary" dark >
           <v-toolbar-title>Recibo</v-toolbar-title>
         </v-toolbar>
         <v-tabs>
@@ -258,8 +258,6 @@ export default {
         },
         montura_cliente: "",
         receta: {
-          // recipe_selection: "recipe",
-          // recipe: {
           panoramic_angle: null,
           pantoscopic_angle: null,
           vertex_distance: null,
@@ -810,8 +808,10 @@ export default {
         const data = response.data;
         if (data.success) {
           if ("comprobante" in data && data.comprobante != null) {
+
             const comprobante = data.comprobante;
             this.comandaURL = "/comandaPDF/" + comprobante.id_comprobante;
+
           }
           const extra = data.extra;
           if ("client" in extra && extra.client != null && Object.keys(extra).length > 0) {
@@ -819,12 +819,7 @@ export default {
             this.reciboURL = recibo.facturador + "/print/document/" + recibo.external_id;
             this.reciboFormato = 'ticket';
             this.showFormats = true;
-          } else {
-            this.reciboURL = "/comprobantes/notas-venta/" + data.comprobante.id_comprobante;
-            this.showFormats = false;
-            this.showCupon = false;
           }
-
           if ("eps" in extra && extra.eps != null) {
             const eps = response.data.extra.eps;
             this.epsURL = eps.facturador + "/print/document/" + eps.external_id;
@@ -973,6 +968,7 @@ export default {
       return true;
     },
     recalculateRecipe() {
+      console.log("Here")
       const recipe = this.formStep2.receta;
       if (recipe.recipe_selection !== "recipe") return;
       switch (recipe.recipe.selection) {
