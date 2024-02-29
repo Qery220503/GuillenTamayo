@@ -197,7 +197,7 @@
 
 
 
-            <v-tooltip bottom v-if="!item.comprobante_generado">
+            <v-tooltip bottom v-if="!item.comprobante_generado || item.id_campana != null">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                 small

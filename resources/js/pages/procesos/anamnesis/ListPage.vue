@@ -131,6 +131,7 @@ export default {
         anamnesis_cerrada: "Anamnesis Completada",
         anamnesis_archivada_usuario: "Anamnesis archivada por usuario",
         anamnesis_archivada_automaticamente: "Anamnesis archivada automáticamente",
+        anamnesis_campana: 'Anamnesis archivada por campaña'
       },
     };
   },

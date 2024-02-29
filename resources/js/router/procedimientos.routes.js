@@ -13,6 +13,6 @@ export default [
     // { path: '/cuentas-pagar', component:()=>import("@/pages/procesos/cuentas/CuentasPorPagar.vue") },
     //--- Campaigns ---
 
-    { path: "/campaigns", name:"campaigns-list", component:()=>import("@/pages/procesos/Campañas/CampaignPage.vue")},
-
+    { path: "/campaigns", name:"campaigns-list", component:()=>import("@/pages/procesos/campañas/CampaignPage.vue")},
+    { path: "/campaigns/facturar/:id", name:"campaigns-billing", component: () => import("@/pages/procesos/campañas/CampaignReceipt.vue")}
 ];

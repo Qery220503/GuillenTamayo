@@ -251,22 +251,12 @@
       <!-- PRECIO LENTES -->
     </v-row>
     <v-divider class="my-4"></v-divider>
-    <!--<h5>Lensometría</h5>-->
-    <!--Antecedentes-->
     <div class="d-flex">
       <h3>Receta</h3>
       <v-spacer></v-spacer>
       <v-btn depressed class="mr-3" color="info" @click="getHistorial">
         Buscar Receta
       </v-btn>
-      <!--
-      <v-btn dark class="mr-3" color="warning" @click="visionCerca">
-        Visión Cerca
-      </v-btn>
-      <v-btn dark color="primary" @click="trasposicionCilindros">
-        Trasposición de Cilindros
-      </v-btn>
-      -->
     </div>
 
     <!--Antecedentes-->
@@ -279,7 +269,7 @@
     <v-row>
       <v-col cols="6">
         <v-textarea
-          rows="3"
+          rows="1"
           v-model="$form.observaciones"
           label="Observaciones / Comentarios"
           filled
@@ -353,11 +343,15 @@
       </v-col>
     </v-row>
     <v-card-actions>
+      <v-btn color="primary" dark @click="openCampaignSelection()">
+        Enviar Campaña
+      </v-btn>
       <v-spacer></v-spacer>
       <v-btn color="error" text @click="cancel()">Cancelar</v-btn>
       <v-btn color="primary" @click="send()"> Guardar </v-btn>
     </v-card-actions>
     <HistorialDialog />
+    <CampaignSelection :dialog="dialogCampaign" @selected="handleCampaign"/>
   </div>
 </template>
 <script>
@@ -367,6 +361,7 @@ import API from "../../../../api";
 import MeasuresComponent from "../../../../components/measures/MeasuresComponent.vue";
 import HistorialDialog from "../components/HistorialDialog";
 import Question from "../components/Question.vue";
+import CampaignSelection from "../components/CampaignSelection";
 export default {
   props: {
     form: {
@@ -386,11 +381,18 @@ export default {
     anamnesis: {
       type: Object,
     },
+    validation: {
+      type: Function
+    },
+    store_campaign: {
+      type: Function
+    }
   },
   components: {
     HistorialDialog,
     MeasuresComponent,
     Question,
+    CampaignSelection
   },
   data: (vm) => ({
     requiredRules: [(v) => !!v || "Campo obligatorio"],
@@ -451,6 +453,7 @@ export default {
       q4: { val: null, obs: "" },
     },
     dialogObs: "",
+    dialogCampaign: false,
   }),
   computed: {
     $form: {
@@ -514,6 +517,12 @@ export default {
     });
   },
   methods: {
+    handleCampaign(campaign){
+      this.dialogCampaign = false;
+      this.$form.id_campana = campaign;
+      this.store_campaign();
+      this.$router.push('/orden-laboratorio');
+    },
     formatDate(date) {
       if (!date) return null;
       const [year, month, day] = date.split("-");
@@ -526,6 +535,11 @@ export default {
     },
     getHistorial() {
       this.$root.$emit("get_historial_cliente", this.id_cliente);
+    },
+    openCampaignSelection(){
+      if(this.validation()){
+        this.dialogCampaign = true;
+      }
     },
     async getProductos() {
       const vm = this;

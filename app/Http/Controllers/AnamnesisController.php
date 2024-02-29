@@ -91,7 +91,7 @@ class AnamnesisController extends Controller
       $orden_lab = OrdenLaboratorio::create($request->all());
 
 
-      OrdenLaboratorioHistorial::create([
+      $orden = OrdenLaboratorioHistorial::create([
         'id_orden' => $orden_lab->id_orden_laboratorio,
         'id_estado' => 1,
         'id_usuario' => $auth->id,
@@ -103,6 +103,19 @@ class AnamnesisController extends Controller
         'fecha'=>date('Y-m-d H:i:s'),
         'estado'=>'anamnesis_paso_2'
       ]);
+
+      if($orden->id_campana != null){
+        AnamnesisEstadosHistorico::create([
+          'user_id'=>$auth->id,
+          'anamnesis_id'=>$orden_lab->id_anamnesis,
+          'fecha'=>date('Y-m-d H:i:s'),
+          'estado'=>'anamnesis_campana'
+        ]);
+        $anamnesis = Anamnesis::findOrFail($orden_lab->id_anamnesis);
+        $anamnesis->estado = 0;
+        $anamnesis->save();
+
+      }
 
 
       return response()->json([
@@ -391,7 +404,7 @@ class AnamnesisController extends Controller
 
     $anamnesis = Anamnesis::whereHas('cliente', function ($q) use ($id) {
       $q->where('nro_documento', $id)->orWhere('id_cliente',$id);
-    })->with(['cliente', 'doctor', 'clinica', 'empresa', 'orden.montura', 'orden.lente'])
+      })->with(['cliente', 'doctor', 'clinica', 'empresa', 'orden.montura', 'orden.lente'])
       ->whereBetween('created_at', [$date, Carbon::now()])
       ->where('estado', 1)
       ->orderBy('id_anamnesis', 'DESC')
@@ -467,7 +480,7 @@ class AnamnesisController extends Controller
   }
 
   public function conformidadMonturaPDF($id)
-    {
+  {
         $html = $this->vistaConformidadMontura($id)->render();
         $file = 'pdf_' . 'pdf';
         $mpdf = new Mpdf(
@@ -482,5 +495,5 @@ class AnamnesisController extends Controller
         );
         $mpdf->WriteHTML($html);
         $mpdf->Output($file, 'I');
-    }
+  }
 }

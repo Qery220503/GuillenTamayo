@@ -78,6 +78,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('cotizaciones', CotizacionController::class);
     Route::apiResource('notas', NotasController::class);
     Route::apiResource('cupones', CuponesController::class);
+    Route::apiResource('campaigns', CampaignController::class);
+
     // Route::apiResource('cuentas-cobrar', CuentasCobrarController::class);
     Route::apiResource('cuentas-pagar', CuentasPagarController::class);
     Route::apiResource('caja-cuadre', CajaCuadreController::class);
@@ -87,7 +89,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('cuentas-pagar/pagoGrupal/{deudas}', [CuentasPagarController::class, 'pagoGrupal']);
     Route::post('permissions/assignPermissionsToRole/{id}', [PermissionsController::class,'assignPermissionsToRole']);
     Route::get('combo/roles/', [RoleController::class,'combo']);
-
+    Route::post('campaigns/facturar', [CampaignController::class,'facturar']);
     Route::apiResource('guia_remision', GuiaRemisionController::class);
     Route::apiResource('encuestas', EncuestaController::class);
     Route::get('encuestas/comprobante/{comprobante}', [EncuestaController::class, 'encuesta']);
@@ -110,7 +112,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('combo/departamentos/', [ServicesController::class,'departamentos']);
     Route::get('combo/provincias/{id_departamento}', [ServicesController::class,'provincias']);
     Route::get('combo/distritos/{provincia}', [ServicesController::class,'distritos']);
-
+    Route::get('combo/campaigns', [CampaignController::class,'loadCampaigns']);
     Route::get('combo/ocupacion/', [ServicesController::class,'ocupacion']);
     Route::post('buscarDniRuc', [ServicesController::class,'buscarDniRuc']);
     Route::get('list/productos', [ServicesController::class,'productos']);

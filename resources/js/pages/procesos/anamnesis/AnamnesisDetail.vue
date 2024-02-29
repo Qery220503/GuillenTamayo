@@ -147,12 +147,13 @@ export default {
       },
       estados: {
         anamnesis_creada: "Anamnesis Iniciada",
-        anamnesis_paso_1: "Paso 1",
-        anamnesis_paso_2: "Paso 2",
-        anamnesis_paso_3: "Paso 3",
+        anamnesis_paso_1: "Paso 1 completado",
+        anamnesis_paso_2: "Paso 2 completado",
+        anamnesis_paso_3: "Paso 3 completado",
         anamnesis_cerrada: "Anamnesis Completada",
         anamnesis_archivada_usuario: "Anamnesis archivada por usuario",
         anamnesis_archivada_automaticamente: "Anamnesis archivada automáticamente",
+        anamnesis_campana: 'Anamnesis archivada por campaña'
       },
       estado: "",
     };

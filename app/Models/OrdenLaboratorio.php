@@ -34,6 +34,8 @@ class OrdenLaboratorio extends Model
         'monto_compra_detallado',
         'tipo_montura',
         'montaje',
+        'id_campana',
+        'id_comprobante'
     ];
     public $timestamps = true;
 

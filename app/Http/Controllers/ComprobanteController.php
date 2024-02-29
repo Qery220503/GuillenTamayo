@@ -64,7 +64,7 @@ class ComprobanteController extends Controller
   public function store(Request $request)
   {
     DB::beginTransaction();
-    //try {
+    try {
       $auth = auth('sanctum')->user();
       $_head =  $request->header;
       if ($request->header["id_cliente"] == "") {
@@ -186,13 +186,13 @@ class ComprobanteController extends Controller
         "comprobante" => $comprobante,
         "cupon" => $cupon,
       ], 200);
-/*
+
     } catch (\Exception $e) {
       DB::rollBack();
       return response()->json($e->getMessage(), 500);
     }
-    */
-  }
+
+}
 
 
   private function generateCouponCode($length) {
