@@ -1,118 +1,52 @@
 <template>
   <div class="d-flex flex-column flex-grow-1">
-    <custom-breadcrumbs
-      :breadcrumbs_title="breadcrumbs_title"
-      :breadcrumbs="breadcrumbs"
-    ></custom-breadcrumbs>
+    <custom-breadcrumbs :breadcrumbs_title="breadcrumbs_title" :breadcrumbs="breadcrumbs"></custom-breadcrumbs>
     <v-card class="mb-4">
       <v-row dense class="pa-2 align-center">
         <v-col>
-          <v-menu
-            v-model="menu2"
-            :close-on-content-click="false"
-            :nudge-right="40"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
+          <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y
+            min-width="auto">
             <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="filter.fecha_inicio"
-                label="Fecha Inicio"
-                prepend-inner-icon="mdi-calendar"
-                readonly
-                hide-details
-                dense
-                outlined
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
+              <v-text-field v-model="filter.fecha_inicio" label="Fecha Inicio" prepend-inner-icon="mdi-calendar" readonly
+                hide-details dense outlined v-bind="attrs" v-on="on"></v-text-field>
             </template>
-            <v-date-picker
-              v-model="filter.fecha_inicio"
-              @input="menu2 = false"
-            ></v-date-picker>
+            <v-date-picker v-model="filter.fecha_inicio" @input="menu2 = false"></v-date-picker>
           </v-menu>
         </v-col>
         <v-col>
-          <v-menu
-            v-model="menu3"
-            :close-on-content-click="false"
-            :nudge-right="40"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
+          <v-menu v-model="menu3" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y
+            min-width="auto">
             <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="filter.fecha_fin"
-                label="Fecha Fin"
-                prepend-inner-icon="mdi-calendar"
-                readonly
-                hide-details
-                dense
-                outlined
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
+              <v-text-field v-model="filter.fecha_fin" label="Fecha Fin" prepend-inner-icon="mdi-calendar" readonly
+                hide-details dense outlined v-bind="attrs" v-on="on"></v-text-field>
             </template>
-            <v-date-picker
-              v-model="filter.fecha_fin"
-              @input="menu3 = false"
-            ></v-date-picker>
+            <v-date-picker v-model="filter.fecha_fin" @input="menu3 = false"></v-date-picker>
           </v-menu>
         </v-col>
         <v-col>
-          <v-autocomplete
-            :items="items_usuarios"
-            label="Usuarios"
-            hide-details
-            dense
-            outlined
-            item-value="id"
-            item-text="name"
-            v-model="filter.user"
-          ></v-autocomplete>
+          <v-autocomplete :items="items_usuarios" label="Usuarios" hide-details dense outlined item-value="id"
+            item-text="name" v-model="filter.user"></v-autocomplete>
         </v-col>
         <v-col>
-          <v-select
-            :items="items_estados"
-            label="Estado"
-            hide-details
-            dense
-            outlined
-            item-value="id_estado_orden_laboratorio"
-            item-text="nombre_estado"
-            v-model="filter.estado"
-          ></v-select>
+          <v-select :items="items_estados" label="Estado" hide-details dense outlined
+            item-value="id_estado_orden_laboratorio" item-text="nombre_estado" v-model="filter.estado"></v-select>
         </v-col>
         <v-col class="text-right">
           <v-btn color="primary" class="mr-2" @click="getRegistros()">
             Filtrar <v-icon>mdi-filter</v-icon>
           </v-btn>
-        <v-btn color="deep-orange" class="mr-2" @click="limpiarFiltros()" dark style="margin-top: 5px;">
+          <v-btn color="deep-orange" class="mr-2" @click="limpiarFiltros()" dark style="margin-top: 5px;">
             Limpiar <v-icon>mdi-broom</v-icon>
-        </v-btn>
+          </v-btn>
         </v-col>
       </v-row>
     </v-card>
     <v-card>
       <v-row dense class="pa-2 align-center">
-        <v-data-table
-          light
-          :headers="headers"
-          :items="data_reg.data"
-          :page="current_page"
-          :items-per-page="itemsperpage"
-          :server-items-length="total_reg"
-          :options.sync="dataTabOptions"
-          class="flex-grow-1 scroll-me"
-          :footer-props="{
+        <v-data-table light :headers="headers" :items="data_reg.data" :page="current_page" :items-per-page="itemsperpage"
+          :server-items-length="total_reg" :options.sync="dataTabOptions" class="flex-grow-1 scroll-me" :footer-props="{
             itemsPerPageOptions: [25, 50, 100, 1000]
-          }"
-          :loading="loadingTable"
-          loading-text="Cargando... Por favor, espere"
-        >
+          }" :loading="loadingTable" loading-text="Cargando... Por favor, espere">
           <template v-slot:[`item.estado`]="{ item }">
             <v-chip class="ma-2" :color="item.status.color" small>
               <span class="font-weight-medium">{{
@@ -137,23 +71,20 @@
           <template v-slot:[`item.lente.nombre_propio`]="{ item }">
             <div class="one-line">{{ item.lente.nombre_propio }}</div>
           </template>
-          <template v-slot:[`item.doctor`]="{item}">
+          <template v-slot:[`item.doctor`]="{ item }">
             <div>
-              {{ item.anamnesis.doctor.nombres + " " + (item.anamnesis.doctor.apellidos ?? '')}}
+              {{ item.anamnesis.doctor.nombres + " " + (item.anamnesis.doctor.apellidos ?? '') }}
             </div>
           </template>
-          <template v-slot:[`item.comprobante_generado`]="{item}">
-            <v-chip
-              color="primary"
-              v-if="item.comprobante_generado"
-            >
-              Generado
-            </v-chip>
+          <template v-slot:[`item.comprobante_generado`]="{ item }">
 
-            <v-chip
-              v-else
-              color="secondary"
-            >
+            <router-link v-if="item.comprobante_generado" :to="'/comprobantes/ver/' + item.id_comprobante" style="cursor: pointer;">
+              <v-chip color="primary"  style="cursor: pointer;">
+                Generado
+              </v-chip>
+            </router-link>
+
+            <v-chip v-else color="secondary">
               Sin generar
             </v-chip>
           </template>
@@ -161,14 +92,8 @@
 
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  small
-                  icon
-                  :to="'/orden-laboratorio/detalle/' + item.id_orden_laboratorio"
-                  link
-                  v-bind="attrs"
-                  v-on="on"
-                >
+                <v-btn small icon :to="'/orden-laboratorio/detalle/' + item.id_orden_laboratorio" link v-bind="attrs"
+                  v-on="on">
                   <v-icon small>mdi-eye-outline</v-icon>
                 </v-btn>
               </template>
@@ -180,14 +105,8 @@
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
 
-                <v-btn
-                  v-bind="attrs"
-                  v-on="on"
-                  small
-                  icon
-                  :href="'/ordenLaboratorioPDF/' + item.id_orden_laboratorio"
-                  target="_blank"
-                >
+                <v-btn v-bind="attrs" v-on="on" small icon :href="'/ordenLaboratorioPDF/' + item.id_orden_laboratorio"
+                  target="_blank">
                   <v-icon small>mdi-file-pdf-box</v-icon>
                 </v-btn>
               </template>
@@ -197,15 +116,9 @@
 
 
 
-            <v-tooltip bottom v-if="!item.comprobante_generado || item.id_campana != null">
+            <v-tooltip bottom v-if="!item.comprobante_generado && item.id_campana == null">
               <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                small
-                icon
-                @click="retakeAnamnesis(item)"
-                v-bind="attrs"
-                v-on="on"
-                >
+                <v-btn small icon @click="retakeAnamnesis(item)" v-bind="attrs" v-on="on">
                   <v-icon small>mdi-receipt</v-icon>
                 </v-btn>
               </template>
@@ -244,7 +157,7 @@ export default {
           value: "anamnesis.clinica.nombre_clinica",
           align: "left"
         },
-        { text: "Comprobante", value: "comprobante_generado", align: "center", sortable: false},
+        { text: "Comprobante", value: "comprobante_generado", align: "center", sortable: false },
         {
           text: "Doctor",
           sortable: false,
@@ -286,14 +199,14 @@ export default {
   },
   methods: {
     limpiarFiltros() {
-        this.filter = {
-            searchTerm: "",
-            fecha_inicio: "",
-            fecha_fin: "",
-            user: "",
-            estado: ""
-        };
-        this.getRegistros();
+      this.filter = {
+        searchTerm: "",
+        fecha_inicio: "",
+        fecha_fin: "",
+        user: "",
+        estado: ""
+      };
+      this.getRegistros();
     },
     async getRegistros(page = 1, per_page = 25, sortDesc = 0, sortBy = "") {
       this.loadingTable = true;
@@ -301,23 +214,23 @@ export default {
       try {
         const response = await API.orden_laboratorio.list(
           "?page=" +
-            page +
-            "&itemsPerPage=" +
-            per_page +
-            "&sortDesc=" +
-            sortDesc +
-            "&sortBy=" +
-            sortBy +
-            "&searchTerm=" +
-            this.filter.searchTerm +
-            "&fecha_inicio=" +
-            this.filter.fecha_inicio +
-            "&fecha_fin=" +
-            this.filter.fecha_fin +
-            "&user=" +
-            this.filter.user +
-            "&estado=" +
-            this.filter.estado
+          page +
+          "&itemsPerPage=" +
+          per_page +
+          "&sortDesc=" +
+          sortDesc +
+          "&sortBy=" +
+          sortBy +
+          "&searchTerm=" +
+          this.filter.searchTerm +
+          "&fecha_inicio=" +
+          this.filter.fecha_inicio +
+          "&fecha_fin=" +
+          this.filter.fecha_fin +
+          "&user=" +
+          this.filter.user +
+          "&estado=" +
+          this.filter.estado
         );
         this.data_reg = response.data;
         this.current_page = response.data.current_page;
@@ -348,7 +261,7 @@ export default {
         console.error(e);
       }
     },
-    retakeAnamnesis(item){
+    retakeAnamnesis(item) {
       this.$router.push('/anamnesis?anamnesis=' + item.id_anamnesis);
     },
   },

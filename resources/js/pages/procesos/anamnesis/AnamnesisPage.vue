@@ -812,6 +812,8 @@ export default {
             const comprobante = data.comprobante;
             this.comandaURL = "/comandaPDF/" + comprobante.id_comprobante;
 
+          }else{
+            this.comandaURL = "/comandaPDF/" + eps.id_comprobante;
           }
           const extra = data.extra;
           if ("client" in extra && extra.client != null && Object.keys(extra).length > 0) {

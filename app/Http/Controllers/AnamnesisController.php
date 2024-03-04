@@ -104,7 +104,8 @@ class AnamnesisController extends Controller
         'estado'=>'anamnesis_paso_2'
       ]);
 
-      if($orden->id_campana != null){
+      if($orden_lab->id_campana != null){
+
         AnamnesisEstadosHistorico::create([
           'user_id'=>$auth->id,
           'anamnesis_id'=>$orden_lab->id_anamnesis,

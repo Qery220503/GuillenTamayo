@@ -148,7 +148,9 @@
               {{ item.orden_laboratorio.codigo_orden_lab }} -
               {{ item.orden_laboratorio.status.nombre_estado }}
             </v-chip>
-            <v-chip v-else small> Sin orden laboratorio </v-chip>
+            <v-chip small v-else :color="(item.id_campana == null) ? 'primary' : 'secondary'">
+              {{ (item.id_campana == null) ? 'Sin Orden Laboratorio' : 'Comprobante de campañas'  }}
+            </v-chip>
           </template>
           <template v-slot:[`item.correlativo`]="{ item }">
             <div class="one-line">

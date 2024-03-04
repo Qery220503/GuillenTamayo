@@ -73,6 +73,14 @@
             </v-btn>
             <v-btn
               depressed
+              color="primary"
+              v-if="invoice.external_id && invoice.id_estado_comprobante == 1 && invoice.id_tipo_comprobante == 1"
+              @click="viewCdr"
+            >
+              <v-icon>mdi-code-less-than</v-icon>CDR
+            </v-btn>
+            <v-btn
+              depressed
               color="error"
               v-if="invoice.external_id"
               @click="viewPdf"
@@ -343,6 +351,11 @@ export default {
     viewXml() {
       window.open(
         this.invoice.sucursal.url_api + "/downloads/document/xml/" + this.invoice.external_id
+      );
+    },
+    viewCdr() {
+      window.open(
+        this.invoice.sucursal.url_api + "/downloads/document/cdr/" + this.invoice.external_id
       );
     },
     async sendDocSunat() {

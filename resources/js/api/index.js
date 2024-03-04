@@ -825,7 +825,7 @@ const API = {
     show(id){
       return callAPI("get", PATHS.campaigns.SET + id);
     },
-    facturar(data){
+    facturar(data, anamnesis){
       return callAPI("post", PATHS.campaigns.FACTURAR, { data: data });
     }
   }

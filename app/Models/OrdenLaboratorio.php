@@ -81,7 +81,7 @@ class OrdenLaboratorio extends Model
         return $this->belongsTo(OrdenLaboratorioEstados::class, 'id_estado_orden_laboratorio','id_estado_orden_laboratorio');
     }
     public function comprobante(){
-      return $this->hasOne(Comprobante::class,'id_orden_lab');
+      return $this->belongsTo(Comprobante::class,'id_comprobante');
     }
     //--- Funciones ---
     public static function listAll($request){
