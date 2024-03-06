@@ -12,23 +12,41 @@ class OcupacionController extends Controller
      *
      * @r     eturn \Illuminate\Http\Response
      */
+
     public function index(Request $request)
     {
         $data = Ocupacion::where('estado', 1);
         $itemsPerPage = $request->itemsPerPage;
+        $sortDesc = $request->sortDesc === 'true'; // Se ha convertido a Booleano.
         $sortBy = $request->sortBy;
-        $sortDesc = $request->sortDesc == true ? 'desc' : 'asc';
-
+    
         if (isset($request->searchTerm)) {
             $data->where(function ($query) use ($request) {
                 $query->where('nombre_ocupacion', 'like', '%' . $request->searchTerm . '%');
             });
         }
+    
         if (isset($sortBy)) {
-            $data->orderBy($sortBy, $sortDesc);
+            switch ($sortBy) {
+                case 'id_ocupacion':
+                    $data->orderBy('id_ocupacion', $sortDesc ? 'desc' : 'asc');
+                    break;
+                case 'PacientesCount':
+                    $data->withCount('pacientes')->orderBy('pacientes_count', $sortDesc ? 'desc' : 'asc');
+                    break;
+                case 'nombre_ocupacion':
+                    $data->orderBy('nombre_ocupacion', $sortDesc ? 'desc' : 'asc');
+                    break;
+                default:
+                    $data->orderBy('id_ocupacion', $sortDesc ? 'desc' : 'asc');
+                    break;
+            }
         }
+    
         return $data->paginate($itemsPerPage);
     }
+    
+
 
     /**
      * Show the form for creating a new resource.
@@ -54,7 +72,6 @@ class OcupacionController extends Controller
                 'estado' => 1,
             ]);
             return response()->json($marca_data, 200);
-
         } catch (\Exception $e) {
             return response()->json($e->getMessage(), 500);
         }
@@ -95,7 +112,6 @@ class OcupacionController extends Controller
             $data = Ocupacion::findOrFail($id);
             $data->update($request->all());
             return response()->json($data, 200);
-
         } catch (\Exception $e) {
             return response()->json($e->getMessage(), 500);
         }
@@ -116,19 +132,18 @@ class OcupacionController extends Controller
             );
             $data->update($upd_data);
             return response()->json($data, 200);
-            
         } catch (\Exception $e) {
             return response()->json($e->getMessage(), 500);
         }
     }
 
-    public function combo(){
-        try{
+    public function combo()
+    {
+        try {
             $data = Ocupacion::where('estado', 1)->get();
             return response()->json($data);
-        }
-        catch(\Exception $e){
-            return response()->json($e->getMessage(),500);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 500);
         }
     }
 }

@@ -41,11 +41,12 @@
           :options.sync="dataTabOptions"
           class="flex-grow-1 scroll-me"
           :footer-props="{
-            itemsPerPageOptions: [25, 50, 100, 1000]
+            itemsPerPageOptions: [25, 50, 100, 1000],
           }"
           :loading="loadingTable"
           loading-text="Cargando... Por favor, espere"
-          @click:row="handleDataRowClick">
+          @click:row="handleDataRowClick"
+          @update:options="handleSortChange">
           <template v-slot:[`item.pacientes`]="{ item }">
             <v-btn
               small
@@ -57,6 +58,7 @@
               Pacientes
             </v-btn>
           </template>
+
           <template v-slot:[`item.actions`]="{ item }">
             <v-btn small icon @click.stop="editReg(item)">
               <v-icon small>mdi-border-color</v-icon>
@@ -109,29 +111,29 @@
     <!-- Fin -->
     <!-- View Dialog -->
     <v-dialog v-model="viewDialog" max-width="60%">
-        <v-card>
-            <v-card-title>
-            <span class="headline">Visualizar Registro</span>
-            </v-card-title>
-            <v-card-text>
-                <v-form ref="viewForm">
-                    <v-row>
-                        <v-col cols="12" sm="12" md="12">
-                            <v-text-field
-                                v-model="viewForm.nombre_ocupacion"
-                                label="Ocupación de trabajo"
-                                readonly
-                            ></v-text-field>
-                            <v-text-field
-                                v-model="viewForm.PacientesCount"
-                                label="Nro. Pacientes"
-                                readonly
-                            ></v-text-field>
-                        </v-col>
-                    </v-row>
-                </v-form>
-            </v-card-text>
-        </v-card>
+      <v-card>
+        <v-card-title>
+          <span class="headline">Visualizar Registro</span>
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="viewForm">
+            <v-row>
+              <v-col cols="12" sm="12" md="12">
+                <v-text-field
+                  v-model="viewForm.nombre_ocupacion"
+                  label="Ocupación de trabajo"
+                  readonly
+                ></v-text-field>
+                <v-text-field
+                  v-model="viewForm.PacientesCount"
+                  label="Nro. Pacientes"
+                  readonly
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-card-text>
+      </v-card>
     </v-dialog>
     <!-- Fin -->
 
@@ -156,6 +158,7 @@
     <!-- Fin -->
   </div>
 </template>
+
 <script>
 export default {
   data() {
@@ -164,22 +167,21 @@ export default {
       breadcrumbs: [
         { text: "Inicio", disabled: false, href: "/dashboard" },
         { text: "Maestros", disabled: false, href: "#" },
-        { text: "Ocupaciones" }
+        { text: "Ocupaciones" },
       ],
       headers: [
         { text: "#", value: "id_ocupacion", align: "left" },
         { text: "Ocupación", value: "nombre_ocupacion", align: "left" },
         { text: "Nro Pacientes", value: "PacientesCount", align: "center" },
-        { text: "Pacientes", value: "pacientes", align: "left" },
-        { text: "Acciones", sortable: false, value: "actions", align: "right" }
+        { text: "Pacientes", sortable: false, value: "pacientes", align: "left"}, //sortable: false
+        { text: "Acciones", sortable: false, value: "actions", align: "right" },
       ],
-        viewDialog: false,
-        viewForm: {
-        },
+      viewDialog: false,
+      viewForm: {},
 
       addForm: {
         id_ocupacion: null,
-        nombre_ocupacion: null
+        nombre_ocupacion: null,
       },
 
       //--- Datatable ---
@@ -190,7 +192,7 @@ export default {
       dataTabOptions: {},
       data_reg: [],
       filter: {
-        searchTerm: ""
+        searchTerm: "",
       },
       addFormTitle: "Agregar Ocupación",
       dialogEditar: false,
@@ -198,17 +200,23 @@ export default {
       addDialog: false,
       deleteDialog: false,
       rules: {
-        required: UTILS.rules.required
-      }
+        required: UTILS.rules.required,
+      },
     };
   },
   created() {
     //
   },
   methods: {
-    async getRegistros(page = 1, per_page = 25, sortDesc = 0, sortBy = "") {
+    async getRegistros(
+      page = 1,
+      per_page = 25,
+      sortDesc = Boolean,
+      sortBy = ""
+    ) {
       this.loadingTable = true;
       this.data_reg = [];
+
       try {
         const response = await API.ocupacion.list(
           "?page=" +
@@ -235,9 +243,9 @@ export default {
       this.filter.searchTerm = "";
       this.getRegistros();
     },
-    handleDataRowClick(row){
-        this.viewForm = Object.assign({}, row);
-        this.viewDialog = true;
+    handleDataRowClick(row) {
+      this.viewForm = Object.assign({}, row);
+      this.viewDialog = true;
     },
 
     editReg(item) {
@@ -294,7 +302,7 @@ export default {
           this.loadingTable = false;
         }
       }
-    }
+    },
   },
   watch: {
     dataTabOptions(event) {
@@ -315,9 +323,9 @@ export default {
       }
     },
     viewDialog() {
-        if (!this.viewDialog) {
-            this.$refs.viewForm.reset();
-        }
+      if (!this.viewDialog) {
+        this.$refs.viewForm.reset();
+      }
     },
   },
 };
