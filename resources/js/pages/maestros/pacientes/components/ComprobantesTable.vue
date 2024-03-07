@@ -1,96 +1,93 @@
 <template>
-  <div>
-    <v-data-table
-      light
-      :headers="headers"
-      :items="tableData"
-      :page="currentPage"
-      :items-per-page="itemsPerPage"
-      :options.sync="dataTabOptions"
-      :footer-props="{
-        itemsPerPageOptions: [25, 50, 100, 1000],
-      }"
-      :loading="loadingTable"
-      loading-text="Cargando... Por favor, espere"
-    >
-      <template v-slot:[`item.estado`]="{ item }">
-        <v-chip :color="item.estado_comprobante.color" small>
-          {{ item.estado_comprobante.nombre_estado }}
-        </v-chip>
-      </template>
-      <template v-slot:[`item.orden_laboratorio`]="{ item }">
-        <v-chip
-          v-if="item.orden_laboratorio"
-          :color="item.orden_laboratorio.status.color"
-          small
-          :to="
-            '/orden-laboratorio/detalle/' +
-            item.orden_laboratorio.id_orden_laboratorio
-          "
-        >
-          {{ item.orden_laboratorio.codigo_orden_lab }} -
-          {{ item.orden_laboratorio.status.nombre_estado }}
-        </v-chip>
-        <v-chip v-else small> Sin orden laboratorio </v-chip>
-      </template>
-      <template v-slot:[`item.correlativo`]="{ item }">
-        <div class="one-line">
-          {{ item.serie.serie }}-{{
-            item.correlativo.toString().padStart(8, "0")
-          }}
-        </div>
-      </template>
-      <template v-slot:[`item.nombre_cliente`]="{ item }">
-        <div class="one-line">{{ item.nombre_cliente }}</div>
-      </template>
-      <template v-slot:[`item.fecha_emision`]="{ item }">
-        <div class="one-line">
-          {{ item.fecha_emision | formatDateGeneral }}
-        </div>
-      </template>
-      <template v-slot:[`item.actions`]="{ item }">
-        <PaymentsComponent
-          @created="getRegistros"
-          v-if="
-            (item.condicion_pago == 2 || item.condicion_pago == 3) &&
-            item.saldo > 0
-          "
-          :short="true"
-          :receipt="item"
-          :methods="metodos"
-        ></PaymentsComponent>
-        <PaymentsList
-          v-if="item.condicion_pago == 2 || item.condicion_pago == 3"
-          :receipt="item"
-          :short="true"
-        ></PaymentsList>
-        <v-btn small icon :to="'/comprobantes/ver/' + item.id_comprobante">
-          <v-icon small>mdi-eye-outline</v-icon>
-        </v-btn>
+    <div>
+        <v-data-table
+    light
+    :headers="headers"
+    :items="tableData"
+    :page="currentPage"
+    :items-per-page="itemsPerPage"
+    :options.sync="dataTabOptions"
 
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-if="
-                item.id_tipo_comprobante == 1 || item.id_tipo_comprobante == 2
-              "
-              small
-              icon
-              :to="'/notas/crear/' + item.id_comprobante"
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon small>mdi-note</v-icon>
-            </v-btn>
+    :footer-props="{
+      itemsPerPageOptions: [25, 50, 100, 1000],
+    }"
+    :loading="loadingTable"
+    loading-text="Cargando... Por favor, espere"
+  >
+  <template v-slot:[`item.estado`]="{ item }">
+            <v-chip :color="item.estado_comprobante.color" small>
+              {{ item.estado_comprobante.nombre_estado }}
+            </v-chip>
           </template>
-          <span>Generar Nota Crédito/Débito</span>
-        </v-tooltip>
-      </template>
-    </v-data-table>
-  </div>
+          <template v-slot:[`item.orden_laboratorio`]="{ item }">
+            <v-chip
+              v-if="item.orden_laboratorio"
+              :color="item.orden_laboratorio.status.color"
+              small
+              :to="
+                '/orden-laboratorio/detalle/' +
+                item.orden_laboratorio.id_orden_laboratorio
+              "
+            >
+              {{ item.orden_laboratorio.codigo_orden_lab }} -
+              {{ item.orden_laboratorio.status.nombre_estado }}
+            </v-chip>
+            <v-chip v-else small> Sin orden laboratorio </v-chip>
+          </template>
+          <template v-slot:[`item.correlativo`]="{ item }">
+            <div class="one-line">
+              {{ item.serie.serie }}-{{
+                item.correlativo.toString().padStart(8, "0")
+              }}
+            </div>
+          </template>
+          <template v-slot:[`item.nombre_cliente`]="{ item }">
+            <div class="one-line">{{ item.nombre_cliente }}</div>
+          </template>
+          <template v-slot:[`item.fecha_emision`]="{ item }">
+            <div class="one-line">
+              {{ item.fecha_emision | formatDateGeneral }}
+            </div>
+          </template>
+          <template v-slot:[`item.actions`]="{ item }">
+            <PaymentsComponent
+              @created="getRegistros"
+              v-if="(item.condicion_pago == 2 || item.condicion_pago == 3) && item.saldo > 0"
+              :short="true"
+              :receipt="item"
+              :methods="metodos"
+            ></PaymentsComponent>
+            <PaymentsList v-if="item.condicion_pago == 2 || item.condicion_pago == 3" :receipt="item" :short="true"></PaymentsList>
+            <v-btn small icon :to="'/comprobantes/ver/' + item.id_comprobante">
+              <v-icon small>mdi-eye-outline</v-icon>
+            </v-btn>
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-if="
+                    item.id_tipo_comprobante == 1 ||
+                    item.id_tipo_comprobante == 2
+                  "
+                  small
+                  icon
+                  :to="'/notas/crear/' + item.id_comprobante"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  <v-icon small>mdi-note</v-icon>
+                </v-btn>
+              </template>
+              <span>Generar Nota Crédito/Débito</span>
+            </v-tooltip>
+          </template>
+  </v-data-table>
+    </div>
+    
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -104,7 +101,10 @@ export default {
         { text: "Total", sortable: false, value: "total" },
         { text: "Adelanto", sortable: false, value: "adelanto" },
         { text: "Saldo", sortable: false, value: "saldo" },
-        { text: "M. Pago", sortable: false, value: "medio_pago.medio_pago" },
+        { text: "M. Pago",
+          sortable: false,
+          value: "medio_pago.medio_pago",
+        },
         {
           text: "Acciones",
           value: "actions",
@@ -114,12 +114,12 @@ export default {
         },
       ],
       filter: {
-        searchTerm: "",
-        fecha_inicio: "",
-        fecha_fin: "",
-        tipo: "",
-        estado: "",
-      },
+      searchTerm: "",
+      fecha_inicio: "",
+      fecha_fin: "",
+      tipo: "",
+      estado: "",
+    },
       tableData: [],
       currentPage: 1,
       pageCount: 1,
@@ -131,14 +131,9 @@ export default {
   },
 
   methods: {
-    async getRegistrosComprobantes(
-      page = 1,
-      per_page = 25,
-      sortDesc = 0,
-      sortBy = ""
-    ) {
+    async getRegistrosComprobantes(page = 1, per_page = 25, sortDesc = 0, sortBy = "") {
       this.loadingTable = true;
-      const id_cliente = this.$route.params.id;
+    const id_cliente = this.$route.params.id;
       this.data_reg = [];
       try {
         const response = await API.comprobante.list(
@@ -159,7 +154,8 @@ export default {
             "&estado=" +
             this.filter.estado +
             "&id_cliente=" +
-            id_cliente
+            id_cliente 
+
         );
         this.tableData = response.data.data;
         console.log(response.data.data);
@@ -167,6 +163,7 @@ export default {
         this.current_page = response.data.current_page;
         this.total_reg = this.data_reg.total;
         this.loadingTable = false;
+
       } catch (e) {
         this.loadingTable = false;
         console.error(e);
@@ -192,8 +189,13 @@ export default {
         event.sortBy[0]
       );
     },
+    
   },
 };
 </script>
 
-<style></style>
+<style>
+
+
+</style>
+
