@@ -168,6 +168,8 @@ class AnamnesisController extends Controller
       */
       if (isset($_head['id_eps_discount']) &&  $_head['id_eps_discount'] != null) {
         $orden = OrdenLaboratorio::with(['lente'])->where('id_anamnesis', $request->id_anamnesis)->first();
+        $cliente = Clientes::findOrFail($_head['id_cliente']);
+        $_head['observaciones'] .= " | DATOS PACIENTE: " . $cliente->nombre_razon_social . ' - NRO. DOCUMENTO: ' . $cliente->nro_documento;
         $epsHead = EpsService::prepareEpsHeader($_head);
         $total = $_head['total'];
         if($total < $_head['eps_discount']){
@@ -274,6 +276,8 @@ class AnamnesisController extends Controller
         /*
           Solo si no es una venta por EPS
         */
+        $cliente = Clientes::findOrFail($_head['id_cliente']);
+        $_head['observaciones'] .= " | DATOS PACIENTE: " . $cliente->nombre_razon_social . ' - NRO. DOCUMENTO: ' . $cliente->nro_documento;
         $comprobante = Comprobante::create(collect($_head)->all());
         $comprobante->correlativo = ++$correlativo;
         $orden = OrdenLaboratorio::with(['lente'])->where('id_anamnesis', $request->id_anamnesis)->first();

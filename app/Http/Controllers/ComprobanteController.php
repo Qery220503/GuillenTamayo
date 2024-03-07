@@ -12,13 +12,17 @@ use App\Models\Clientes;
 use App\Models\AlmacenMovimiento;
 use App\Models\ComprobanteDeuda;
 use App\Models\Cupon;
+use App\Models\OrdenLaboratorio;
 use App\Models\Productos;
 use App\Models\ProductosCategoria;
 use App\Services\ComprobanteService;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Mpdf\Mpdf;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ComprobanteController extends Controller
 {
@@ -194,6 +198,157 @@ class ComprobanteController extends Controller
       return response()->json($e->getMessage(), 500);
     }
 
+  }
+
+  public function anular(Request $request, $id){
+    DB::beginTransaction();
+    try{
+        $receipt = Comprobante::with(['sucursal'])->findOrFail($id);
+        $details = ComprobanteDetalle::where("id_comprobante", $id)->get();
+        $user = Auth::user();
+
+        if($receipt->fecha_anulacion != null && $receipt->id_estado_comprobante == 2){
+            throw new Exception("Comprobante previamente anulado");
+        }
+
+        /** Devolución stock e insumos */
+        $upd_data = array(
+            'id_estado_comprobante' => 2,
+            'motivo_anulacion'  =>  $request->motivo_anulacion,
+            'fecha_anulacion'  =>  date('Y-m-d'),
+            'disminucion_valor' => $request->disminucion_valor,
+        );
+        $receipt->update($upd_data);
+        /** Devolvemos stock (productos e insumos) */
+        if($request->disminucion_valor != 1){
+          foreach ($details as $det) {
+            if($det->item_type == 1){
+              $returnData = [
+                'id_producto' => $det->id_producto,
+                'cantidad' => $det->cantidad,
+                'precio_total' => $det->precio_total
+              ];
+              AlmacenMovimiento::devolucionStock($returnData, $user->id_sucursal);
+            }
+          }
+        }
+
+        /** Anulacion ordenes */
+        if($receipt->id_orden_lab != null && $request->disminucion_valor != 1){
+          OrdenLaboratorio::findOrFail($receipt->id_orden_lab)->update(['id_estado_orden_laboratorio' => 5]);
+        }
+        if($receipt->id_campana != null && $request->disminucion_valor != 1){
+          OrdenLaboratorio::where('id_campana', $receipt->id_campana)->update(['id_estado_orden_laboratorio' => 5]);
+        }
+
+        $token = $receipt->sucursal['token_api'];
+        $ruta = $receipt->sucursal['url_api'];
+        $flag = 0;
+        $fecha_de_emision_de_documentos = date("Y-m-d", strtotime($receipt->fecha_emision));
+
+        if($receipt->id_tipo_comprobante == 1){
+            $ruta_envio_cpe = "/api/documents/send";
+            $ruta_anulacion = "/api/voided";
+            $documentos_arr[] = array(
+                "external_id"      => $receipt->external_id,
+                "motivo_anulacion" => $receipt->motivo_anulacion
+            );
+            //Array API-Anulacion
+            $inv_voided = array(
+                "fecha_de_emision_de_documentos" => $fecha_de_emision_de_documentos,
+                "codigo_tipo_proceso"=> "3",
+                "documentos" => $documentos_arr
+            );
+
+            //Primero enviamos Factura a Sunat
+            $envio_cpe_json = array("external_id" => $receipt->external_id);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $ruta.$ruta_envio_cpe);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token
+            ));
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($envio_cpe_json));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            $respuesta  = curl_exec($ch);
+
+            curl_close($ch);
+            $flag = 1;
+
+        }
+        if($receipt->id_tipo_comprobante == 2){
+            //anulacion boleta
+            $ruta_envio_cpe = "/api/summaries";
+            $ruta_anulacion = "/api/summaries";
+
+            //Array API-Resumen Diario Anulacion Documentos[]
+            $documentos_arr[] = array(
+                "external_id"      => $receipt->external_id,
+                "motivo_anulacion" => $receipt->motivo_anulacion
+            );
+
+            //Array API-Resumen Diario Anulacion
+            $inv_voided = array(
+                "fecha_de_emision_de_documentos" => $fecha_de_emision_de_documentos,
+                "codigo_tipo_proceso" => "3",
+                "documentos" => $documentos_arr
+            );
+
+            //ENVIO RESUMEN DIARIO
+            $envio_cpe_json = array("fecha_de_emision_de_documentos" => $fecha_de_emision_de_documentos, "codigo_tipo_proceso" => "1");
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $ruta.$ruta_envio_cpe);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token
+            ));
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($envio_cpe_json));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            $respuesta  = curl_exec($ch);
+            curl_close($ch);
+            $flag = 1;
+
+        }
+
+        if($flag == 1){
+
+            //Conversion de Array a Json
+            $convertido = json_encode($inv_voided);
+            //echo $convertido;
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $ruta.$ruta_anulacion);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token
+            ));
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $convertido);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            $respuesta  = curl_exec($ch);
+
+            Log::info('Respuesta anulación: '.$respuesta);
+            curl_close($ch);
+            $res_decode = json_decode($respuesta,true);
+        }
+
+
+        DB::commit();
+        return response()->json(['message' =>'Comprobante anulado.'], 200);
+
+    }
+    catch(\Exception $e){
+        DB::rollBack();
+        return response()->json($e->getMessage(),500);
+    }
 }
 
 

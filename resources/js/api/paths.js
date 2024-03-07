@@ -181,6 +181,7 @@ const PATHS = {
   comprobantes: {
     ROOT: "api/comprobantes",
     SET: "api/comprobantes/",
+    ANULAR: "api/comprobantes/anular/"
   },
   egresos: {
     ROOT: "api/egresos",

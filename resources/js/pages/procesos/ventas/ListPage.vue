@@ -148,8 +148,16 @@
               {{ item.orden_laboratorio.codigo_orden_lab }} -
               {{ item.orden_laboratorio.status.nombre_estado }}
             </v-chip>
-            <v-chip small v-else :color="(item.id_campana == null) ? 'primary' : 'secondary'">
-              {{ (item.id_campana == null) ? 'Sin Orden Laboratorio' : 'Comprobante de campañas'  }}
+            <v-chip
+              small
+              v-else
+              :color="item.id_campana == null ? 'primary' : 'secondary'"
+            >
+              {{
+                item.id_campana == null
+                  ? "Sin Orden Laboratorio"
+                  : "Comprobante de campañas"
+              }}
             </v-chip>
           </template>
           <template v-slot:[`item.correlativo`]="{ item }">
@@ -170,15 +178,50 @@
           <template v-slot:[`item.actions`]="{ item }">
             <PaymentsComponent
               @created="getRegistros"
-              v-if="(item.condicion_pago == 2 || item.condicion_pago == 3) && item.saldo > 0"
+              v-if="
+                (item.condicion_pago == 2 || item.condicion_pago == 3) &&
+                item.saldo > 0
+              "
               :short="true"
               :receipt="item"
               :methods="metodos"
             ></PaymentsComponent>
-            <PaymentsList v-if="item.condicion_pago == 2 || item.condicion_pago == 3" :receipt="item" :short="true"></PaymentsList>
-            <v-btn small icon :to="'/comprobantes/ver/' + item.id_comprobante">
-              <v-icon small>mdi-eye-outline</v-icon>
-            </v-btn>
+            <PaymentsList
+              v-if="item.condicion_pago == 2 || item.condicion_pago == 3"
+              :receipt="item"
+              :short="true"
+            ></PaymentsList>
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  small
+                  icon
+                  :to="'/comprobantes/ver/' + item.id_comprobante"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  <v-icon small>mdi-eye-outline</v-icon>
+                </v-btn>
+              </template>
+              <span>Ver Comprobante</span>
+            </v-tooltip>
+
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  small
+                  icon
+                  :disabled="item.id_estado_comprobante === 2"
+                  @click="openCancelDialog(item)"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  <v-icon small>mdi-close</v-icon>
+                </v-btn>
+              </template>
+              <span>Anular Comprobante</span>
+            </v-tooltip>
 
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
@@ -198,11 +241,16 @@
               </template>
               <span>Generar Nota Crédito/Débito</span>
             </v-tooltip>
+
           </template>
         </v-data-table>
+
+
       </div>
     </v-card>
 
+    <!-- Anular -->
+    <CancelReceipt :dialog="dialogCancel" :id_comprobante="idCancel" @deleted="handleDeleted"/>
     <!-- Delete Dialog -->
     <v-dialog v-model="deleteDialog" max-width="400">
       <v-card>
@@ -228,11 +276,13 @@
 import API from "../../../api";
 import PaymentsComponent from "./components/PaymentsComponent.vue";
 import PaymentsList from "./components/PaymentsList.vue";
+import CancelReceipt from "./components/CancelReceipt.vue";
 
 export default {
   components: {
     PaymentsComponent,
     PaymentsList,
+    CancelReceipt
   },
   data: (vm) => ({
     breadcrumbs_title: "Comprobantes",
@@ -264,6 +314,8 @@ export default {
         align: "right",
       },
     ],
+    dialogCancel: false,
+    idCancel: 0,
     addForm: {
       id_cliente: null,
       nombre_categoria: null,
@@ -320,9 +372,18 @@ export default {
       };
       this.getRegistros();
     },
+    openCancelDialog(item){
+      this.idCancel = item.id_comprobante;
+      this.dialogCancel = true;
+    },
     async getMetodosPago() {
       const response = await API.apis.medioPago();
       this.metodos = response.data;
+    },
+    handleDeleted(){
+      this.idCancel = 0;
+      this.dialogCancel = false;
+      this.getRegistros();
     },
     async getRegistros(page = 1, per_page = 25, sortDesc = 0, sortBy = "") {
       this.loadingTable = true;

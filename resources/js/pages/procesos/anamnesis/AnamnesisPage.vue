@@ -160,7 +160,7 @@
           <v-tab-item v-if="epsFormato != ''">
             <v-card flat>
               <v-card-text>
-                <v-select :items="['a4', 'a5', 'ticket']" v-model="epsFormato" outlined hide-details
+                <v-select :items="['ticketguillen', 'a4', 'a5', 'ticket']" v-model="epsFormato" outlined hide-details
                   label="Formato comprobante"></v-select>
               </v-card-text>
               <v-card-text>
@@ -819,13 +819,13 @@ export default {
           if ("client" in extra && extra.client != null && Object.keys(extra).length > 0) {
             const recibo = response.data.extra.client;
             this.reciboURL = recibo.facturador + "/print/document/" + recibo.external_id;
-            this.reciboFormato = 'ticket';
+            this.reciboFormato = 'ticketguillen';
             this.showFormats = true;
           }
           if ("eps" in extra && extra.eps != null) {
             const eps = response.data.extra.eps;
             this.epsURL = eps.facturador + "/print/document/" + eps.external_id;
-            this.epsFormato = 'ticket';
+            this.epsFormato = 'ticketguillen';
           }
           if ("cupon" in data && data.cupon != null) {
             this.cupon = data.cupon;

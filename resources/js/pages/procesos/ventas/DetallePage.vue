@@ -1,23 +1,18 @@
 <template>
   <div class="flex-grow-1">
-    <custom-breadcrumbs
-      v-if="invoice"
-      :breadcrumbs_title="breadcrumbs_title"
-      :breadcrumbs="breadcrumbs"
-    >
+    <custom-breadcrumbs v-if="invoice" :breadcrumbs_title="breadcrumbs_title" :breadcrumbs="breadcrumbs">
     </custom-breadcrumbs>
-    <v-alert
-      v-if="invoice.cliente.lista_negra == 1"
-      border="left"
-      type="warning"
-      icon="mdi-alert"
-    >
-      <div class="text-h6" style="color: black">Cliente en Lista Negra</div>
+    <v-alert v-if="invoice.cliente.lista_negra == 1" border="left" type="warning" icon="mdi-alert">
+      <div class="text-h6" style="color: white">Cliente en Lista Negra</div>
       <div style="color: black">
         Requiere atención especial. Procede con precaución y sigue los
         protocolos establecidos. Contacta al supervisor o departamento
         correspondiente para más información.
       </div>
+    </v-alert>
+    <v-alert v-if="invoice.factura_gratuita == 1" border="left" type="info" icon="mdi-alert">
+      <div class="text-h6" style="color: white">Factura Gratuita</div>
+
     </v-alert>
 
 
@@ -25,84 +20,42 @@
       <v-card-title class="headline">
         <v-row dense>
           <v-col class="text-right">
-            <v-btn
-              v-if="invoice.id_eps_discount"
-              depressed
-              dark
-              :disabled="invoice.id_comprobante_eps == null"
-              color="info"
-              :href="
-                '/comprobantes/ver/' +
-                invoice.id_comprobante_eps
-              "
-            >
+            <v-btn v-if="invoice.id_eps_discount" depressed dark :disabled="invoice.id_comprobante_eps == null"
+              color="info" :href="'/comprobantes/ver/' +
+      invoice.id_comprobante_eps
+      ">
               <v-icon>mdi-file</v-icon>
               EPS - COMPROBANTE CLIENTE
             </v-btn>
 
-            <v-btn
-              v-if="invoice.orden_laboratorio"
-              depressed
-              dark
-              :color="invoice.orden_laboratorio.status.color"
-              :to="
-                '/orden-laboratorio/detalle/' +
-                invoice.orden_laboratorio.id_orden_laboratorio
-              "
-            >
+            <v-btn v-if="invoice.orden_laboratorio" depressed dark :color="invoice.orden_laboratorio.status.color" :to="'/orden-laboratorio/detalle/' +
+      invoice.orden_laboratorio.id_orden_laboratorio
+      ">
               <v-icon>mdi-microscope</v-icon>
               {{ invoice.orden_laboratorio.codigo_orden_lab }} -
               {{ invoice.orden_laboratorio.status.nombre_estado }}
             </v-btn>
-            <v-btn
-              depressed
-              dark
-              color="grey"
-              v-if="!invoice.external_id"
-              @click="sendDocSunat"
-            >
+            <v-btn depressed dark color="grey" v-if="!invoice.external_id" @click="sendDocSunat">
               <v-icon>mdi-send-lock</v-icon>Enviar SUNAT
             </v-btn>
-            <v-btn
-              depressed
-              color="success"
-              v-if="invoice.external_id"
-              @click="viewXml"
-            >
+            <v-btn depressed color="success" v-if="invoice.external_id" @click="viewXml">
               <v-icon>mdi-xml</v-icon>XML
             </v-btn>
-            <v-btn
-              depressed
-              color="primary"
+            <v-btn depressed color="primary"
               v-if="invoice.external_id && invoice.id_estado_comprobante == 1 && invoice.id_tipo_comprobante == 1"
-              @click="viewCdr"
-            >
+              @click="viewCdr">
               <v-icon>mdi-code-less-than</v-icon>CDR
             </v-btn>
-            <v-btn
-              depressed
-              color="error"
-              v-if="invoice.external_id"
-              @click="viewPdf"
-            >
+            <v-btn depressed color="error" v-if="invoice.external_id" @click="viewPdf">
               <v-icon>mdi-file-pdf</v-icon>PDF
             </v-btn>
-            <v-btn
-              depressed
-              color="secondary"
-              :to="'/encuesta/' + invoice.id_comprobante"
-              v-if="invoice.id_orden_lab != null"
-            >
+            <v-btn depressed color="secondary" :to="'/encuesta/' + invoice.id_comprobante"
+              v-if="invoice.id_orden_lab != null">
               <v-icon>mdi-emoticon</v-icon>ENCUESTA
             </v-btn>
 
-            <v-btn
-              depressed
-              color="primary"
-              :href="'/conformidadMonturaPDF/' + invoice.id_orden_lab"
-              target="_blank"
-              v-if="invoice.id_orden_lab != null"
-            >
+            <v-btn depressed color="primary" :href="'/conformidadMonturaPDF/' + invoice.id_orden_lab" target="_blank"
+              v-if="invoice.id_orden_lab != null">
               <v-icon>mdi-glasses</v-icon>&nbsp; CONFORMIDAD MONTURA
             </v-btn>
 
@@ -115,55 +68,27 @@
       <!-- Invoice Header -->
       <v-row dense class="pa-2">
         <v-col cols="2">
-          <v-text-field
-            v-if="invoice.tipo_documento"
-            readonly
-            v-model="invoice.tipo_documento.nombre_tipo_documento"
-            label="Tipo Documento"
-          ></v-text-field>
+          <v-text-field filled v-if="invoice.tipo_documento" readonly
+            v-model="invoice.tipo_documento.nombre_tipo_documento" label="Tipo Documento"></v-text-field>
         </v-col>
         <v-col cols="2">
-          <v-text-field
-            readonly
-            v-model="invoice.nro_documento"
-            label="Nro.Documento"
-          ></v-text-field>
+          <v-text-field filled readonly v-model="invoice.nro_documento" label="Nro.Documento"></v-text-field>
         </v-col>
         <v-col cols="5">
-          <v-text-field
-            readonly
-            v-model="invoice.nombre_cliente"
-            label="Nombre Cliente"
-          ></v-text-field>
+          <v-text-field filled readonly v-model="invoice.nombre_cliente" label="Nombre Cliente"></v-text-field>
         </v-col>
         <v-col cols="3">
-          <v-text-field
-            readonly
-            v-model="invoice.fecha_emision"
-            label="Fecha de Emisión"
-          ></v-text-field>
+          <v-text-field filled readonly v-model="invoice.fecha_emision" label="Fecha de Emisión"></v-text-field>
         </v-col>
         <v-col cols="5">
-          <v-text-field
-            readonly
-            v-model="invoice.direccion_cliente"
-            label="Dirección"
-          ></v-text-field>
+          <v-text-field filled readonly v-model="invoice.direccion_cliente" label="Dirección"></v-text-field>
         </v-col>
         <v-col cols="4">
-          <v-text-field
-            v-if="invoice.medio_pago"
-            readonly
-            v-model="invoice.medio_pago.medio_pago"
-            label="Medio de Pago"
-          ></v-text-field>
+          <v-text-field filled v-if="invoice.medio_pago" readonly v-model="invoice.medio_pago.medio_pago"
+            label="Medio de Pago"></v-text-field>
         </v-col>
         <v-col cols="3">
-          <v-text-field
-            readonly
-            v-model="invoice.nro_operacion"
-            label="Nro. Operación"
-          ></v-text-field>
+          <v-text-field filled readonly v-model="invoice.nro_operacion" label="Nro. Operación"></v-text-field>
         </v-col>
       </v-row>
       <!-- Fin -->
@@ -184,10 +109,8 @@
             <tbody>
               <tr v-if="invoice.detalle.length == 0">
                 <td colspan="7" class="text-center">
-                  <b
-                    >Aún no se han agregado productos o servicios a este
-                    comprobante.</b
-                  >
+                  <b>Aún no se han agregado productos o servicios a este
+                    comprobante.</b>
                 </td>
               </tr>
               <tr v-for="(item, k) in invoice.detalle" :key="k">
@@ -240,11 +163,7 @@
       <!-- Fin -->
 
       <!-- Cuotas -->
-      <v-row
-        v-if="invoice.deuda && invoice.deuda.length > 0"
-        dense
-        class="pa-2 py-0"
-      >
+      <v-row v-if="invoice.deuda && invoice.deuda.length > 0" dense class="pa-2 py-0">
         <v-col cols="6" md="6">
           <v-simple-table>
             <template v-slot:default>
@@ -257,23 +176,12 @@
               <tbody>
                 <tr v-for="(item, index) in invoice.deuda" :key="index">
                   <td>
-                    <v-text-field
-                      v-model="item.fecha"
-                      prepend-inner-icon="mdi-calendar"
-                      readonly
-                      dense
-                      hide-details
-                    ></v-text-field>
+                    <v-text-field v-model="item.fecha" prepend-inner-icon="mdi-calendar" readonly dense
+                      hide-details></v-text-field>
                   </td>
                   <td>
-                    <v-text-field
-                      v-model="item.monto"
-                      dense
-                      readonly
-                      prefix="S/."
-                      type="number"
-                      hide-details
-                    ></v-text-field>
+                    <v-text-field v-model="item.monto" dense readonly prefix="S/." type="number"
+                      hide-details></v-text-field>
                   </td>
                 </tr>
               </tbody>
@@ -311,7 +219,7 @@ export default {
     invoice: {
       tipo_documentos: "",
       detalle: "",
-      cliente:{
+      cliente: {
         lista_negra: 0
       }
     },
@@ -345,7 +253,7 @@ export default {
     //--- External Documents ---
     viewPdf() {
       window.open(
-        this.invoice.sucursal.url_api + "/print/document/" + this.invoice.external_id + "/a4"
+        this.invoice.sucursal.url_api + "/print/document/" + this.invoice.external_id + "/ticketguillen"
       );
     },
     viewXml() {

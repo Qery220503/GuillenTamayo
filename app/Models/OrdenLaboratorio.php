@@ -92,7 +92,8 @@ class OrdenLaboratorio extends Model
             'status',
             'lente',
             'anamnesis.clinica',
-            'anamnesis.doctor'
+            'anamnesis.doctor',
+            'usuario'
         )
             ->where('id_sucursal', $auth->id_sucursal);
         $itemsPerPage = $request->itemsPerPage;

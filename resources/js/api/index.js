@@ -653,6 +653,9 @@ const API = {
     create(data) {
       return callAPI("post", PATHS.comprobantes.ROOT, { data: data });
     },
+    anular(data,id){
+      return callAPI("post", PATHS.comprobantes.ANULAR + id, {data: data});
+    }
   },
   egresos: {
     list(queryParam) {

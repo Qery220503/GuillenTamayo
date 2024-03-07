@@ -95,7 +95,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('encuestas/comprobante/{comprobante}', [EncuestaController::class, 'encuesta']);
     Route::get('encuestas/preguntas/{comprobante}', [EncuestaController::class, 'preguntas']);
     Route::post('encuestas/responder/{encuesta}', [EncuestaController::class, 'responder']);
-
+    Route::post('comprobantes/anular/{id}',[ComprobanteController::class,'anular']);
 
     Route::get('list/clientes', [GuiaRemisionController::class,'clientes']);
 

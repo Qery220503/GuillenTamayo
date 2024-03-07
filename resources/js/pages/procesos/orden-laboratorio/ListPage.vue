@@ -157,6 +157,13 @@ export default {
           value: "anamnesis.clinica.nombre_clinica",
           align: "left"
         },
+        {
+          text: "Usuario",
+          sortable: false,
+          value: "usuario.name",
+          align: "center"
+        },
+
         { text: "Comprobante", value: "comprobante_generado", align: "center", sortable: false },
         {
           text: "Doctor",

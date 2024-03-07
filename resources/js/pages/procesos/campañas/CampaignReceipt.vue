@@ -712,7 +712,7 @@
             <v-card flat>
               <v-card-text v-if="showFormats">
                 <v-select
-                  :items="['a4', 'a5', 'ticket']"
+                  :items="['ticketguillen', 'a4', 'a5', 'ticket']"
                   v-model="format"
                   outlined
                   hide-details
@@ -1495,7 +1495,7 @@ export default {
         if (data.pdf) {
           url = data.facturador + "/print/document/" + data.external_id;
           this.id_comprobante = data.comprobante.id_comprobante;
-          this.format = 'ticket';
+          this.format = 'ticketguillen';
           this.showFormats = true;
         } else {
           url = "/comprobantes/notas-venta/" + data.comprobante.id_comprobante;
