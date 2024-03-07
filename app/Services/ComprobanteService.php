@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use App\Models\ComprobanteSerie;
 use App\Models\PreciosLentes;
+use App\Models\Productos;
 use App\Models\TipoComprobante;
 use Illuminate\Support\Facades\Log;
 
@@ -29,9 +30,14 @@ class ComprobanteService
       $total_items    += $cmp_d->precio_total;
       $total_gratuita = 0;
 
+      $codigo_sunat = "";
+
       switch ($cmp_d->item_type) {
         case 1:
-          $codigoInterno = $cmp_d->id_producto;
+          //$codigoInterno = $cmp_d->id_producto;
+          $p = Productos::find($cmp_d->id_producto) ;
+          $codigoInterno = $p->codigo_producto;
+          $codigo_sunat = $p->codigo_sunat;
           break;
         case 2:
           $codigoInterno = $cmp_d->id_precio_lente;
@@ -45,51 +51,33 @@ class ComprobanteService
       }
 
       if ($comprobante_n->factura_gratuita == 1) {
-        /*
+
+
         $items[] = array(
-          "unidad_de_medida"          =>  $cmp_d->unidad->codigo_sunat,
-          "codigo_interno"            => $codigoInterno,
-          "codigo_producto_sunat"    => "",
+					"unidad_de_medida"          => $cmp_d->unidad->codigo_sunat,
+					"codigo_interno"            => $codigoInterno,
+					"codigo_producto_sunat"		=> $codigo_sunat,
           "codigo_producto_gsl"        => "",
-          "descripcion"        => $cmp_d->detalle_item,
-          "cantidad"          => $cmp_d->cantidad,
-          "valor_unitario"      => 0,
-          "codigo_tipo_precio"     => "02",
-          "precio_unitario"      => 0,
-          "codigo_tipo_afectacion_igv" => "21",
-          "total_base_igv"        => 0,
-          "porcentaje_igv"       => 0,
-          "total_igv"          => 0,
-          "total_impuestos"      => 0,
-          "total_valor_item"       => 0,
-          "total_item"          => 0,
-        );
-        */
-        $total_gratuita += number_format(($cmp_d->precio_total - $total_igv), 2, '.', '');
-        $items[] = array(
-          "unidad_de_medida"          =>  $cmp_d->unidad->codigo_sunat,
-          "codigo_interno"            => $codigoInterno,
-          "codigo_producto_sunat"    => "",
-          "codigo_producto_gsl"        => "",
-          "descripcion"        => $cmp_d->detalle_item,
-          "cantidad"          => $cmp_d->cantidad,
-          "valor_unitario"      => 0,
-          "codigo_tipo_precio"     => "02",
-          "precio_unitario"      => $total_gratuita,
-          "codigo_tipo_afectacion_igv" => "21",
-          "total_base_igv"        => 0,
-          "porcentaje_igv"       => 0,
-          "total_igv"          => 0,
-          "total_impuestos"      => 0,
-          "total_valor_item"       => 0,
-          "total_item"          => $total_gratuita,
-        );
+					"descripcion"				=> $cmp_d->detalle_item,
+					"cantidad"					=> $cmp_d->cantidad,
+					"valor_unitario"			=> 0,
+					"codigo_tipo_precio" 		=> "02",
+					"precio_unitario"			=> $cmp_d->precio_unitario,
+					"codigo_tipo_afectacion_igv"=> "21",
+					"total_base_igv"  			=> number_format($cmp_d->precio_total,2, '.', ''),
+					"porcentaje_igv" 			=> 18,
+					"total_igv"  				=> 0,
+					"total_impuestos"			=> 0,
+					"total_valor_item"   		=> number_format($cmp_d->precio_total,2, '.', ''),
+					"total_item"  				=> $cmp_d->precio_total,
+				);
+				$total_gratuita += number_format($cmp_d->precio_total,2, '.', '');
 
       } else {
         $items[] = array(
           "codigo_interno"             => $codigoInterno,
           "descripcion"                => $cmp_d->detalle_item,
-          "codigo_producto_sunat"      => "",
+          "codigo_producto_sunat"      => $codigo_sunat,
           "codigo_producto_gsl"        => "",
           "unidad_de_medida"           => $cmp_d->unidad->codigo_sunat,
           "cantidad"                   => $cmp_d->cantidad,
@@ -160,7 +148,7 @@ class ComprobanteService
         "total_operaciones_gravadas"   => number_format($comprobante->subtotal, 2, '.', ''),
         "total_operaciones_inafectas"  => 0.00,
         "total_operaciones_exoneradas" => 0.00,
-        "total_operaciones_gratuita"   => ($comprobante_n->factura_gratuita == 1) ? $total_items : 0.00,
+        "total_operaciones_gratuitas"   => $total_items,
         "total_igv"                    => number_format($comprobante->igv, 2, '.', ''),
         "total_impuestos"              => number_format($comprobante->igv, 2, '.', ''), //Total de Impuestos?
         "total_valor"                  => number_format($comprobante->subtotal, 2, '.', ''),
@@ -172,13 +160,13 @@ class ComprobanteService
     );
 
     if($comprobante_n->factura_gratuita == 1){
-			$comp_arr["totales"]["total_descuentos"] = 0;
-			$comp_arr["totales"]["total_operaciones_gravadas"] = 0;
-			$comp_arr["totales"]["total_igv"] = 0;
-			$comp_arr["totales"]["total_impuestos"] = 0;
-			$comp_arr["totales"]["total_valor"] = 0;
-			$comp_arr["totales"]["total_venta"] = 0;
-			$comp_arr["totales"]["total_operaciones_gratuitas"] = $total_gratuita;
+			$comp_arr["totales"]["total_descuentos"] = 0.00;
+			$comp_arr["totales"]["total_operaciones_gravadas"] = 0.00;
+			$comp_arr["totales"]["total_igv"] = 0.00;
+			$comp_arr["totales"]["total_impuestos"] = 0.00;
+			$comp_arr["totales"]["total_valor"] = 0.00;
+			$comp_arr["totales"]["total_venta"] = 0.00;
+			$comp_arr["totales"]["total_operaciones_gratuitas"] = number_format($total_gratuita, 2, '.', '');
 
 			$comp_arr["leyendas"] = array(array("codigo" => 1002, "valor" => "TRANSFERENCIA GRATUITA"));
 		}
@@ -213,14 +201,6 @@ class ComprobanteService
       $comprobante->external_id = $external_id;
       $comprobante->id_estado_comprobante  = 4;
       $comprobante->correlativo = $correlativo;
-      //Actualizamos detalles si es gratuita
-      if($comprobante->factura_gratuita == 1){
-        ComprobanteDetalle::where('id_comprobante', $comprobante->id_comprobante)
-                          ->update([
-                            'precio_unitario' => 0,
-                            'precio_total' => 0,
-                          ]);
-      }
       $comprobante->save();
       return ['success' => true, 'pdf' => $pdf_cpe_embed, 'message' => 'Comprobante creado y validado.', 'external_id' => $external_id, 'facturador' => $ruta];
     } else {

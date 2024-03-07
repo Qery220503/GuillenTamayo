@@ -12,33 +12,19 @@
       </div>
       <v-spacer></v-spacer>
 
+
+
+
       <div class="d-flex">
-        <v-btn
-          class="mb-2 mr-2"
-          depressed
-          color="info"
-          :href="urlComprobante"
-          target="_blank"
-        >
+        <v-btn class="mb-2 mr-2" depressed color="info" :href="urlComprobante" target="_blank">
           <v-icon>mdi-cart-outline</v-icon>Generar Compra
         </v-btn>
-        <v-btn
-          class="mb-2 mr-2"
-          depressed
-          color="secondary"
-          :to="'/comprobantes/ver/' + form.id_comprobante"
-          v-if="form.id_comprobante != null"
-        >
+        <v-btn class="mb-2 mr-2" depressed color="secondary" :to="'/comprobantes/ver/' + form.id_comprobante"
+          v-if="form.id_comprobante != null">
           <v-icon>mdi-cart-outline</v-icon> Ver Comprobante
         </v-btn>
 
-        <v-btn
-          class="mb-2 mr-2"
-          depressed
-          color="secondary"
-          v-else
-          disabled
-        >
+        <v-btn class="mb-2 mr-2" depressed color="secondary" v-else disabled>
           <v-icon>mdi-cart-outline</v-icon> Sin Comprobante
         </v-btn>
 
@@ -56,6 +42,19 @@
         correspondiente para más información.
       </div>
     </v-alert>
+
+    <v-alert v-if="form.id_campana != null" border="left" type="info" icon="mdi-alert">
+        <div class="text-h6" style="color: white">Orden de campaña</div>
+        <div style="color: black">
+          Esta Orden de laboratorio esta asociada a una campaña.
+        </div>
+      </v-alert>
+      <v-alert v-if="form.id_comprobante == null" border="left" type="warning" icon="mdi-alert">
+        <div class="text-h6" style="color: white">Orden sin comprobante</div>
+        <div style="color: black">
+          Aún no se ha generado un comprobante asociado a esta orden de laboratorio.
+        </div>
+      </v-alert>
 
     <v-card class="mb-4 px-3">
       <div class="px-2" style="overflow-x: hidden !important; overflow-y: hidden !important">
@@ -99,10 +98,10 @@
             <h4>Montura</h4>
             <h5 v-if="form.montura">
               {{
-                form.montura
+              form.montura
                 ? form.montura.nombre_producto
                 : form.montura_cliente
-              }}
+            }}
             </h5>
           </v-col>
         </v-row>
@@ -118,8 +117,8 @@
                       <v-col cols="7">
                         <span>
                           <strong>{{
-                            event.estado_orden.nombre_estado
-                          }}</strong> </span><br />
+              event.estado_orden.nombre_estado
+            }}</strong> </span><br />
                         <span> Por {{ event.usuario.name }} </span>
                       </v-col>
                       <v-col class="text-right" cols="5">
@@ -202,9 +201,9 @@
               readonly item-text="text" item-value="text" :items="items_foto"></v-select>
           </v-col>
           <v-col class="py-1 px-1" cols="12" md="4">
-            <v-select label="Color Fotocromat" v-model="form.lente.color_fotocromatico" placeholder="Selecciona un color"
-              :rules="[rules.required]" dense filled readonly item-text="text" item-value="text"
-              :items="items_color"></v-select>
+            <v-select label="Color Fotocromat" v-model="form.lente.color_fotocromatico"
+              placeholder="Selecciona un color" :rules="[rules.required]" dense filled readonly item-text="text"
+              item-value="text" :items="items_color"></v-select>
           </v-col>
           <v-col class="py-1 px-1" cols="12" md="3">
             <v-text-field label="Precio" type="number" dense filled readonly autocomplete="off"
@@ -303,41 +302,18 @@
                   </tr>
                 </tbody>
               </template>
-            </v-simple-table>
-          </v-col>
-          <v-col class="d-flex align-center">
-            <v-text-field
-              hide-details
-              outlined
-              dense
-              filled
-              readonly
-              class="mr-1"
-              label="Ángulo panorámico"
-              v-model="form.angulo.panoramico"
-            ></v-text-field>
-            <v-text-field
-              hide-details
-              outlined
-              dense
-              filled
-              readonly
-              class="mr-1"
-              label="Ángulo pantoscópico"
-              v-model="form.angulo.pantoscopico"
-            ></v-text-field>
-            <v-text-field
-              hide-details
-              outlined
-              dense
-              filled
-              readonly
-              label="Distancia Vértice"
-              v-model="form.angulo.vertice"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        -->
+</v-simple-table>
+</v-col>
+<v-col class="d-flex align-center">
+  <v-text-field hide-details outlined dense filled readonly class="mr-1" label="Ángulo panorámico"
+    v-model="form.angulo.panoramico"></v-text-field>
+  <v-text-field hide-details outlined dense filled readonly class="mr-1" label="Ángulo pantoscópico"
+    v-model="form.angulo.pantoscopico"></v-text-field>
+  <v-text-field hide-details outlined dense filled readonly label="Distancia Vértice"
+    v-model="form.angulo.vertice"></v-text-field>
+</v-col>
+</v-row>
+-->
 
         <v-divider class="my-4"></v-divider>
         <h5>Receta</h5>
