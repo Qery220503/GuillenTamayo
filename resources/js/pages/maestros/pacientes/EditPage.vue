@@ -1,209 +1,228 @@
 <template>
-  <div>
+  <div class="d-flex flex-column flex-grow-1">
     <custom-breadcrumbs
       :breadcrumbs_title="breadcrumbs_title"
       :breadcrumbs="breadcrumbs"
     ></custom-breadcrumbs>
-    <v-tabs v-model="tab" color="primary" background-color="transparent">
-      <v-tab>Información</v-tab>
-      <v-tab>Historial</v-tab>
-      <v-tab>Recetas</v-tab>
-      <v-tab>Comprobantes</v-tab>
-      <v-tab>Deudas</v-tab>
-    </v-tabs>
+    <v-card>
+      <v-row dense class="pa-2 align-center">
+        <v-tabs v-model="tab" color="primary" background-color="transparent">
+          <v-tab>Información</v-tab>
+          <v-tab>Historial</v-tab>
+          <v-tab>Recetas</v-tab>
+          <v-tab>Comprobantes</v-tab>
+          <v-tab>Deudas</v-tab>
+        </v-tabs>
 
-    <v-tabs-items class="mt-3" v-model="tab">
-      <v-tab-item>
-        <v-card class="px-5 py-2">
-          <v-card-text>
-            <v-form
-              ref="addForm"
-              v-model="validAddForm"
-              @submit.prevent="saveReg()"
-              lazy-validation
-            >
-              <v-row>
-                <v-col class="py-1" cols="12" md="3">
-                  <v-select
-                    :items="items_tipo_doc"
-                    label="Tipo Documento"
-                    placeholder="Selecciona una marca"
-                    v-model="addForm.cod_tipo_doc"
-                    :rules="[rules.required]"
-                    item-text="nombre_tipo_documento"
-                    item-value="id_tipo_documento"
-                    filled
-                    dense
-                    disabled
-                  ></v-select>
-                </v-col>
-                <v-col class="py-1" cols="12" md="3">
-                  <v-text-field
-                    v-model="addForm.nro_documento"
-                    label="Nro. Documento"
-                    :rules="[rules.required]"
-                    autocomplete="off"
-                    filled
-                    dense
-                    disabled
-                  >
-                    <!-- <template #append-outer>
-                        <v-btn
-                            color="primary"
-                            class="mb-1"
-                            @click="obtenerDataDocumentos()">
-                            <v-icon>mdi-magnify</v-icon>
-                        </v-btn>
-                    </template> -->
-                  </v-text-field>
-                </v-col>
-                <v-col class="py-1" cols="12" md="3">
-                  <v-text-field
-                    v-model="addForm.nombre_razon_social"
-                    label="Nombre"
-                    :rules="[rules.required]"
-                    autocomplete="off"
-                    filled
-                    dense
-                  ></v-text-field>
-                </v-col>
-                <v-col class="py-1" cols="12" md="3">
-                  <v-text-field
-                    v-model="addForm.fecha_nacimiento"
-                    label="Fecha Nacimiento"
-                    :rules="[rules.required]"
-                    autocomplete="off"
-                    filled
-                    dense
-                  ></v-text-field>
-                </v-col>
+        <v-tabs-items class="w-full" v-model="tab">
+          <v-tab-item>
+            <v-card class="px-2 py-2">
+              <v-card-text>
+                <v-form
+                  ref="addForm"
+                  v-model="validAddForm"
+                  @submit.prevent="saveReg()"
+                  lazy-validation
+                >
+                  <v-row>
+                    <v-col class="py-1" cols="12" md="3">
+                      <v-select
+                        :items="items_tipo_doc"
+                        label="Tipo Documento"
+                        placeholder="Selecciona una marca"
+                        v-model="addForm.cod_tipo_doc"
+                        :rules="[rules.required]"
+                        item-text="nombre_tipo_documento"
+                        item-value="id_tipo_documento"
+                        filled
+                        dense
+                        disabled
+                      ></v-select>
+                    </v-col>
+                    <v-col class="py-1" cols="12" md="3">
+                      <v-text-field
+                        v-model="addForm.nro_documento"
+                        label="Nro. Documento"
+                        :rules="[rules.required]"
+                        autocomplete="off"
+                        filled
+                        dense
+                        disabled
+                      >
+                        <!-- <template #append-outer>
+                            <v-btn
+                                color="primary"
+                                class="mb-1"
+                                @click="obtenerDataDocumentos()">
+                                <v-icon>mdi-magnify</v-icon>
+                            </v-btn>
+                        </template> -->
+                      </v-text-field>
+                    </v-col>
+                    <v-col class="py-1" cols="12" md="3">
+                      <v-text-field
+                        v-model="addForm.nombre_razon_social"
+                        label="Nombre"
+                        :rules="[rules.required]"
+                        autocomplete="off"
+                        filled
+                        dense
+                      ></v-text-field>
+                    </v-col>
+                    <v-col class="py-1" cols="12" md="3">
+                      <v-text-field
+                        v-model="addForm.fecha_nacimiento"
+                        label="Fecha Nacimiento"
+                        :rules="[rules.required]"
+                        autocomplete="off"
+                        filled
+                        dense
+                      ></v-text-field>
+                    </v-col>
 
-                <v-col class="py-1" cols="12" md="3">
-                  <v-text-field
-                    v-model="addForm.telefono"
-                    label="Teléfono Principal"
-                    autocomplete="off"
-                    :rules="[rules.phone]"
-                    filled
-                    dense
-                  ></v-text-field>
-                </v-col>
-                <!--
-                <v-col class="py-1" cols="12" md="3">
-                  <v-text-field
-                    v-model="addForm.telefono_adic"
-                    label="Teléfono Adicional"
-                    autocomplete="off"
-                    filled
-                    dense
-                  ></v-text-field>
-                </v-col>
-                -->
-                <v-col class="py-1" cols="12" md="3">
-                  <v-text-field
-                    v-model="addForm.email"
-                    label="Correo Electrónico"
-                    :rules="[rules.email, rules.required]"
-                    autocomplete="off"
-                    type="email"
-                    filled
-                    dense
-                  ></v-text-field>
-                </v-col>
+                    <v-col class="py-1" cols="12" md="3">
+                      <v-text-field
+                        v-model="addForm.telefono"
+                        label="Teléfono Principal"
+                        autocomplete="off"
+                        :rules="[rules.phone]"
+                        filled
+                        dense
+                      ></v-text-field>
+                    </v-col>
+                    <!--
+                    <v-col class="py-1" cols="12" md="3">
+                      <v-text-field
+                        v-model="addForm.telefono_adic"
+                        label="Teléfono Adicional"
+                        autocomplete="off"
+                        filled
+                        dense
+                      ></v-text-field>
+                    </v-col>
+                    -->
+                    <v-col class="py-1" cols="12" md="3">
+                      <v-text-field
+                        v-model="addForm.email"
+                        label="Correo Electrónico"
+                        :rules="[rules.email, rules.required]"
+                        autocomplete="off"
+                        type="email"
+                        filled
+                        dense
+                      ></v-text-field>
+                    </v-col>
 
-                <v-col class="py-1" cols="12" md="3">
-                  <v-select
-                    :items="items_ocupacion"
-                    label="Ocupación/Trabajo"
-                    placeholder="Selecciona una ocupación"
-                    v-model="addForm.id_ocupacion"
-                    :rules="[rules.required]"
-                    item-text="nombre_ocupacion"
-                    item-value="id_ocupacion"
-                    filled
-                    dense
-                  ></v-select>
-                </v-col>
-                <v-col class="py-1" cols="12" md="3">
-                  <v-select
-                    :items="items_departamento"
-                    label="Departamento"
-                    placeholder="Selecciona un departamento"
-                    v-model="addForm.id_departamento"
-                    :rules="[rules.required]"
-                    item-text="nombre_departamento"
-                    item-value="id_departamento"
-                    filled
-                    dense
-                  ></v-select>
-                </v-col>
-                <v-col class="py-1" cols="12" md="3">
-                  <v-select
-                    :items="items_provincia"
-                    label="Provincia"
-                    placeholder="Selecciona una provincia"
-                    v-model="addForm.id_provincia"
-                    :rules="[rules.required]"
-                    item-text="nombre_provincia"
-                    item-value="id_provincia"
-                    filled
-                    dense
-                  ></v-select>
-                </v-col>
-                <v-col class="py-1" cols="6" md="3">
-                  <v-select
-                    :items="items_distrito"
-                    label="Distrito"
-                    placeholder="Selecciona un distrito"
-                    v-model="addForm.id_distrito"
-                    :rules="[rules.required]"
-                    item-text="nombre_distrito"
-                    item-value="id_distrito"
-                    filled
-                    dense
-                  ></v-select>
-                </v-col>
-                <v-col class="py-1" cols="12">
-                  <v-text-field
-                    v-model="addForm.direccion"
-                    label="Dirección"
-                    :rules="[rules.required]"
-                    autocomplete="off"
-                    filled
-                    dense
-                  ></v-text-field>
-                </v-col>
+                    <v-col class="py-1" cols="12" md="3">
+                      <v-select
+                        :items="items_ocupacion"
+                        label="Ocupación/Trabajo"
+                        placeholder="Selecciona una ocupación"
+                        v-model="addForm.id_ocupacion"
+                        :rules="[rules.required]"
+                        item-text="nombre_ocupacion"
+                        item-value="id_ocupacion"
+                        filled
+                        dense
+                      ></v-select>
+                    </v-col>
+                    <v-col class="py-1" cols="12" md="3">
+                      <v-select
+                        :items="items_departamento"
+                        label="Departamento"
+                        placeholder="Selecciona un departamento"
+                        v-model="addForm.id_departamento"
+                        :rules="[rules.required]"
+                        item-text="nombre_departamento"
+                        item-value="id_departamento"
+                        filled
+                        dense
+                      ></v-select>
+                    </v-col>
+                    <v-col class="py-1" cols="12" md="3">
+                      <v-select
+                        :items="items_provincia"
+                        label="Provincia"
+                        placeholder="Selecciona una provincia"
+                        v-model="addForm.id_provincia"
+                        :rules="[rules.required]"
+                        item-text="nombre_provincia"
+                        item-value="id_provincia"
+                        filled
+                        dense
+                      ></v-select>
+                    </v-col>
+                    <v-col class="py-1" cols="6" md="3">
+                      <v-select
+                        :items="items_distrito"
+                        label="Distrito"
+                        placeholder="Selecciona un distrito"
+                        v-model="addForm.id_distrito"
+                        :rules="[rules.required]"
+                        item-text="nombre_distrito"
+                        item-value="id_distrito"
+                        filled
+                        dense
+                      ></v-select>
+                    </v-col>
+                    <v-col class="py-1" cols="12">
+                      <v-text-field
+                        v-model="addForm.direccion"
+                        label="Dirección"
+                        :rules="[rules.required]"
+                        autocomplete="off"
+                        filled
+                        dense
+                      ></v-text-field>
+                    </v-col>
 
-                <v-col class="py-1" cols="12">
-                  <v-radio-group v-model="addForm.lista_negra" row>
-                    <template v-slot:label>
-                      <div>¿Paciente en Lista Negra?</div>
-                    </template>
-                    <v-radio label="Si" :value="1"></v-radio>
-                    <v-radio label="No" :value="0"></v-radio>
-                  </v-radio-group>
-                </v-col>
-              </v-row>
+                    <v-col class="py-1" cols="12">
+                      <v-radio-group v-model="addForm.lista_negra" row>
+                        <template v-slot:label>
+                          <div>¿Paciente en Lista Negra?</div>
+                        </template>
+                        <v-radio label="Si" :value="1"></v-radio>
+                        <v-radio label="No" :value="0"></v-radio>
+                      </v-radio-group>
+                    </v-col>
+                  </v-row>
 
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="error" text>Cancelar</v-btn>
-                <v-btn type="submit" color="primary" :disabled="!validAddForm">
-                  Guardar
-                </v-btn>
-              </v-card-actions>
-            </v-form>
-          </v-card-text>
-        </v-card>
-      </v-tab-item>
-      <v-tab-item>
-        <anamnesis-table :documento="documento_cliente" />
-      </v-tab-item>
-      <v-tab-item>
-        <recetas-table :id_cliente="id_cliente" />
-      </v-tab-item>
-      <v-tab-item> </v-tab-item>
-    </v-tabs-items>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="error" text>Cancelar</v-btn>
+                    <v-btn type="submit" color="primary" :disabled="!validAddForm">
+                      Guardar
+                    </v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+
+
+          <v-tab-item>
+            <anamnesis-table :documento="documento_cliente" />
+          </v-tab-item>
+
+          <v-tab-item>
+            <recetas-table :id_cliente="id_cliente" />
+            v-
+          </v-tab-item>
+          
+          <v-tab-item>
+            <v-card class="px-0 py-2">
+              <v-card-text>
+                <comprobantes-table :id_cliente="id_cliente" />
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+          <v-tab-item>
+            <deudas-table :id_cliente="id_cliente" />
+          </v-tab-item>
+          
+        </v-tabs-items>
+      </v-row>
+    </v-card>
   </div>
 </template>
 <script>
@@ -211,11 +230,16 @@ import axios from "axios";
 import API from "../../../api";
 import RecetasTable from "./components/RecetasTable.vue";
 import AnamnesisTable from "./components/AnamnesisTable.vue";
+import ComprobantesTable from "./components/ComprobantesTable.vue";
+import DeudasTable from "./components/DeudasTable.vue";
+
 
 export default {
   components: {
     AnamnesisTable,
     RecetasTable,
+    ComprobantesTable,
+    DeudasTable,
   },
   data() {
     return {
@@ -266,6 +290,15 @@ export default {
     vm.getDistrito(401);
   },
   watch: {
+    dataTabOptions(event) {
+      this.itemsperpage = event.itemsPerPage;
+      this.getRegistroComprobantes(
+        event.page,
+        event.itemsPerPage,
+        event.sortDesc,
+        event.sortBy[0]
+      );
+    },
     "addForm.id_departamento"(value) {
       this.getProvincia(value);
     },
@@ -293,7 +326,7 @@ export default {
     async saveReg() {
       const vm = this;
       if (this.$refs.addForm.validate()) {
-        try {
+        try { 
           this.$store.commit("loader", true);
           const response = await API.clientes.update(
             vm.addForm.id_cliente,

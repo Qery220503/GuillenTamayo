@@ -147,6 +147,7 @@
           </template>
           <template v-slot:[`item.actions`]="{ item }">
             <v-btn
+              v-if="item.id_cliente == 1"
               small
               icon
               :to="'/paciente/editar/' + item.id_cliente"
@@ -154,8 +155,19 @@
               @click.stop.prevent
               link
             >
+              <v-icon small>mdi-eye</v-icon>
+            </v-btn>
+            <v-btn
+              v-else
+              small
+              icon
+              :to="'/paciente/editar/' + item.id_cliente"
+              @click.stop.prevent
+              link
+            >
               <v-icon small>mdi-border-color</v-icon>
             </v-btn>
+            
             <v-btn
               small
               icon

@@ -124,6 +124,8 @@ class Comprobante extends Model
         $tipo = $request->tipo;
         $status = $request->estado;
 
+        $id_cliente = $request->id_cliente;
+
         if(isset($sortBy)){
             $data->orderBy($sortBy, $sortDesc);
         }
@@ -141,6 +143,9 @@ class Comprobante extends Model
         if(isset($tipo) && $tipo == 0){
           $data->where('saldo', '=', 0)
                ->where('condicion_pago', '=', 1);
+        }
+        if(isset($id_cliente)){
+            $data->where('id_cliente', $id_cliente);
         }
 
         //if(isset($tipo)){
