@@ -660,7 +660,6 @@ export default {
       const vm = this;
       vm.urlCotizacion = "/cotizacionPDf";
       vm.cotizacionDialog = true;
-      console.log(vm.refraccion_lejos, vm.refraccion_cerca, "REFRACIONES");
     },
     async searchAnamnesis() {
       try {

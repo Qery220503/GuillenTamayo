@@ -34,6 +34,8 @@ class OrdenLaboratorio extends Model
         'monto_compra_detallado',
         'tipo_montura',
         'montaje',
+        'id_campana',
+        'id_comprobante'
     ];
     public $timestamps = true;
 
@@ -79,7 +81,7 @@ class OrdenLaboratorio extends Model
         return $this->belongsTo(OrdenLaboratorioEstados::class, 'id_estado_orden_laboratorio','id_estado_orden_laboratorio');
     }
     public function comprobante(){
-      return $this->hasOne(Comprobante::class,'id_orden_lab');
+      return $this->belongsTo(Comprobante::class,'id_comprobante');
     }
     //--- Funciones ---
     public static function listAll($request){
@@ -90,7 +92,8 @@ class OrdenLaboratorio extends Model
             'status',
             'lente',
             'anamnesis.clinica',
-            'anamnesis.doctor'
+            'anamnesis.doctor',
+            'usuario'
         )
             ->where('id_sucursal', $auth->id_sucursal);
         $itemsPerPage = $request->itemsPerPage;

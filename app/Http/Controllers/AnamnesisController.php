@@ -91,7 +91,7 @@ class AnamnesisController extends Controller
       $orden_lab = OrdenLaboratorio::create($request->all());
 
 
-      OrdenLaboratorioHistorial::create([
+      $orden = OrdenLaboratorioHistorial::create([
         'id_orden' => $orden_lab->id_orden_laboratorio,
         'id_estado' => 1,
         'id_usuario' => $auth->id,
@@ -103,6 +103,20 @@ class AnamnesisController extends Controller
         'fecha'=>date('Y-m-d H:i:s'),
         'estado'=>'anamnesis_paso_2'
       ]);
+
+      if($orden_lab->id_campana != null){
+
+        AnamnesisEstadosHistorico::create([
+          'user_id'=>$auth->id,
+          'anamnesis_id'=>$orden_lab->id_anamnesis,
+          'fecha'=>date('Y-m-d H:i:s'),
+          'estado'=>'anamnesis_campana'
+        ]);
+        $anamnesis = Anamnesis::findOrFail($orden_lab->id_anamnesis);
+        $anamnesis->estado = 0;
+        $anamnesis->save();
+
+      }
 
 
       return response()->json([
@@ -154,6 +168,8 @@ class AnamnesisController extends Controller
       */
       if (isset($_head['id_eps_discount']) &&  $_head['id_eps_discount'] != null) {
         $orden = OrdenLaboratorio::with(['lente'])->where('id_anamnesis', $request->id_anamnesis)->first();
+        $cliente = Clientes::findOrFail($_head['id_cliente']);
+        $_head['observaciones'] .= " | DATOS PACIENTE: " . $cliente->nombre_razon_social . ' - NRO. DOCUMENTO: ' . $cliente->nro_documento;
         $epsHead = EpsService::prepareEpsHeader($_head);
         $total = $_head['total'];
         if($total < $_head['eps_discount']){
@@ -168,6 +184,7 @@ class AnamnesisController extends Controller
           $detalle["id_comprobante"] = $epsInvoice->id_comprobante;
           ComprobanteDetalle::create(collect($detalle)->all());
         }
+        $clientDocument = null;
         if ($total > $epsInvoice->total) {
           $clientReceipt = $total - $epsInvoice->total;
           $_head['total'] = $clientReceipt;
@@ -204,7 +221,7 @@ class AnamnesisController extends Controller
         $anamnesis = Anamnesis::where('id_anamnesis', $request->id_anamnesis)->first();
         $anamnesis->estado = 0;
         $anamnesis->save();
-        if ($orden->lente['modelo'] == 'MULTIFOCAL') {
+        if ($orden->lente['modelo'] == 'MULTIFOCAL' &&  $clientDocument != null) {
           $client = Clientes::where('id_cliente', $clientDocument->id_cliente)->first();
           if($client != null){
             Mail::to($client->email)->queue(new MultiFocalMail($client));
@@ -236,15 +253,19 @@ class AnamnesisController extends Controller
           'id_comprobante_origen' => ($clientDocument == null) ? $epsInvoice->id_comprobante : $clientDocument->id_comprobante,
         ]);
 
+
+        $orden->id_comprobante = isset($clientDocument) ? $clientDocument->id_comprobante : $epsInvoice->id_comprobante;
+        $orden->save();
+
+
         $cliente = Clientes::find( $_head['id_cliente']);
         Mail::to($cliente->email)->queue(new CouponMail($cupon, $cliente));
-
         DB::commit();
 
 
         return response()->json([
           'success' => true,
-          'comprobante' => isset($clientDocument) ? $clientDocument : null,
+          'comprobante' => ($clientDocument != null) ? $clientDocument : null,
           'cupon' => $cupon,
           'extra' => [
             'eps' => $facturacion_eps,
@@ -255,11 +276,17 @@ class AnamnesisController extends Controller
         /*
           Solo si no es una venta por EPS
         */
+        $cliente = Clientes::findOrFail($_head['id_cliente']);
+        $_head['observaciones'] .= " | DATOS PACIENTE: " . $cliente->nombre_razon_social . ' - NRO. DOCUMENTO: ' . $cliente->nro_documento;
         $comprobante = Comprobante::create(collect($_head)->all());
         $comprobante->correlativo = ++$correlativo;
         $orden = OrdenLaboratorio::with(['lente'])->where('id_anamnesis', $request->id_anamnesis)->first();
         $comprobante->id_orden_lab = $orden->id_orden_laboratorio;
         $comprobante->save();
+
+        $orden->id_comprobante = $comprobante->id_comprobante;
+        $orden->save();
+
         foreach ($request->detail as $value) {
           $value['id_comprobante'] = $comprobante->id_comprobante;
           $detalle = ComprobanteDetalle::create(collect($value)->all());
@@ -318,6 +345,7 @@ class AnamnesisController extends Controller
           Nota de venta
           Pendiente a implementación si se requiere
         */
+        /*
         if ($comprobante->id_tipo_comprobante != 1 && $comprobante->id_tipo_comprobante != 2) {
           DB::commit();
           return response()->json([
@@ -325,7 +353,7 @@ class AnamnesisController extends Controller
             "comprobante" => $comprobante,
             'extra' => []
           ]);
-        }
+        }*/
         $facturacion_data = ComprobanteService::facturar($comprobante->id_comprobante);
         DB::commit();
         if ($orden->lente['modelo'] == 'MULTIFOCAL') {
@@ -391,7 +419,7 @@ class AnamnesisController extends Controller
 
     $anamnesis = Anamnesis::whereHas('cliente', function ($q) use ($id) {
       $q->where('nro_documento', $id)->orWhere('id_cliente',$id);
-    })->with(['cliente', 'doctor', 'clinica', 'empresa', 'orden.montura', 'orden.lente'])
+      })->with(['cliente', 'doctor', 'clinica', 'empresa', 'orden.montura', 'orden.lente'])
       ->whereBetween('created_at', [$date, Carbon::now()])
       ->where('estado', 1)
       ->orderBy('id_anamnesis', 'DESC')
@@ -467,7 +495,7 @@ class AnamnesisController extends Controller
   }
 
   public function conformidadMonturaPDF($id)
-    {
+  {
         $html = $this->vistaConformidadMontura($id)->render();
         $file = 'pdf_' . 'pdf';
         $mpdf = new Mpdf(
@@ -482,5 +510,5 @@ class AnamnesisController extends Controller
         );
         $mpdf->WriteHTML($html);
         $mpdf->Output($file, 'I');
-    }
+  }
 }

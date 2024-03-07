@@ -30,7 +30,6 @@
             </v-chip>
         </template>
           <template v-slot:[`item.actions`]="{ item }">
-
             <v-tooltip bottom v-if="canCloseAnamnesis(item)">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -42,12 +41,9 @@
                 >
                   <v-icon small>mdi-close</v-icon>
                 </v-btn>
-
               </template>
               <span>Archivar Anamnesis</span>
             </v-tooltip>
-
-
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -59,12 +55,9 @@
                 >
                   <v-icon small>mdi-eye</v-icon>
                 </v-btn>
-
               </template>
               <span>Ver Anamnesis</span>
             </v-tooltip>
-
-
             <v-tooltip bottom v-if="canRetakeAnamnesis(item)">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -79,10 +72,6 @@
               </template>
               <span>Retomar Anamnesis</span>
             </v-tooltip>
-
-
-
-
           </template>
         </v-data-table>
       </v-row>
@@ -131,6 +120,7 @@ export default {
         anamnesis_cerrada: "Anamnesis Completada",
         anamnesis_archivada_usuario: "Anamnesis archivada por usuario",
         anamnesis_archivada_automaticamente: "Anamnesis archivada automáticamente",
+        anamnesis_campana: 'Anamnesis archivada por campaña'
       },
     };
   },
@@ -154,7 +144,7 @@ export default {
       if(item.last_state.estado in states){
         return true;
       }
-      return true;
+      return false;
     },
     async getRegistros(page = 1, per_page = 25, sortDesc = 0, sortBy = "id_anamnesis") {
       this.loadingTable = true;

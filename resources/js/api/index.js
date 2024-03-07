@@ -653,6 +653,9 @@ const API = {
     create(data) {
       return callAPI("post", PATHS.comprobantes.ROOT, { data: data });
     },
+    anular(data,id){
+      return callAPI("post", PATHS.comprobantes.ANULAR + id, {data: data});
+    }
   },
   egresos: {
     list(queryParam) {
@@ -811,6 +814,24 @@ const API = {
       return callAPI("get", PATHS.eps.ROOT);
     },
   },
+
+  campaign: {
+    list(params){
+      return callAPI("get", PATHS.campaigns.ROOT + params);
+    },
+    create(data){
+      return callAPI("post", PATHS.campaigns.ROOT, {data: data});
+    },
+    combo(){
+      return callAPI("get", PATHS.campaigns.COMBO);
+    },
+    show(id){
+      return callAPI("get", PATHS.campaigns.SET + id);
+    },
+    facturar(data, anamnesis){
+      return callAPI("post", PATHS.campaigns.FACTURAR, { data: data });
+    }
+  }
 };
 
 export default API;

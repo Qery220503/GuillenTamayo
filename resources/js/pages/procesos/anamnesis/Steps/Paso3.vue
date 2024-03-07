@@ -38,6 +38,20 @@
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
+          <v-select
+            :items="items_tipo_doc"
+            label="Tipo Documento"
+            placeholder="Selecciona un tipo documento"
+            v-model="$form.header.id_tipo_documento"
+            :rules="[rules.required]"
+            required
+            item-text="nombre_tipo_documento"
+            item-value="id_tipo_documento"
+            filled
+            dense
+          ></v-select>
+        </v-col>
+        <v-col cols="12" md="4">
           <v-text-field
             v-model="$form.header.nro_documento"
             :rules="[rules.required]"
@@ -811,6 +825,7 @@ export default {
     epsDiscountPercentage: null,
     epsDisabled: false,
     coupon: null,
+    items_tipo_doc: []
   }),
 
   computed: {
@@ -882,10 +897,8 @@ export default {
       this.$form.detail.splice(2, this.$form.detail.length);
       this.epsActive = true;
       this.$form.header.dscto_porcentaje = null;
-      console.log("epsSelectedWatch");
       this.$form.header.descuento_porcentaje = null;
       this.$nextTick(() => {
-        console.log("here 9");
         this.$form.header.dscto_fijo = null;
       });
     },
@@ -974,7 +987,6 @@ export default {
       this.$form.header.pago_saldo = this.$form.header.total - val;
     },
     "form.header.descuento_porcentaje"(value) {
-      console.log("Here 2: " + value);
       var sumaTotal = this.$form.detail.reduce(function (sum, product) {
         var total_fila = parseFloat(Number(product.precio_total));
         if (!isNaN(total_fila)) {
@@ -1009,7 +1021,6 @@ export default {
       }
       if (value > 100) {
         this.$nextTick(() => {
-          console.log("Descuento Porcentaje");
           this.$form.header.descuento_porcentaje = 100;
         });
         return;
@@ -1052,7 +1063,6 @@ export default {
       }
       if (value > sumaTotal) {
         this.$nextTick(() => {
-          console.log("here6");
           this.$form.header.dscto_fijo = sumaTotal;
         });
         return;
@@ -1131,8 +1141,19 @@ export default {
     this.getNotAllowedDates();
     this.getSeries();
     this.getEps();
+    this.getTipos();
   },
   methods: {
+    async getTipos() {
+      let vm = this;
+      try {
+        const response = await API.tipos_documentos.combo();
+        vm.items_tipo_doc = response.data;
+      } catch (e) {
+        UTILS.toastrr.error("Ups! Ocurrió un error", this);
+        console.error(e);
+      }
+    },
     async getEps() {
       const response = await API.eps.list();
       this.eps_institution = response.data;
@@ -1142,7 +1163,6 @@ export default {
       this.clearEps();
       this.epsDisabled = true;
       this.coupon = coupon;
-      console.log("handleCoupon");
       this.$form.header.descuento_porcentaje = 25;
     },
     handleTipoDeuda() {
@@ -1598,6 +1618,7 @@ export default {
   },
 };
 </script>
+
 <style lang="scss" scoped>
 .btn-actions {
   background-color: #fff !important;

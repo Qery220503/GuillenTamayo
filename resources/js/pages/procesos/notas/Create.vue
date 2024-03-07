@@ -432,7 +432,6 @@ export default {
           });
           if(result.isConfirmed){
             const res = await API.notas.anulacionOperacion(response.data.id_nota);
-            console.log(res, "Respuesta")
           }
 
         }
@@ -518,7 +517,6 @@ export default {
       vm.nota.subtotal = subtotal;
       vm.nota.igv = igv;
 
-      console.log(vm.nota, "Totales recalculados");
     },
     calcularTotal(index) {
       let detail = this.nota.detalle[index];
@@ -582,11 +580,6 @@ export default {
     },
     get_producto(val) {
       if (val == null) return;
-      console.log(val, "Trying to add");
-      /*
-      console.log(detail)
-      this.nota.detalle.push(detail);
-      */
 
       let detail = {
         id_precio_lente: null,

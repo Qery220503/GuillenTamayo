@@ -259,9 +259,11 @@
                 rows="2"
               ></v-textarea>
             </v-col>
+            <!--
             <v-col cols="12" md="4">
               <PaymentCoupons @validated="handleCoupon"></PaymentCoupons>
             </v-col>
+          -->
           </v-row>
           <v-divider></v-divider>
           <br />
@@ -710,7 +712,7 @@
             <v-card flat>
               <v-card-text v-if="showFormats">
                 <v-select
-                  :items="['a4', 'a5', 'ticketguillen', 'ticket']"
+                  :items="['ticketguillen', 'a4', 'a5', 'ticket']"
                   v-model="format"
                   outlined
                   hide-details
@@ -726,6 +728,7 @@
               </v-card-text>
             </v-card>
           </v-tab-item>
+          <!---
           <v-tab-item v-if="showCoupon">
             <v-card flat>
               <v-card-text>
@@ -733,6 +736,7 @@
               </v-card-text>
             </v-card>
           </v-tab-item>
+          -->
         </v-tabs>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -748,13 +752,13 @@
 import axios from "axios";
 import API from "../../../api";
 import Vue from "vue";
-import ClientDialog from "./components/ClientDialog";
-import CouponTicket from "./components/CouponTicket";
-import PaymentCoupons from "./components/PaymentCoupons";
+import ClientDialog from "../ventas/components/ClientDialog";
+//import CouponTicket from "../ventas/components/CouponTicket";
+import PaymentCoupons from "../ventas/components/PaymentCoupons";
 
 export default {
   components: {
-    CouponTicket,
+    //CouponTicket,
     ClientDialog,
     PaymentCoupons
   },
@@ -835,6 +839,7 @@ export default {
     otp: "",
     text: "",
     form: {
+      id_campana: null,
       id_cupon: null,
       header: {
         nota_credito_referencia: "",
@@ -876,11 +881,11 @@ export default {
       cuotas: [],
     },
     loading: false,
-    breadcrumbs_title: "Crear Comprobante",
+    breadcrumbs_title: "Facturar Campañas",
     breadcrumbs: [
       { text: "Inicio", disabled: false, href: "#" },
       { text: "Procesos", disabled: false, href: "#" },
-      { text: "Comprobantes" },
+      { text: "Campañas" },
     ],
     unidades_medida: [],
     series: [],
@@ -1157,21 +1162,52 @@ export default {
     this.getMedioPago();
     this.getTipoComprobante();
     this.getUnidadesMedida();
+    this.loadCampaignDetails();
   },
   methods: {
+    async loadCampaignDetails(){
+      const response = await API.campaign.show(this.$route.params.id);
+      const details = response.data;
+      details.forEach(e => {
+        if(e.hasOwnProperty('montura')){
+          this.form.detail.push({
+            is_invoice_item: true,
+            id_producto:e.montura.id_producto,
+            id_precio_lente: null,
+            id_servicio: null,
+            detalle_item: e.montura.nombre_producto,
+            cantidad: e.count,
+            id_unidad_medida: 1,
+            precio_unitario: e.montura.precio_venta,
+            precio_total: e.montura.precio_venta * e.count,
+            item_type: 1,
+            disabled: true,
+          });
+        }
+        if(e.hasOwnProperty('lente')){
+          this.form.detail.push({
+            id_producto: null,
+            id_precio_lente: e.lente.id_precio_lente,
+            id_servicio: null,
+            is_invoice_item: true,
+            detalle_item: e.lente.nombre_propio,
+            cantidad: e.count,
+            id_unidad_medida: 2,
+            precio_unitario: e.lente.precio_venta,
+            precio_total: e.lente.precio_venta * e.count,
+            item_type: 2,
+            disabled: true,
+          });
+        }
+      });
+      this.calcularTotal();
+      this.form.id_campana = this.$route.params.id;
+
+    },
     handleMedio(){
       if(this.form.header.id_medio_pago != 5) this.form.header.	nota_credito_referencia = '';
     },
-    handleCoupon(coupon) {
-      this.form.id_cupon = coupon.id;
-      if (coupon.tipo_descuento == 1) {
-        this.form.header.dscto_fijo = Number(coupon.descuento).toFixed(2);
-      } else {
-        this.form.header.descuento_porcentaje = Number(
-          coupon.descuento
-        ).toFixed(2);
-      }
-    },
+
     HandleClient(client) {
       const vm = this;
       vm.form.header.nro_documento = client.nro_documento;
@@ -1442,7 +1478,7 @@ export default {
           );
           return;
         }
-        const response = await API.comprobante.create(vm.form);
+        const response = await API.campaign.facturar(vm.form);
         if (!response.data.success) {
           UTILS.toastr.error("Error de comprobación con SUNAT", vm);
           return;

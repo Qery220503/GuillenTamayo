@@ -6,42 +6,35 @@
           <div class="text-left">
             <h2>{{ breadcrumbs_title }}</h2>
             <slot></slot>
-            <v-breadcrumbs
-              :items="breadcrumbs"
-              class="pa-0 py-2"
-            ></v-breadcrumbs>
+            <v-breadcrumbs :items="breadcrumbs" class="pa-0 py-2"></v-breadcrumbs>
           </div>
         </div>
       </div>
       <v-spacer></v-spacer>
 
+
+
+
       <div class="d-flex">
-        <!--<v-btn
-          class="mb-2 mr-2"
-          depressed
-          color="info"
-          :href="urlComprobante"
-          target="_blank"
-        >
+        <v-btn class="mb-2 mr-2" depressed color="info" :href="urlComprobante" target="_blank">
           <v-icon>mdi-cart-outline</v-icon>Generar Compra
-        </v-btn>-->
-        <v-btn
-          class="mb-2"
-          depressed
-          color="error"
-          :href="urlComprobante"
-          target="_blank"
-        >
+        </v-btn>
+        <v-btn class="mb-2 mr-2" depressed color="secondary" :to="'/comprobantes/ver/' + form.id_comprobante"
+          v-if="form.id_comprobante != null">
+          <v-icon>mdi-cart-outline</v-icon> Ver Comprobante
+        </v-btn>
+
+        <v-btn class="mb-2 mr-2" depressed color="secondary" v-else disabled>
+          <v-icon>mdi-cart-outline</v-icon> Sin Comprobante
+        </v-btn>
+
+
+        <v-btn class="mb-2" depressed color="error" :href="urlComprobante" target="_blank">
           <v-icon>mdi-file-pdf</v-icon>PDF
         </v-btn>
       </div>
     </div>
-    <v-alert
-      v-if="form.cliente.lista_negra == 1"
-      border="left"
-      type="warning"
-      icon="mdi-alert"
-    >
+    <v-alert v-if="form.cliente.lista_negra == 1" border="left" type="warning" icon="mdi-alert">
       <div class="text-h6" style="color: black">Cliente en Lista Negra</div>
       <div style="color: black">
         Requiere atención especial. Procede con precaución y sigue los
@@ -50,11 +43,21 @@
       </div>
     </v-alert>
 
+    <v-alert v-if="form.id_campana != null" border="left" type="info" icon="mdi-alert">
+        <div class="text-h6" style="color: white">Orden de campaña</div>
+        <div style="color: black">
+          Esta Orden de laboratorio esta asociada a una campaña.
+        </div>
+      </v-alert>
+      <v-alert v-if="form.id_comprobante == null" border="left" type="warning" icon="mdi-alert">
+        <div class="text-h6" style="color: white">Orden sin comprobante</div>
+        <div style="color: black">
+          Aún no se ha generado un comprobante asociado a esta orden de laboratorio.
+        </div>
+      </v-alert>
+
     <v-card class="mb-4 px-3">
-      <div
-        class="px-2"
-        style="overflow-x: hidden !important; overflow-y: hidden !important"
-      >
+      <div class="px-2" style="overflow-x: hidden !important; overflow-y: hidden !important">
         <v-row class="mt-2 align-center">
           <v-col class="py-2 px-1" cols="12" md="4">
             <h2 class="mb-1">Orden de Laboratorio</h2>
@@ -63,24 +66,12 @@
           <v-spacer></v-spacer>
           <v-col class="py-2 px-1" cols="12" md="4">
             <h4 class="mb-1">Estado de la Orden</h4>
-            <v-select
-              v-if="
-                id_estado_orden_laboratorio != 3 &&
-                id_estado_orden_laboratorio != 5
-              "
-              v-model="form.id_estado_orden_laboratorio"
-              :items="items_estados"
-              item-value="id_estado_orden_laboratorio"
-              item-text="nombre_estado"
-              placeholder=""
-              outlined
-              dense
-              hide-details
-            ></v-select>
-            <v-chip
-              v-else-if="id_estado_orden_laboratorio == 3"
-              color="success"
-            >
+            <v-select v-if="id_estado_orden_laboratorio != 3 &&
+              id_estado_orden_laboratorio != 5
+              " v-model="form.id_estado_orden_laboratorio" :items="items_estados"
+              item-value="id_estado_orden_laboratorio" item-text="nombre_estado" placeholder="" outlined dense
+              hide-details></v-select>
+            <v-chip v-else-if="id_estado_orden_laboratorio == 3" color="success">
               Entregado
             </v-chip>
             <v-chip v-else-if="id_estado_orden_laboratorio == 5" color="error">
@@ -88,16 +79,9 @@
             </v-chip>
           </v-col>
           <v-col class="py-2 px-1" cols="12" md="2">
-            <v-btn
-              v-if="
-                id_estado_orden_laboratorio != 3 &&
-                id_estado_orden_laboratorio != 5
-              "
-              depressed
-              color="primary"
-              class="mt-3"
-              @click="actualizarEstado()"
-            >
+            <v-btn v-if="id_estado_orden_laboratorio != 3 &&
+              id_estado_orden_laboratorio != 5
+              " depressed color="primary" class="mt-3" @click="actualizarEstado()">
               Actualizar
             </v-btn>
           </v-col>
@@ -114,10 +98,10 @@
             <h4>Montura</h4>
             <h5 v-if="form.montura">
               {{
-                form.montura
-                  ? form.montura.nombre_producto
-                  : form.montura_cliente
-              }}
+              form.montura
+                ? form.montura.nombre_producto
+                : form.montura_cliente
+            }}
             </h5>
           </v-col>
         </v-row>
@@ -128,20 +112,13 @@
             <v-container style="width: 600px">
               <v-timeline dense clipped>
                 <v-slide-x-transition group>
-                  <v-timeline-item
-                    v-for="(event, idx) in form.historial"
-                    :key="idx"
-                    class="mb-4"
-                    color="primary"
-                    small
-                  >
+                  <v-timeline-item v-for="(event, idx) in form.historial" :key="idx" class="mb-4" color="primary" small>
                     <v-row>
                       <v-col cols="7">
                         <span>
                           <strong>{{
-                            event.estado_orden.nombre_estado
-                          }}</strong> </span
-                        ><br />
+              event.estado_orden.nombre_estado
+            }}</strong> </span><br />
                         <span> Por {{ event.usuario.name }} </span>
                       </v-col>
                       <v-col class="text-right" cols="5">
@@ -189,127 +166,48 @@
         <v-row>
           <!-- PRECIO LENTES -->
           <v-col class="py-1 px-1" cols="12" md="4">
-            <v-select
-              label="Diseño"
-              placeholder="Selecciona un diseño"
-              v-model="form.lente.modelo"
-              :rules="[rules.required]"
-              dense
-              filled
-              readonly
-              item-text="text"
-              item-value="text"
-              :items="items_disenio"
-            ></v-select>
+            <v-select label="Diseño" placeholder="Selecciona un diseño" v-model="form.lente.modelo"
+              :rules="[rules.required]" dense filled readonly item-text="text" item-value="text"
+              :items="items_disenio"></v-select>
           </v-col>
           <v-col class="py-1 px-1" cols="12" md="4">
-            <v-select
-              label="Fabricación"
-              placeholder="Selecciona una fabricación"
-              v-model="form.lente.fabricacion"
-              :rules="[rules.required]"
-              dense
-              filled
-              readonly
-              item-text="text"
-              item-value="text"
-              :items="items_fabricacion"
-            ></v-select>
+            <v-select label="Fabricación" placeholder="Selecciona una fabricación" v-model="form.lente.fabricacion"
+              :rules="[rules.required]" dense filled readonly item-text="text" item-value="text"
+              :items="items_fabricacion"></v-select>
           </v-col>
           <v-col class="py-1 px-1" cols="12" md="4">
-            <v-select
-              label="Material"
-              placeholder="Selecciona un material"
-              v-model="form.lente.material"
-              :rules="[rules.required]"
-              dense
-              filled
-              readonly
-              item-text="text"
-              item-value="text"
-              :items="items_material"
-            ></v-select>
+            <v-select label="Material" placeholder="Selecciona un material" v-model="form.lente.material"
+              :rules="[rules.required]" dense filled readonly item-text="text" item-value="text"
+              :items="items_material"></v-select>
           </v-col>
           <v-col class="py-1 px-1" cols="12" md="4">
-            <v-select
-              label="Serie"
-              placeholder="Selecciona una serie"
-              v-model="form.lente.serie"
-              :rules="[rules.required]"
-              dense
-              filled
-              readonly
-              item-text="text"
-              item-value="text"
-              :items="items_serie"
-            ></v-select>
+            <v-select label="Serie" placeholder="Selecciona una serie" v-model="form.lente.serie"
+              :rules="[rules.required]" dense filled readonly item-text="text" item-value="text"
+              :items="items_serie"></v-select>
           </v-col>
           <v-col class="py-1 px-1" cols="12" md="4">
-            <v-select
-              label="Tratamiento"
-              placeholder="Selecciona un tratamiento"
-              v-model="form.lente.tratamiento"
-              :rules="[rules.required]"
-              dense
-              filled
-              readonly
-              item-text="text"
-              item-value="text"
-              :items="items_tratamiento"
-            ></v-select>
+            <v-select label="Tratamiento" placeholder="Selecciona un tratamiento" v-model="form.lente.tratamiento"
+              :rules="[rules.required]" dense filled readonly item-text="text" item-value="text"
+              :items="items_tratamiento"></v-select>
           </v-col>
           <v-col class="py-1 px-1" cols="12" md="4">
-            <v-select
-              label="Nombre"
-              placeholder="Selecciona un nombre"
-              v-model="form.lente.nombre"
-              :rules="[rules.required]"
-              dense
-              filled
-              readonly
-              item-text="text"
-              item-value="text"
-              :items="items_nombre"
-            ></v-select>
+            <v-select label="Nombre" placeholder="Selecciona un nombre" v-model="form.lente.nombre"
+              :rules="[rules.required]" dense filled readonly item-text="text" item-value="text"
+              :items="items_nombre"></v-select>
           </v-col>
 
           <v-col class="py-1 px-1" cols="12" md="4">
-            <v-select
-              label="Fotocromat."
-              v-model="form.lente.fotocromatico"
-              :rules="[rules.required]"
-              dense
-              filled
-              readonly
-              item-text="text"
-              item-value="text"
-              :items="items_foto"
-            ></v-select>
+            <v-select label="Fotocromat." v-model="form.lente.fotocromatico" :rules="[rules.required]" dense filled
+              readonly item-text="text" item-value="text" :items="items_foto"></v-select>
           </v-col>
           <v-col class="py-1 px-1" cols="12" md="4">
-            <v-select
-              label="Color Fotocromat"
-              v-model="form.lente.color_fotocromatico"
-              placeholder="Selecciona un color"
-              :rules="[rules.required]"
-              dense
-              filled
-              readonly
-              item-text="text"
-              item-value="text"
-              :items="items_color"
-            ></v-select>
+            <v-select label="Color Fotocromat" v-model="form.lente.color_fotocromatico"
+              placeholder="Selecciona un color" :rules="[rules.required]" dense filled readonly item-text="text"
+              item-value="text" :items="items_color"></v-select>
           </v-col>
           <v-col class="py-1 px-1" cols="12" md="3">
-            <v-text-field
-              label="Precio"
-              type="number"
-              dense
-              filled
-              readonly
-              autocomplete="off"
-              :value="items_precio.precio_venta"
-            ></v-text-field>
+            <v-text-field label="Precio" type="number" dense filled readonly autocomplete="off"
+              :value="items_precio.precio_venta"></v-text-field>
           </v-col>
           <!-- PRECIO LENTES -->
         </v-row>
@@ -404,93 +302,42 @@
                   </tr>
                 </tbody>
               </template>
-            </v-simple-table>
-          </v-col>
-          <v-col class="d-flex align-center">
-            <v-text-field
-              hide-details
-              outlined
-              dense
-              filled
-              readonly
-              class="mr-1"
-              label="Ángulo panorámico"
-              v-model="form.angulo.panoramico"
-            ></v-text-field>
-            <v-text-field
-              hide-details
-              outlined
-              dense
-              filled
-              readonly
-              class="mr-1"
-              label="Ángulo pantoscópico"
-              v-model="form.angulo.pantoscopico"
-            ></v-text-field>
-            <v-text-field
-              hide-details
-              outlined
-              dense
-              filled
-              readonly
-              label="Distancia Vértice"
-              v-model="form.angulo.vertice"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        -->
+</v-simple-table>
+</v-col>
+<v-col class="d-flex align-center">
+  <v-text-field hide-details outlined dense filled readonly class="mr-1" label="Ángulo panorámico"
+    v-model="form.angulo.panoramico"></v-text-field>
+  <v-text-field hide-details outlined dense filled readonly class="mr-1" label="Ángulo pantoscópico"
+    v-model="form.angulo.pantoscopico"></v-text-field>
+  <v-text-field hide-details outlined dense filled readonly label="Distancia Vértice"
+    v-model="form.angulo.vertice"></v-text-field>
+</v-col>
+</v-row>
+-->
 
         <v-divider class="my-4"></v-divider>
         <h5>Receta</h5>
 
         <!-- Antecedentes Componente -->
-        <MeasuresComponent
-          :recipes="form.receta"
-          :noeditable="true"
-        ></MeasuresComponent>
+        <MeasuresComponent :recipes="form.receta" :noeditable="true"></MeasuresComponent>
         <v-divider class="my-4"></v-divider>
         <v-row>
           <v-col cols="6">
-            <v-textarea
-              rows="3"
-              v-model="form.observaciones"
-              label="Observaciones"
-              filled
-              readonly
-            ></v-textarea>
+            <v-textarea rows="3" v-model="form.observaciones" label="Observaciones" filled readonly></v-textarea>
           </v-col>
           <v-col cols="3">
-            <v-text-field
-              v-model="form.fecha_entrega"
-              label="Fecha entrega"
-              prepend-inner-icon="mdi-calendar"
-              readonly
-              filled
-              dense
-              :rules="[rules.required]"
-            ></v-text-field>
+            <v-text-field v-model="form.fecha_entrega" label="Fecha entrega" prepend-inner-icon="mdi-calendar" readonly
+              filled dense :rules="[rules.required]"></v-text-field>
           </v-col>
           <v-col cols="3">
-            <v-text-field
-              v-model="form.hora_entrega"
-              label="Hora entrega"
-              prepend-inner-icon="mdi-clock-time-four-outline"
-              readonly
-              filled
-              dense
-              :rules="[rules.required]"
-            ></v-text-field>
+            <v-text-field v-model="form.hora_entrega" label="Hora entrega"
+              prepend-inner-icon="mdi-clock-time-four-outline" readonly filled dense
+              :rules="[rules.required]"></v-text-field>
           </v-col>
         </v-row>
       </div>
       <div v-if="verRecetaCard" style="text-align: center">
-        <iframe
-          class="mx-auto"
-          :src="urlComprobante"
-          frameborder="0"
-          height="700px"
-          width="90%"
-        >
+        <iframe class="mx-auto" :src="urlComprobante" frameborder="0" height="700px" width="90%">
         </iframe>
       </div>
     </v-card>
@@ -580,135 +427,140 @@ export default {
           vertice: "",
         },
         receta: {
-          recipe_selection: "recipe",
-          recipe: {
-            dip: null,
+          panoramic_angle: null,
+          pantoscopic_angle: null,
+          vertex_distance: null,
+          dip: null,
+          od: {
+            esf: null,
+            cyl: null,
+            add_cerca: null,
+            add_intermedio: null,
+            alt: null,
+            prismas: null,
+            avcc: null,
+            eje: null,
+          },
+          oi: {
+            esf: null,
+            cyl: null,
+            add_cerca: null,
+            add_intermedio: null,
+            alt: null,
+            prismas: null,
+            avcc: null,
+            eje: null,
+          },
+          selection: "far",
+          /* Specific recipes */
+          near: {
+            oi: {
+              esf: null,
+              cyl: null,
+              dnp: null,
+              alt: null,
+              prismas: null,
+              //avcc: null,
+              eje: null,
+            },
             od: {
               esf: null,
               cyl: null,
-              add_cerca: null,
-              add_intermedio: null,
+              dnp: null,
               alt: null,
               prismas: null,
-              avcc: null,
+              //avcc: null,
+              eje: null,
+            },
+          },
+          intermediate: {
+            oi: {
+              esf: null,
+              cyl: null,
+              dnp: null,
+              alt: null,
+              prismas: null,
+              //avcc: null,
+              eje: null,
+            },
+            od: {
+              esf: null,
+              cyl: null,
+              dnp: null,
+              alt: null,
+              prismas: null,
+              //avcc: null,
+              eje: null,
+            },
+          },
+          far: {
+            oi: {
+              esf: null,
+              cyl: null,
+              dnp: null,
+              alt: null,
+              prismas: null,
+              //avcc: null,
+              eje: null,
+            },
+            od: {
+              esf: null,
+              cyl: null,
+              dnp: null,
+              alt: null,
+              prismas: null,
+              //avcc: null,
+              eje: null,
+            },
+          },
+          multifocal: {
+            od: {
+              esf: null,
+              cyl: null,
+              eje: null,
+              add: null,
+              dnp: null,
+              alt: null,
+              prismas: null,
+              //avcc: null,
             },
             oi: {
               esf: null,
               cyl: null,
-              add_cerca: null,
-              add_intermedio: null,
+              eje: null,
+              add: null,
+              dnp: null,
               alt: null,
               prismas: null,
-              avcc: null,
-            },
-            selection: "far",
-            /* Specific recipes */
-            near: {
-              oi: {
-                esf: null,
-                cyl: null,
-                dnp: null,
-                alt: null,
-                prismas: null,
-                avcc: null,
-              },
-              od: {
-                esf: null,
-                cyl: null,
-                dnp: null,
-                alt: null,
-                prismas: null,
-                avcc: null,
-              },
-            },
-            intermediate: {
-              oi: {
-                esf: null,
-                cyl: null,
-                dnp: null,
-                alt: null,
-                prismas: null,
-                avcc: null,
-              },
-              od: {
-                esf: null,
-                cyl: null,
-                dnp: null,
-                alt: null,
-                prismas: null,
-                avcc: null,
-              },
-            },
-            far: {
-              oi: {
-                esf: null,
-                cyl: null,
-                dnp: null,
-                alt: null,
-                prismas: null,
-                avcc: null,
-              },
-              od: {
-                esf: null,
-                cyl: null,
-                dnp: null,
-                alt: null,
-                prismas: null,
-                avcc: null,
-              },
-            },
-            multifocal: {
-              od: {
-                esf: null,
-                cyl: null,
-                eje: null,
-                add: null,
-                dnp: null,
-                alt: null,
-                prismas: null,
-                avcc: null,
-              },
-              oi: {
-                esf: null,
-                cyl: null,
-                eje: null,
-                add: null,
-                dnp: null,
-                alt: null,
-                prismas: null,
-                avcc: null,
-              },
-              panoramic_angle: null,
-              pantoscopic_angle: null,
-              vertex_distance: null,
-            },
-            bifocal: {
-              od: {
-                esf: null,
-                cyl: null,
-                eje: null,
-                add: null,
-                dnp: null,
-                alt: null,
-                prismas: null,
-                avcc: null,
-              },
-              oi: {
-                esf: null,
-                cyl: null,
-                eje: null,
-                add: null,
-                dnp: null,
-                alt: null,
-                prismas: null,
-                avcc: null,
-              },
-              panoramic_angle: null,
-              pantoscopic_angle: null,
-              vertex_distance: null,
+              //avcc: null,
             },
           },
-          contact_recipe: {
+          bifocal: {
+            od: {
+              esf: null,
+              cyl: null,
+              eje: null,
+              add: null,
+              dnp: null,
+              alt: null,
+              prismas: null,
+              //avcc: null,
+            },
+            oi: {
+              esf: null,
+              cyl: null,
+              eje: null,
+              add: null,
+              dnp: null,
+              alt: null,
+              prismas: null,
+              //avcc: null,
+            },
+            panoramic_angle: null,
+            pantoscopic_angle: null,
+            vertex_distance: null,
+          },
+          contact: {
             od: {
               esf: null,
               cyl: null,
@@ -817,14 +669,12 @@ export default {
         vm.$store.commit("loader", true);
         const response = await API.orden_laboratorio.show(vm.id_orden_lab);
         let form = response.data;
-        console.log(form, "Formulario");
 
         form.lensometria = form.lensometria;
         form.angulo = form.angulos;
         form.refraccion_lejos = form.refraccion_lejos;
         form.refraccion_cerca = form.refraccion_cerca;
 
-        console.log(form);
         vm.form = form;
         vm.id_estado_orden_laboratorio = vm.form.id_estado_orden_laboratorio;
       } catch (e) {

@@ -846,18 +846,7 @@
                 <td class="desc pt-3 desc-12"><b>Montaje: </b></td>
                 <td class="desc pt-3 desc-12">{{ $orden_lab->montaje }}</td>
             </tr>
-            <tr>
-                <td class="desc pt-3 desc-12"><b>Ángulo Panorámico: </b></td>
-                <td class="desc pt-3 desc-12">{{ $orden_lab->angulos['panoramico'] }}</td>
-            </tr>
-            <tr>
-                <td class="desc pt-3 desc-12"><b>Ángulo Pantoscópico: </b></td>
-                <td class="desc pt-3 desc-12">{{ $orden_lab->angulos['pantoscopico'] }}</td>
-            </tr>
-            <tr>
-                <td class="desc pt-3 desc-12"><b>Distancia Vértice: </b></td>
-                <td class="desc pt-3 desc-12">{{ $orden_lab->angulos['vertice'] }}</td>
-            </tr>
+
 
             <tr>
                 <td class="desc pt-3 desc-12"><b>Observaciones: </b></td>

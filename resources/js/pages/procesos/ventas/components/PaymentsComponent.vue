@@ -1,11 +1,15 @@
 <template>
   <div>
-    <v-dialog v-model="dialog" max-width="60%">
+    <v-tooltip bottom>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn text icon v-bind="attrs" v-on="on" small>
+        <v-btn text icon v-bind="attrs" v-on="on" small @click="dialog = !dialog">
           <v-icon>mdi-cash-multiple</v-icon>
         </v-btn>
       </template>
+      <span>Agregar de pago</span>
+    </v-tooltip>
+    <v-dialog v-model="dialog" max-width="60%">
+
       <v-card>
         <v-card-title>
           <span class="headline">Agregar Pago</span>

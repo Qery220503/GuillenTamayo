@@ -10,14 +10,7 @@
     </div>
     <!-- Anamnesis Pendientes -->
     <div class="my-2" v-if="anamnesis_pendientes.length > 0 && e1 == 1">
-      <v-alert
-        v-for="(anamnesis, idx) in anamnesis_pendientes"
-        :key="idx"
-        dense
-        prominent
-        text
-        type="info"
-      >
+      <v-alert v-for="(anamnesis, idx) in anamnesis_pendientes" :key="idx" dense prominent text type="info">
         <div class="d-flex justify-space-between align-center">
           <span>
             Anamnesis pendiente del <strong>{{ anamnesis.created_at }}</strong>
@@ -26,12 +19,7 @@
             <v-btn color="success" icon @click="retomarAnamnesis(anamnesis)">
               <v-icon>mdi-restart</v-icon>
             </v-btn>
-            <v-btn
-              v-if="anamnesis.orden == null"
-              color="red"
-              @click="descartarAnamnesis(anamnesis.id_anamnesis)"
-              icon
-            >
+            <v-btn v-if="anamnesis.orden == null" color="red" @click="descartarAnamnesis(anamnesis.id_anamnesis)" icon>
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </div>
@@ -77,34 +65,21 @@
         <v-stepper-items>
           <v-stepper-content step="1" class="py-5">
             <v-form ref="formstep1" v-model="validAddFormStep1" lazy-validation>
-              <Paso1
-                :form.sync="formStep1"
-                :send="nextStep"
-                v-on:formReset="resetStep1"
-              />
+              <Paso1 :form.sync="formStep1" :send="nextStep" v-on:formReset="resetStep1" />
             </v-form>
           </v-stepper-content>
 
           <v-stepper-content step="2">
             <v-form ref="formstep2" v-model="validAddFormStep2" lazy-validation>
-              <Paso2
-                :form.sync="formStep2"
-                :send="nextStep"
-                :id_cliente="cliente.id_cliente"
-                v-on:formReset="resetStep2"
-                :cancel="cancelarAnamnesis"
-                :anamnesis="anamnesis"
-              />
+              <Paso2 :form.sync="formStep2" :send="nextStep" :id_cliente="cliente.id_cliente" v-on:formReset="resetStep2"
+                :cancel="cancelarAnamnesis" :anamnesis="anamnesis" :validation="validateStep2"
+                :store_campaign="saveStep2" />
             </v-form>
           </v-stepper-content>
 
           <v-stepper-content step="3">
             <v-form ref="formstep3" v-model="validAddFormStep3" lazy-validation>
-              <Paso3
-                :form.sync="formStep3"
-                :send="nextStep"
-                :convenio="anamnesis.id_empresa_convenio"
-              />
+              <Paso3 :form.sync="formStep3" :send="nextStep" :convenio="anamnesis.id_empresa_convenio" />
             </v-form>
           </v-stepper-content>
         </v-stepper-items>
@@ -112,12 +87,7 @@
     </div>
 
     <!-- Listado de Cotizaciones -->
-    <v-dialog
-      v-model="cotizacionDialog"
-      scrollable
-      :overlay="false"
-      width="85%"
-    >
+    <v-dialog v-model="cotizacionDialog" scrollable :overlay="false" width="85%">
       <v-card>
         <v-card-title primary-title> Cotizaciones </v-card-title>
         <v-card-text>
@@ -129,22 +99,11 @@
               {{ new Date(item.created_at).toISOString().slice(0, 10) }}
             </template>
             <template v-slot:[`item.actions`]="{ item }">
-              <v-btn
-                @click="verCotizacion(item.id_cotizacion)"
-                small
-                color="blue darken-4"
-                icon
-              >
+              <v-btn @click="verCotizacion(item.id_cotizacion)" small color="blue darken-4" icon>
                 <v-icon>mdi-file-pdf-box</v-icon>
               </v-btn>
 
-              <v-btn
-                icon
-                small
-                color="blue darken-4"
-                class="ml-1"
-                @click="usarCotizacion(item)"
-              >
+              <v-btn icon small color="blue darken-4" class="ml-1" @click="usarCotizacion(item)">
                 <v-icon>mdi-check</v-icon>
               </v-btn>
             </template>
@@ -155,25 +114,21 @@
 
     <!-- Recibos -->
 
-    <v-dialog
-      v-model="receiptDialog"
-      style="width: 80%"
-      @click:outside="exitReceipt"
-    >
+    <v-dialog v-model="receiptDialog" style="width: 80%" @click:outside="exitReceipt">
       <v-card>
-        <v-toolbar flat color="primary" dark>
+        <v-toolbar flat color="primary" dark >
           <v-toolbar-title>Recibo</v-toolbar-title>
         </v-toolbar>
         <v-tabs>
-          <v-tab v-if="comandaURL !=  ''">
+          <v-tab v-if="comandaURL != ''">
             <v-icon left> mdi-receipt </v-icon>
             Comanda
           </v-tab>
-          <v-tab v-if="reciboURL !=  ''">
+          <v-tab v-if="reciboURL != ''">
             <v-icon left> mdi-receipt </v-icon>
             Recibo
           </v-tab>
-          <v-tab v-if="epsFormato !=  ''">
+          <v-tab v-if="epsFormato != ''">
             <v-icon left> mdi-receipt </v-icon>
             Eps
           </v-tab>
@@ -182,56 +137,34 @@
             Cupon
           </v-tab>
 
-          <v-tab-item v-if="comandaURL !=  ''">
+          <v-tab-item v-if="comandaURL != ''">
             <v-card flat>
               <v-card-text>
-                <iframe
-                  :src="comandaURL"
-                  frameborder="0"
-                  style="width: 100%; height: 450px"
-                ></iframe>
+                <iframe :src="comandaURL" frameborder="0" style="width: 100%; height: 450px"></iframe>
               </v-card-text>
             </v-card>
           </v-tab-item>
 
-          <v-tab-item v-if="reciboURL !=  ''">
+          <v-tab-item v-if="reciboURL != ''">
             <v-card flat>
               <v-card-text v-if="showFormats">
-                <v-select
-                  :items="['a4', 'a5', 'ticket']"
-                  v-model="reciboFormato"
-                  outlined
-                  hide-details
-                  label="Formato comprobante"
-                ></v-select>
+                <v-select :items="['a4', 'a5', 'ticket']" v-model="reciboFormato" outlined hide-details
+                  label="Formato comprobante"></v-select>
               </v-card-text>
               <v-card-text>
-                <iframe
-                  :src="reciboURLFormated"
-                  frameborder="0"
-                  style="width: 100%; height: 450px"
-                ></iframe>
+                <iframe :src="reciboURLFormated" frameborder="0" style="width: 100%; height: 450px"></iframe>
               </v-card-text>
             </v-card>
           </v-tab-item>
 
-          <v-tab-item v-if="epsFormato !=  ''">
+          <v-tab-item v-if="epsFormato != ''">
             <v-card flat>
               <v-card-text>
-                <v-select
-                  :items="['a4', 'a5', 'ticket']"
-                  v-model="epsFormato"
-                  outlined
-                  hide-details
-                  label="Formato comprobante"
-                ></v-select>
+                <v-select :items="['ticketguillen', 'a4', 'a5', 'ticket']" v-model="epsFormato" outlined hide-details
+                  label="Formato comprobante"></v-select>
               </v-card-text>
               <v-card-text>
-                <iframe
-                  :src="epsURLFormated"
-                  frameborder="0"
-                  style="width: 100%; height: 450px"
-                ></iframe>
+                <iframe :src="epsURLFormated" frameborder="0" style="width: 100%; height: 450px"></iframe>
               </v-card-text>
             </v-card>
           </v-tab-item>
@@ -254,9 +187,9 @@
 </template>
 <script>
 import API from "../../../api";
-import Paso1 from "./Steps/Paso1.vue";
-import Paso2 from "./Steps/Paso2.vue";
-import Paso3 from "./Steps/Paso3.vue";
+import Paso1 from "./Steps/Paso1";
+import Paso2 from "./Steps/Paso2";
+import Paso3 from "./Steps/Paso3";
 import CouponTicket from '../ventas/components/CouponTicket.vue';
 import { RecipeService } from "../../../services/RecipeService";
 
@@ -308,6 +241,7 @@ export default {
       formStep2: {
         tipo_montura: "Aro Completo",
         montaje: "Bisell Brillante",
+        id_campana: '',
         lente: {
           disenio: "",
           fabricacion: "",
@@ -323,26 +257,7 @@ export default {
           precio_compra: "",
         },
         montura_cliente: "",
-        lensometria: {
-          od: {
-            esfera: "",
-            cilindro: "",
-            eje: "",
-          },
-          oi: {
-            esfera: "",
-            cilindro: "",
-            eje: "",
-          },
-        },
-        angulo: {
-          panoramico: "",
-          pantoscopico: "",
-          vertice: "",
-        },
         receta: {
-          // recipe_selection: "recipe",
-          // recipe: {
           panoramic_angle: null,
           pantoscopic_angle: null,
           vertex_distance: null,
@@ -609,13 +524,58 @@ export default {
     },
   },
   methods: {
-    async processAnamnesis(anamnesisId){
+    async processAnamnesis(anamnesisId) {
       const anamnesis = await this.searchAnamnesis(anamnesisId);
       this.retomarAnamnesis(anamnesis);
     },
-    async searchAnamnesis(id_anamnesis){
+    async searchAnamnesis(id_anamnesis) {
       const response = await API.anamnesis.search(id_anamnesis);
       return response.data;
+    },
+    validateStep2() {
+      const vm = this;
+      const monturaCliente = vm.formStep2.montura_cliente ?? "";
+      const montura = Object.keys(vm.formStep2.montura).length;
+      if (monturaCliente == "" && montura == 0) {
+        UTILS.toastr.info("No se ha definido una montura!", vm);
+        return false;
+      }
+      if (!vm.$refs.formstep2.validate()) {
+        return false;
+      }
+      return true;
+    },
+    async saveStep2() {
+      const vm = this;
+      vm.recalculateRecipe();
+      const element = vm.formStep2;
+      const data = {
+        id_campana: element.id_campana,
+        tipo_montura: element.tipo_montura,
+        montaje: element.montaje,
+        id_cliente: vm.cliente.id_cliente,
+        id_anamnesis: vm.anamnesis.id_anamnesis,
+        id_precio_lentes: element.lente.id_precio_lente,
+        id_montura: element.montura.id_producto,
+        montura_cliente: element.montura_cliente,
+        lensometria: element.lensometria,
+        angulos: element.angulo,
+        receta: element.receta,
+        observaciones: element.observaciones,
+        fecha_entrega:
+          element.fecha_entrega == ""
+            ? new Date().toISOString().slice(0, 10)
+            : element.fecha_entrega,
+        hora_entrega: element.hora_entrega,
+        monto_compra_proyectado: element.lente.monto_compra_proyectado,
+        monto_compra_detallado: element.lente.monto_compra_detallado,
+        seleccion_medidas: element.seleccion_medidas,
+      };
+      const response = await API.anamnesis.paso2(
+        vm.anamnesis.id_anamnesis,
+        data
+      );
+      return response;
     },
     nextStep(isCotizacion = false) {
       const vm = this;
@@ -720,7 +680,7 @@ export default {
         return e;
       });
     },
-    exitReceipt(){
+    exitReceipt() {
       this.$router.push('/comprobantes');
     },
     async descartarAnamnesis(id) {
@@ -848,27 +808,26 @@ export default {
         const data = response.data;
         if (data.success) {
           if ("comprobante" in data && data.comprobante != null) {
+
             const comprobante = data.comprobante;
             this.comandaURL = "/comandaPDF/" + comprobante.id_comprobante;
+
+          }else{
+            this.comandaURL = "/comandaPDF/" + eps.id_comprobante;
           }
           const extra = data.extra;
           if ("client" in extra && extra.client != null && Object.keys(extra).length > 0) {
             const recibo = response.data.extra.client;
             this.reciboURL = recibo.facturador + "/print/document/" + recibo.external_id;
-            this.reciboFormato = 'ticket';
+            this.reciboFormato = 'ticketguillen';
             this.showFormats = true;
-          }else{
-            this.reciboURL = "/comprobantes/notas-venta/" + data.comprobante.id_comprobante;
-            this.showFormats = false;
-            this.showCupon = false;
           }
-
           if ("eps" in extra && extra.eps != null) {
             const eps = response.data.extra.eps;
             this.epsURL = eps.facturador + "/print/document/" + eps.external_id;
-            this.epsFormato = 'ticket';
+            this.epsFormato = 'ticketguillen';
           }
-          if("cupon" in data && data.cupon != null){
+          if ("cupon" in data && data.cupon != null) {
             this.cupon = data.cupon;
           }
         }
@@ -1011,6 +970,7 @@ export default {
       return true;
     },
     recalculateRecipe() {
+      console.log("Here")
       const recipe = this.formStep2.receta;
       if (recipe.recipe_selection !== "recipe") return;
       switch (recipe.recipe.selection) {
@@ -1039,11 +999,11 @@ export default {
       }
     },
   },
-  computed:{
-    reciboURLFormated(){
-      return this.reciboURL + '/' +this.reciboFormato;
+  computed: {
+    reciboURLFormated() {
+      return this.reciboURL + '/' + this.reciboFormato;
     },
-    epsURLFormated(){
+    epsURLFormated() {
       return this.epsURL + '/' + this.epsFormato
     }
   }

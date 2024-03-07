@@ -51,7 +51,8 @@ class Comprobante extends Model
         'total_abonado',
         'id_comprobante_eps',
         'observaciones',
-        'nota_credito_referencia'
+        'nota_credito_referencia',
+        'id_campana'
     ];
     public $timestamps = true;
 

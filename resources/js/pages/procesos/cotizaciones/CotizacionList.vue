@@ -606,11 +606,9 @@ export default {
     },
     formatCorrelativo(ct) {
       let c = ct.toString().padStart(8, "0");
-      console.log(c, "PAD");
       return c;
     },
     async deleteRegConfirm(data) {
-      console.log(data, "Data");
     },
     async loadDetallesCotizacion(id_cotizacion) {
       const vm = this;
@@ -782,8 +780,6 @@ export default {
       this.getRegistros();
     },
     generatePDF() {
-      console.log(this.seleccionCotizaciones);
-
       const detalles = this.seleccionCotizaciones.map(
         (e) => e.id_cotizacion_detalle
       );
@@ -793,8 +789,6 @@ export default {
 
       this.cotizacionesDialog = false;
       window.open(pdfURL, "Cotizacion", "width=500,height=600");
-
-      console.log(pdfURL, detalles);
     },
   },
   watch: {

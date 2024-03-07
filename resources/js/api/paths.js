@@ -181,6 +181,7 @@ const PATHS = {
   comprobantes: {
     ROOT: "api/comprobantes",
     SET: "api/comprobantes/",
+    ANULAR: "api/comprobantes/anular/"
   },
   egresos: {
     ROOT: "api/egresos",
@@ -256,6 +257,12 @@ const PATHS = {
   eps: {
     ROOT: "api/eps",
   },
+  campaigns: {
+    ROOT: 'api/campaigns',
+    SET: 'api/campaigns/',
+    COMBO: 'api/combo/campaigns',
+    FACTURAR: 'api/campaigns/facturar',
+  }
 };
 
 export default PATHS;
