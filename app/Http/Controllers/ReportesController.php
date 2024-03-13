@@ -8,6 +8,7 @@ use App\Models\Encuesta;
 use App\Models\OrdenLaboratorio;
 use App\Models\Productos;
 use App\Models\Servicio;
+use App\Models\Clinicas;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -309,4 +310,8 @@ class ReportesController extends Controller
         return Excel::download( new DeudasPendientesExport(), $fileName);
     }
 
+    public function clinicasReferentes(Request $request){
+        $data = Clinicas::where("id",">",0)->with(['nombre_clinica', 'telefono_clinica', 'email_clinica'])->paginate($request->perpage);
+        return response()->json($data);
+    }
 }

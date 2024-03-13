@@ -8,5 +8,10 @@ export default [
       path: "/reportes/deudas-comprobantes",
       name: "ReporteDeudas",
       component: () => import("@/pages/reportes/deudasComprobantes/deudasComprobantesPage.vue")
+    },
+    {
+      path: "/reportes/clinicas-referentes",
+      name: "ReporteClinicas",
+      component: () => import("@/pages/reportes/clinicasReferentes/ClinicasReferentesPage.vue")
     }
   ];

@@ -787,6 +787,9 @@ const API = {
     deudasPendientes(params) {
       return callAPI("get", PATHS.reportes.DEUDAS_PENDIENTES + params);
     },
+    clinicasReferentes(params) {
+      return callAPI("get", PATHS.reportes.CLINICAS_REFERENTES + params);
+    },
   },
 
   cuentas_cobrar: {

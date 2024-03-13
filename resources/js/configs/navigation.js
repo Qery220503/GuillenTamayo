@@ -141,6 +141,11 @@ export default {
               link: "/reportes/deudas-comprobantes",
               gate: "reporte_deudas_comprobantes"
             },
+            {
+              text: "Reporte de Clínicas",
+              link: "/reportes/clinicas-referentes",
+              gate: "reporte_clinicas_referentes"
+            },
           ]
         }
       ]

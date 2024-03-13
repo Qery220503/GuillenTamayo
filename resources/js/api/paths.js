@@ -241,6 +241,7 @@ const PATHS = {
   reportes: {
     CUADRO_GENERAL: "api/reportes/cuadro-general",
     DEUDAS_PENDIENTES: "api/reportes/deudas-pendientes",
+    CLINICAS_REFERENTES: "api/reportes/clinicas-referentes",
   },
 
   cuentas_cobrar: {
