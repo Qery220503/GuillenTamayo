@@ -18,17 +18,15 @@
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
                 filled
-                v-model="form.startDate"
-                label="Fecha de Inicio"
-                readonly
-                v-bind="attrs"
-                v-on="on"
+                label="Clinica"
+                v-model="filter.nombre_clinica"
+                type="text"
+                dense
+                class="mt-1"
+                hide-details
+                @input="getData()"
               ></v-text-field>
             </template>
-            <v-date-picker
-              v-model="form.startDate"
-              @input="menu1 = false"
-            ></v-date-picker>
           </v-menu>
         </v-col>
         <v-col cols="12" sm="5" md="5">
@@ -44,7 +42,7 @@
               <v-text-field
                 v-model="form.endDate"
                 filled
-                label="Fecha de Fin"
+                label="Mes"
                 readonly
                 v-bind="attrs"
                 v-on="on"
@@ -54,26 +52,6 @@
               v-model="form.endDate"
               @input="menu2 = false"
             ></v-date-picker>
-          </v-menu>
-        </v-col>
-        <v-col cols="12" sm="5" md="5">
-          <v-menu
-            v-model="menu3"
-            :close-on-content-click="false"
-            :nudge-right="40"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-on:keyup="searchingTerm(menu3)"
-                filled
-                label="Clinica"
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
-            </template>
           </v-menu>
         </v-col>
         <v-col cols="12" sm="1" md="1">
@@ -98,22 +76,81 @@
             </v-btn>
         </v-col>
       </v-row>
-    </v-card>
-
-    <v-card>
+      <v-row dense class="pa-2 align-center">
         <v-data-table
           light
           :headers="headers"
           :items="data_reg.data"
-          :hide-default-footer="true"
+          :page="current_page"
+          :items-per-page="itemsperpage"
+          :server-items-length="total_reg"
+          :options.sync="dataTabOptions"
           class="flex-grow-1 scroll-me"
           :footer-props="{
             itemsPerPageOptions: [25, 50, 100, 1000]
           }"
           :loading="loadingTable"
           loading-text="Cargando... Por favor, espere"
-        ></v-data-table>
-    </v-card>
+          @click:row="handleDataRowClick">
+          <template v-slot:[`item.estado_trabajo`]="{ item }">
+            <v-chip
+                small
+                v-if="item.estado_trabajo == 'REGISTRADO'"
+                class="ma-2"
+                color="primary">
+                REGISTRADO
+            </v-chip>
+            <v-chip
+                small
+                v-if="item.estado_trabajo == 'APROBADO'"
+                class="ma-2"
+                color="success">
+                APROBADO
+            </v-chip>
+            <v-chip
+                small
+                v-if="item.estado_trabajo == 'ENVIADO'"
+                class="ma-2"
+                color="success">
+                ENVIADO
+            </v-chip>
+            <v-chip
+                small
+                v-if="item.estado == 'RECHAZADO'"
+                class="ma-2"
+                color="error">
+                RECHAZADO
+            </v-chip>
+            <v-chip
+                small
+                v-if="item.estado_trabajo == 'ANULADO'"
+                class="ma-2">
+                ANULADO
+            </v-chip>
+            <v-chip
+                small
+                v-if="item.estado == 'OBSERVADO'"
+                class="ma-2"
+                color="error">
+                OBSERVADO
+            </v-chip>
+            <v-chip
+                small
+                v-if="item.estado == 'POR ANULAR'"
+                class="ma-2"
+                color="error">
+                POR ANULAR
+            </v-chip>
+          </template>
+          <template v-slot:[`item.fecha_cpe`]="{ item }">
+            <div class="one-line">
+              {{ item.fecha_cpe | formatDateGeneral }}
+            </div>
+          </template>
+        </v-data-table>
+      </v-row>
+      
+    </v-card>  
   </div>
 </template>
 <script>
@@ -132,7 +169,6 @@ export default {
       ],
       menu1: false,
       menu2: false,
-      menu3: false,
       date: null,
       form:{
         startDate: new Date().toISOString().substring(0,10),
@@ -152,11 +188,39 @@ export default {
             value: "nombre"
         },
         { text: "% Descuento", sortable: false, value: "porcen_dscto" },
-        { text: "Monto Total", sortable: false, value: "ganancia_bruta" },
+        { text: "Monto Total", sortable: false, value: "monto_total_venta" },
         { text: "Estado", sortable: false, value: "estado_trabajo" },
-        { text: "Ganancia Neta", sortable: false, value: "ganancia_bruta" },
         { text: "Doctor Ref.", sortable: false, value: "nombre_doctor" },
       ],
+      loadingTable: false,
+      current_page: 1,
+      itemsperpage: 25,
+      total_reg: 0,
+      dataTabOptions: {},
+      data_reg: [],
+      filter: {
+        searchTerm: "",
+        nombre_clinica: "",
+      },
+
+      addFormTitle: "Agregar Clínica",
+      dialogEditar: false,
+      validAddForm: false,
+      addDialog: false,
+      deleteDialog: false,
+      rules: {
+        required: UTILS.rules.required
+      },
+      activePicker: null,
+      date: null,
+      menu: false,
+
+      rules: {
+        required: UTILS.nRules.required,
+        dni: UTILS.nRules.min8,
+        only_numbers: UTILS.nRules.only_numbers,
+        email: UTILS.nRules.email
+      }
     };
   },
   created(){
@@ -172,15 +236,53 @@ export default {
     },
   },
   methods: {
-    async getData(page = 1, per_page = 25){
-      const response = await API.reportes.clinicasReferentes('?page=' + page +
-                                                        '&itemsPerPage=' + per_page + 
-                                                        '&begin=' + this.form.startDate +
-                                                        '&end=' + this.form.endDate);
-                                                        this.data_reg = response.data;
+    
+    async getRegistros(page = 1, per_page = 25, sortDesc = 0, sortBy = "") {
+      this.loadingTable = true;
+      this.data_reg = [];
+      const myParams = new URLSearchParams(this.filter).toString();
+      try {
+        const response = await API.clinicas.list(
+          "?page=" +
+            page +
+            "&itemsPerPage=" +
+            per_page +
+            "&sortDesc=" +
+            sortDesc +
+            "&sortBy=" +
+            sortBy +
+            "&searchTerm=" +
+            this.filter.searchTerm +
+            "&" +
+            myParams
+        );
+        this.data_reg = response.data;
+        this.current_page = response.data.current_page;
         this.total_reg = this.data_reg.total;
-
+        this.loadingTable = false;
+      } catch (e) {
+        this.loadingTable = false;
+        console.error(e);
+      }
+    },
+    async getData(page = 1, per_page = 25, sortDesc = 0, sortBy=""){
+      this.loadingTable = true;
+      this.data_reg = [];
+      const myParams = new URLSearchParams(this.filter).toString();
+      const response = await API.reportes.clinicasReferentes('?page=' + page +
+                                                        '&itemsPerPage=' + per_page +
+                                                        "&sortDesc=" + sortDesc +
+                                                        "&sortBy=" + sortBy +
+                                                        "&searchTerm=" + this.filter.searchTerm +
+                                                        "&" +myParams + 
+                                                        '&begin=' + this.form.startDate +
+                                                        '&end=' + this.form.endDate
+                                                        );
+        this.data_reg = response.data;
+        this.total_reg = this.data_reg.total;
         this.data_reg.data = response.data;
+        this.loadingTable = false;
+        this.current_page = response.data.current_page;
       console.log(response);
     },
     
@@ -193,17 +295,6 @@ export default {
     },
     async exportData(){
 
-    },
-    async searchingTerm(value) {
-      const response = await API.reportes.clinicasReferentes('?page=' + page +
-                                                        '&itemsPerPage=' + per_page + 
-                                                        '&begin=' + this.form.startDate +
-                                                        '&end=' + this.form.endDate);
-                                                        this.data_reg = response.data;
-        this.total_reg = this.data_reg.total;
-
-        this.data_reg.data = response.data;
-      console.log(response);
     },
   },
 };

@@ -328,7 +328,7 @@ class ReportesController extends Controller
             $monturas_consideradas = [];
             foreach($detalle_comp as $dcomp){
                 $nombre_clinica = "N/A";
-                $fecha_orden = "";
+                $fecha_cpe = $comp->fecha_emision;
                 $estado_comprobante = $comp->estado_comprobante->nombre_estado;
                 $nombre = "SIN CLIENTE";
                 $monto_total_venta = $comp->total;
@@ -337,6 +337,7 @@ class ReportesController extends Controller
                 $nombre_doctor = "N/A";
                 $nombre_convenio = "N/A";
                 $satisfaccion = "N/A";
+                $ganancia_bruta = 0;
                 
 
                 $flag_add = 0;
@@ -369,7 +370,7 @@ class ReportesController extends Controller
                     $flag_orden = 1;
                     $flag_add = 1;
                     $orden = OrdenLaboratorio::with(['montura', 'lente', 'estadoComprobante', 'usuario'])->where('id_orden_laboratorio', $comp->id_orden_lab)->first();
-                    $estado_trabajo = $orden->estadoComprobante['nombre_estados'];
+                    $estado_trabajo = $comp->estado_comprobante['nombre_estado'];
                     $factura_compra = "N/A";
                     if($orden->id_anamnesis != null){
                         $anam_datos = Anamnesis::where('id_anamnesis', $orden->id_anamnesis)
@@ -384,9 +385,8 @@ class ReportesController extends Controller
                 if($flag_add == 1){
                     $data[] = array(
                         "nombre_clinica" 	=> $nombre_clinica,
-                        "fecha_orden" => $fecha_orden,
+                        "fecha_cpe" => $fecha_cpe,
                         "nombre" => $nombre,
-                        "doc" => $doc,
                         "monto_total_venta" => $monto_total_venta,
                         "porcen_dscto" 		=> $porcen_dscto,
                         "estado_trabajo"	=> $estado_trabajo,
