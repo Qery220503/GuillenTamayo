@@ -214,6 +214,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     /* Reportes */
     Route::get('reportes/cuadro-general', [ReportesController::class, 'cuadroGeneral']);
     Route::get('reportes/deudas-pendientes', [ReportesController::class, 'deudasPendientes']);
-
+    Route::get('reportes/clinicas-referentes', [ReportesController::class, 'clinicasReferentes']);
     Route::get('eps', EpsController::class);
 });

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\AnamnesisEstadosHistorico;
 use App\Models\Anamnesis;
 use App\Models\Comprobante;
 use App\Models\Encuesta;
@@ -311,7 +311,92 @@ class ReportesController extends Controller
     }
 
     public function clinicasReferentes(Request $request){
-        $data = Clinicas::where("id",">",0)->with(['nombre_clinica', 'telefono_clinica', 'email_clinica'])->paginate($request->perpage);
-        return response()->json($data);
+        $start = new Carbon($request->begin);
+        $end = new Carbon($request->end);
+
+        $comprobantes = Comprobante::whereBetween('fecha_emision',[$start, $end])
+                            ->with(['serie', 'cliente', 'estado_comprobante', 'usuario'])
+                            ->orderBy('id_comprobante', 'DESC')
+                            ->get();
+        $data = [];
+
+        foreach($comprobantes as $comp){
+            $detalle_comp = DB::table('comprobantes_detalles')
+                            ->where('id_comprobante', $comp->id_comprobante)
+                            ->get();
+            $flag_orden = 0;
+            $monturas_consideradas = [];
+            foreach($detalle_comp as $dcomp){
+                $nombre_clinica = "N/A";
+                $fecha_orden = "";
+                $estado_comprobante = $comp->estado_comprobante->nombre_estado;
+                $nombre = "SIN CLIENTE";
+                $monto_total_venta = $comp->total;
+                $porcen_dscto = $comp->dscto_porcentaje;
+                $estado_trabajo = "N/A";
+                $nombre_doctor = "N/A";
+                $nombre_convenio = "N/A";
+                $satisfaccion = "N/A";
+                
+
+                $flag_add = 0;
+
+
+                if($comp->id_cliente){
+                    $nombre = $comp->cliente['nombre_razon_social'];
+                }
+
+                if($comp->id_orden_lab != null){
+                    $encuesta = Encuesta::where('id_comprobante', $comp->id_comprobante)->first();
+                    if(isset($encuesta->nivel_satisfaccion)){
+                        if($encuesta->nivel_satisfaccion == 1){
+                            $satisfaccion = "Muy Mala";
+                        }else if($encuesta->nivel_satisfaccion == 2){
+                            $satisfaccion = "Mala";
+                        }else if($encuesta->nivel_satisfaccion == 3){
+                            $satisfaccion = "Regular";
+                        }else if($encuesta->nivel_satisfaccion == 4){
+                            $satisfaccion = "Buena";
+                        }else if($encuesta->nivel_satisfaccion == 5){
+                            $satisfaccion = "Muy Buena";
+                        }
+                    }
+                }else{
+                    $satisfaccion = "N/A";
+                }
+
+                if($comp->id_orden_lab != null && $flag_orden == 0){
+                    $flag_orden = 1;
+                    $flag_add = 1;
+                    $orden = OrdenLaboratorio::with(['montura', 'lente', 'estadoComprobante', 'usuario'])->where('id_orden_laboratorio', $comp->id_orden_lab)->first();
+                    $estado_trabajo = $orden->estadoComprobante['nombre_estados'];
+                    $factura_compra = "N/A";
+                    if($orden->id_anamnesis != null){
+                        $anam_datos = Anamnesis::where('id_anamnesis', $orden->id_anamnesis)
+                                        ->with(['clinica', 'doctor', 'empresa'])
+                                        ->first();
+                        $nombre_clinica = ($anam_datos->id_clinica == 0 || $anam_datos->id_clinica == null) ? "Ninguna" : $anam_datos->clinica['nombre_clinica'];
+                        $nombre_doctor = ($anam_datos->id_doctor == 0 || $anam_datos->id_doctor == null) ? "Ninguno" : $anam_datos->doctor['nombres'];
+                        $nombre_convenio = ($anam_datos->id_empresa_convenio == 0 || $anam_datos->id_empresa_convenio == null) ? "Ninguno" : "";//$anam_datos->empresa['nombre_empresa'];
+                    }
+
+                }
+                if($flag_add == 1){
+                    $data[] = array(
+                        "nombre_clinica" 	=> $nombre_clinica,
+                        "fecha_orden" => $fecha_orden,
+                        "nombre" => $nombre,
+                        "doc" => $doc,
+                        "monto_total_venta" => $monto_total_venta,
+                        "porcen_dscto" 		=> $porcen_dscto,
+                        "estado_trabajo"	=> $estado_trabajo,
+                        "nombre_doctor" 	=> $nombre_doctor,
+                        "nombre_convenio" 	=> $nombre_convenio,
+                        "satisfaccion"		=> $satisfaccion,
+                    );
+                }
+            }
+        }
+        return response()->json($data); 
     }
 }

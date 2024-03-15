@@ -56,6 +56,26 @@
             ></v-date-picker>
           </v-menu>
         </v-col>
+        <v-col cols="12" sm="5" md="5">
+          <v-menu
+            v-model="menu3"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            offset-y
+            min-width="auto"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-on:keyup="searchingTerm(menu3)"
+                filled
+                label="Clinica"
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+          </v-menu>
+        </v-col>
         <v-col cols="12" sm="1" md="1">
             <v-btn color="success" @click="getData()">
                 <v-icon dark>mdi-filter</v-icon>
@@ -66,7 +86,7 @@
             </v-btn>
             <v-btn color="secondary"
             :href="
-              '/api/exportCuadroGeneral' +
+              '/api/exportClinicasReferentes' +
                 '?begin=' +
                 form.startDate +
                 '&end=' +
@@ -112,6 +132,7 @@ export default {
       ],
       menu1: false,
       menu2: false,
+      menu3: false,
       date: null,
       form:{
         startDate: new Date().toISOString().substring(0,10),
@@ -123,38 +144,17 @@ export default {
       total_reg: 0,
       dataTabOptions: {},
       headers: [
+        { text: "Clinica Ref.", sortable: false, value: "nombre_clinica" },
         { text: "Fecha", sortable: false, value: "fecha_cpe"},
-        { text: "Comprobante", sortable: false, value: "cpe" },
         {
             text: "Cliente",
             sortable: false,
             value: "nombre"
         },
-        { text: "Nro. Documento", sortable: false, value: "doc" },
-        { text: "Telefono", sortable: false, value: "telefono" },
-        { text: "Correo", sortable: false, value: "correo" },
-        { text: "Servicio", sortable: false, value: "nombre_servicio" },
-        { text: "Montura", sortable: false, value: "montura" },
-        { text: "Tipo M.", sortable: false, value: "tipo_montura" },
-        { text: "Precio M.", sortable: false, value: "precio_montura" },
-        { text: "Diseño", sortable: false, value: "disenio_lentes" },
-        { text: "AR", sortable: false, value: "tratamiento" },
-        { text: "Fotosensible", sortable: false, value: "fotocroma_lentes" },
-        { text: "Fabricacion", sortable: false, value: "fabricacion_lentes" },
-        { text: "Medida", sortable: false, value: "medida" },
-        { text: "Cant. Lentes.", sortable: false, value: "cantidad_lentes" },
-        { text: "Precio L.", sortable: false, value: "precio_lentes" },
-        { text: "Proveedor L.", sortable: false, value: "proveedor_lentes" },
-        { text: "Factura L.", sortable: false, value: "comprobante_compra" },
-        { text: "Fec. Entrega", sortable: false, value: "fecha_entrega" },
-        { text: "Fec. Entregado", sortable: false, value: "fecha_entregado" },
         { text: "% Descuento", sortable: false, value: "porcen_dscto" },
         { text: "Monto Total", sortable: false, value: "ganancia_bruta" },
         { text: "Estado", sortable: false, value: "estado_trabajo" },
-        { text: "Costo L.", sortable: false, value: "compra_laboratorio" },
-        { text: "Costo Montura.", sortable: false, value: "compra_montura" },
         { text: "Ganancia Neta", sortable: false, value: "ganancia_bruta" },
-        { text: "Clinica Ref.", sortable: false, value: "nombre_clinica" },
         { text: "Doctor Ref.", sortable: false, value: "nombre_doctor" },
       ],
     };
@@ -173,12 +173,11 @@ export default {
   },
   methods: {
     async getData(page = 1, per_page = 25){
-      const response = await API.reportes.cuadroGeneral('?page=' + page +
+      const response = await API.reportes.clinicasReferentes('?page=' + page +
                                                         '&itemsPerPage=' + per_page + 
                                                         '&begin=' + this.form.startDate +
                                                         '&end=' + this.form.endDate);
                                                         this.data_reg = response.data;
-        //this.current_page = response.data.current_page;
         this.total_reg = this.data_reg.total;
 
         this.data_reg.data = response.data;
@@ -194,7 +193,18 @@ export default {
     },
     async exportData(){
 
-    }
+    },
+    async searchingTerm(value) {
+      const response = await API.reportes.clinicasReferentes('?page=' + page +
+                                                        '&itemsPerPage=' + per_page + 
+                                                        '&begin=' + this.form.startDate +
+                                                        '&end=' + this.form.endDate);
+                                                        this.data_reg = response.data;
+        this.total_reg = this.data_reg.total;
+
+        this.data_reg.data = response.data;
+      console.log(response);
+    },
   },
 };
 </script>
